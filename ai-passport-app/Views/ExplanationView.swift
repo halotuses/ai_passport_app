@@ -55,23 +55,7 @@ struct ExplanationView: View {
                     .font(.body)
                     .multilineTextAlignment(.leading)
                 
-                Spacer(minLength: 24)
-                
-                // MARK: - 次の問題 or 結果表示ボタン
-                Button(action: {
-
-                    if hasNextQuestion {
-                        onNextQuestion()
-                    } else {
-                        onShowResult()
-                    }
-                }) {
-                    Text(hasNextQuestion ? "次の問題へ" : "結果表示")
-                        .frame(maxWidth: .infinity)
-                        .padding()
-                        .background(Color.accentColor.opacity(0.2))
-                        .cornerRadius(12)
-                }
+                Spacer(minLength: 80) // 下のボタン分の余白
             }
             .padding()
         }
@@ -79,6 +63,25 @@ struct ExplanationView: View {
         .navigationBarTitleDisplayMode(.inline)
         .onChange(of: mainViewState.navigationResetToken) { _ in
             onDismiss()
+        }
+
+        // ✅ 常に画面下部にボタンを固定
+        .safeAreaInset(edge: .bottom) {
+            Button(action: {
+                if hasNextQuestion {
+                    onNextQuestion()
+                } else {
+                    onShowResult()
+                }
+            }) {
+                Text(hasNextQuestion ? "次の問題へ" : "結果表示")
+                    .frame(maxWidth: .infinity)
+                    .padding()
+                    .background(Color.blue.opacity(0.2))
+                    .cornerRadius(12)
+                    .padding(.horizontal)
+                    .padding(.bottom, 8)
+            }
         }
     }
 }

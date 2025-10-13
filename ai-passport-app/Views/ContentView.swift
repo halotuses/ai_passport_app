@@ -4,71 +4,40 @@
 //
 
 import SwiftUI
-
 struct ContentView: View {
     let chapter: ChapterMetadata
     @ObservedObject var viewModel: QuizViewModel
     let onQuizEnd: () -> Void
-    
+
     @EnvironmentObject private var mainViewState: MainViewState
-    
-    @State private var goExplanation = false
+
+    @State private var showExplanation = false
     @State private var explanationQuiz: Quiz?
     @State private var explanationSelectedAnswerIndex: Int = 0
     @State private var hasLoaded = false
-    
-    
+
     var body: some View {
         VStack(spacing: 0) {
-            
-            // MARK: - ExplanationView 遷移リンク
-            NavigationLink(isActive: $goExplanation) {
-                if let quiz = explanationQuiz {
-                    ExplanationView(
-                        quiz: quiz,
-                        selectedAnswerIndex: explanationSelectedAnswerIndex,
-                        hasNextQuestion: viewModel.hasNextQuestion,
-                        
-                        onNextQuestion: {
-                            proceedToNextQuestion()
-                        },
-                        onShowResult: {
-                            finishQuiz()
-                        },
-                        onDismiss: {
-                            closeExplanation()
-                            
-                        }
-                    )
-                } else {
-                    EmptyView()
-                }
-            } label: {
-                EmptyView()
-            }
-            .hidden()
-            
+
             // MARK: - ロード状態
             if !viewModel.isLoaded {
                 ProgressView("読み込み中...")
                     .padding()
             }
-            
-            
-            
+
             // MARK: - エラーまたはデータ無し
             else if viewModel.hasError || viewModel.quizzes.isEmpty {
                 VStack(spacing: 12) {
                     Text("問題データが見つかりませんでした。")
                         .foregroundColor(.secondary)
-                    
+
                     Button("前に戻る") {
                         onQuizEnd()
                     }
                 }
                 .padding()
             }
-            
+
             // MARK: - クイズ完了
             else if viewModel.isFinished {
                 ResultView(
@@ -77,28 +46,25 @@ struct ContentView: View {
                     onRestart: onQuizEnd
                 )
             }
-            
+
             // MARK: - 問題画面
             else {
-                
                 VStack(spacing: 0) {
                     QuestionView(viewModel: viewModel)
                         .padding(.top, 12)
-                    
-                    
+
                     Spacer(minLength: 0)
-                    
-                    
+
                     Divider()
                         .padding(.top, 12)
-                    
+
                     AnswerAreaView(
                         choices: viewModel.currentQuiz?.choices ?? [],
                         selectAction: { selectedIndex in
                             viewModel.recordAnswer(selectedIndex: selectedIndex)
                             explanationQuiz = viewModel.currentQuiz
                             explanationSelectedAnswerIndex = selectedIndex
-                            goExplanation = true
+                            showExplanation = true
                         }
                     )
                     .padding(.top, 12)
@@ -108,7 +74,24 @@ struct ContentView: View {
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        
+        .sheet(isPresented: $showExplanation) {
+            if let quiz = explanationQuiz {
+                ExplanationView(
+                    quiz: quiz,
+                    selectedAnswerIndex: explanationSelectedAnswerIndex,
+                    hasNextQuestion: viewModel.hasNextQuestion,
+                    onNextQuestion: {
+                        proceedToNextQuestion()
+                    },
+                    onShowResult: {
+                        finishQuiz()
+                    },
+                    onDismiss: {
+                        closeExplanation()
+                    }
+                )
+            }
+        }
         .onAppear {
             guard !hasLoaded else { return }
             loadQuizzes()
@@ -117,14 +100,6 @@ struct ContentView: View {
         .onChange(of: chapter.id) { _ in
             loadQuizzes()
         }
-        
-        
-        .onChange(of: mainViewState.navigationResetToken) { _ in
-            goExplanation = false
-            explanationQuiz = nil
-            viewModel.reset()
-        }
-        
     }
 }
 
@@ -135,7 +110,7 @@ private extension ContentView {
         viewModel.chapterId = chapter.id
         viewModel.fetchQuizzes(from: chapterFilePath)
     }
-    
+
     func extractUnitIdentifier(from path: String) -> String {
         let components = path.split(separator: "/")
         if let unitComponent = components.first(where: { $0.hasPrefix("unit") }) {
@@ -143,29 +118,21 @@ private extension ContentView {
         }
         return ""
     }
-    
+
     func closeExplanation() {
-        withAnimation {
-            goExplanation = false
-        }
+        showExplanation = false
         explanationQuiz = nil
         explanationSelectedAnswerIndex = 0
     }
 
     func proceedToNextQuestion() {
-        closeExplanation()
+        viewModel.moveNext()
         viewModel.selectedAnswerIndex = nil
-        
-        DispatchQueue.main.async {
-            viewModel.moveNext()
-        }
+        closeExplanation()
     }
 
     func finishQuiz() {
+        viewModel.finishQuiz()
         closeExplanation()
-
-        DispatchQueue.main.async {
-            viewModel.finishQuiz()
-        }
     }
 }
