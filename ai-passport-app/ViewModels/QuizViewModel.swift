@@ -32,7 +32,6 @@ class QuizViewModel: ObservableObject {
         selectedAnswerIndex = nil
         selectedAnswers = []
         showResultView = false
-        
         // ✅ URL生成ロジックを安全化
         var normalizedPath = chapterFilePath
         if normalizedPath.hasPrefix("/") {
@@ -45,11 +44,6 @@ class QuizViewModel: ObservableObject {
         
         let fullURL = Constants.url(normalizedPath)
         
-#if DEBUG
-        print("📡 fetchQuizzes called with path: \(chapterFilePath)")
-        print("🌐 fullURL resolved as: \(fullURL)")
-#endif
-        
         NetworkManager.fetchQuizList(from: fullURL) { [weak self] result in
             guard let self else { return }
             
@@ -60,9 +54,7 @@ class QuizViewModel: ObservableObject {
                 self.selectedAnswerIndex = nil
                 self.isLoaded = true
                 self.hasError = false
-#if DEBUG
-                print("✅ Loaded \(qs.count) quizzes successfully.")
-#endif
+                
             } else {
                 self.quizzes = []
                 self.selectedAnswers = []
@@ -70,9 +62,7 @@ class QuizViewModel: ObservableObject {
                 self.selectedAnswerIndex = nil
                 self.isLoaded = true
                 self.hasError = true
-#if DEBUG
-                print("⚠️ Failed to load quizzes or quiz list is empty.")
-#endif
+                
             }
         }
     }
