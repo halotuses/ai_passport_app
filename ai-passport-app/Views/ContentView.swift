@@ -26,14 +26,14 @@ struct ContentView: View {
                         quiz: quiz,
                         selectedAnswerIndex: viewModel.selectedAnswerIndex ?? 0,
                         hasNextQuestion: viewModel.hasNextQuestion,
-                        
-                        onNext: {
-                            
+
+                        onNextQuestion: {
                             viewModel.moveNext()
+                        },
+                        onDismiss: {
                             withAnimation {
                                 goExplanation = false
                             }
-                            
                         }
                     )
                 } else {
