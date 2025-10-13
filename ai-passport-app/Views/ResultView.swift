@@ -38,6 +38,8 @@ struct ResultView: View {
         }
         .padding(.top, 20)
         .navigationBarBackButtonHidden(true)
+        .navigationTitle("結果")
+        .navigationBarTitleDisplayMode(.inline)
     }
 
     private var resultMessage: String {

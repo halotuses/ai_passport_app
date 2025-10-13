@@ -28,12 +28,13 @@ struct ContentView: View {
                         hasNextQuestion: viewModel.hasNextQuestion,
                         
                         onNextQuestion: {
-                            viewModel.moveNext()
+                            proceedToNextQuestion()
+                        },
+                        onShowResult: {
+                            finishQuiz()
                         },
                         onDismiss: {
-                            withAnimation {
-                                goExplanation = false
-                            }
+                            closeExplanation()
                             
                         }
                     )
@@ -136,5 +137,27 @@ private extension ContentView {
             return String(unitComponent)
         }
         return ""
+    }
+    
+    func closeExplanation() {
+        withAnimation {
+            goExplanation = false
+        }
+    }
+
+    func proceedToNextQuestion() {
+        closeExplanation()
+
+        DispatchQueue.main.async {
+            viewModel.moveNext()
+        }
+    }
+
+    func finishQuiz() {
+        closeExplanation()
+
+        DispatchQueue.main.async {
+            viewModel.finishQuiz()
+        }
     }
 }

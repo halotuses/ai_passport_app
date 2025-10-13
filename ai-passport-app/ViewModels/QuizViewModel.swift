@@ -107,15 +107,17 @@ class QuizViewModel: ObservableObject {
         
         if currentQuestionIndex < quizzes.count - 1 {
             currentQuestionIndex += 1
+            selectedAnswerIndex = nil
         } else {
             // ✅ 最後の問題を終えたら結果画面へ
-            showResult()
+            finishQuiz()
         }
-        
-        selectedAnswerIndex = nil
     }
     
-    func showResult() {
+    func finishQuiz() {
+        guard hasQuizzes else { return }
+        currentQuestionIndex = quizzes.count
+        selectedAnswerIndex = nil
         showResultView = true
     }
     

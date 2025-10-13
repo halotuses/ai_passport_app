@@ -6,6 +6,7 @@ struct ExplanationView: View {
     let selectedAnswerIndex: Int
     let hasNextQuestion: Bool
     let onNextQuestion: () -> Void
+    let onShowResult: () -> Void
     let onDismiss: () -> Void
     @EnvironmentObject private var mainViewState: MainViewState
     
@@ -58,18 +59,10 @@ struct ExplanationView: View {
                 
                 // MARK: - 次の問題 or 結果表示ボタン
                 Button(action: {
-                    // ① まず解説画面を閉じる
-                    onDismiss()
-                    
-                    // ② 少し遅延して、次の処理を行う
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
-                        if hasNextQuestion {
-                            // 次の問題へ進む
-                            onNextQuestion()
-                        } else {
-                            // 結果画面へ遷移
-                            mainViewState.showResult()
-                        }
+                    if hasNextQuestion {
+                        onNextQuestion()
+                    } else {
+                        onShowResult()
                     }
                 }) {
                     Text(hasNextQuestion ? "次の問題へ" : "結果表示")
