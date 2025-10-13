@@ -7,9 +7,8 @@ struct ExplanationView: View {
     let hasNextQuestion: Bool
     let onNextQuestion: () -> Void
     let onDismiss: () -> Void
-    
     @EnvironmentObject private var mainViewState: MainViewState
-    
+    @State private var shouldAdvanceToNextQuestion = false
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 16) {
@@ -59,8 +58,8 @@ struct ExplanationView: View {
                 
                 // MARK: 次の問題へ
                 Button(action: {
+                    shouldAdvanceToNextQuestion = true
                     onDismiss()
-                    onNextQuestion()
                     
                 }) {
                     
@@ -77,6 +76,15 @@ struct ExplanationView: View {
         .navigationBarTitleDisplayMode(.inline)
         .onChange(of: mainViewState.navigationResetToken) { _ in
             onDismiss()
+        }
+        .onAppear {
+            shouldAdvanceToNextQuestion = false
+        }
+        .onDisappear {
+            if shouldAdvanceToNextQuestion {
+                onNextQuestion()
+                shouldAdvanceToNextQuestion = false
+            }
         }
     }
 }
