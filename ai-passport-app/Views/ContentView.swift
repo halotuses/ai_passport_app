@@ -13,6 +13,8 @@ struct ContentView: View {
     @EnvironmentObject private var mainViewState: MainViewState
     
     @State private var goExplanation = false
+    @State private var explanationQuiz: Quiz?
+    @State private var explanationSelectedAnswerIndex: Int = 0
     @State private var hasLoaded = false
     
     
@@ -21,10 +23,10 @@ struct ContentView: View {
             
             // MARK: - ExplanationView 遷移リンク
             NavigationLink(isActive: $goExplanation) {
-                if let quiz = viewModel.currentQuiz {
+                if let quiz = explanationQuiz {
                     ExplanationView(
                         quiz: quiz,
-                        selectedAnswerIndex: viewModel.selectedAnswerIndex ?? 0,
+                        selectedAnswerIndex: explanationSelectedAnswerIndex,
                         hasNextQuestion: viewModel.hasNextQuestion,
                         
                         onNextQuestion: {
@@ -94,6 +96,8 @@ struct ContentView: View {
                         choices: viewModel.currentQuiz?.choices ?? [],
                         selectAction: { selectedIndex in
                             viewModel.recordAnswer(selectedIndex: selectedIndex)
+                            explanationQuiz = viewModel.currentQuiz
+                            explanationSelectedAnswerIndex = selectedIndex
                             goExplanation = true
                         }
                     )
@@ -117,6 +121,7 @@ struct ContentView: View {
         
         .onChange(of: mainViewState.navigationResetToken) { _ in
             goExplanation = false
+            explanationQuiz = nil
             viewModel.reset()
         }
         
@@ -143,11 +148,14 @@ private extension ContentView {
         withAnimation {
             goExplanation = false
         }
+        explanationQuiz = nil
+        explanationSelectedAnswerIndex = 0
     }
 
     func proceedToNextQuestion() {
         closeExplanation()
-
+        viewModel.selectedAnswerIndex = nil
+        
         DispatchQueue.main.async {
             viewModel.moveNext()
         }
