@@ -12,7 +12,7 @@ struct ContentView: View {
 
     @State private var goExplanation = false
     @State private var hasLoaded = false
-    @State private var shouldAdvanceToNextQuestion = false
+
 
     var body: some View {
         VStack(spacing: 0) {
@@ -25,8 +25,11 @@ struct ContentView: View {
                         selectedAnswerIndex: viewModel.selectedAnswerIndex ?? 0,
                         onNext: {
 
-                            shouldAdvanceToNextQuestion = true
+
                             goExplanation = false
+                            DispatchQueue.main.async {
+                                viewModel.moveNext()
+                            }
                         }
                     )
                 } else {
@@ -104,11 +107,7 @@ struct ContentView: View {
                            hasLoaded = true
                        }
                    }
-                   .onChange(of: goExplanation) { isExplanationActive in
-                       guard !isExplanationActive, shouldAdvanceToNextQuestion else { return }
-                       viewModel.moveNext()
-                       shouldAdvanceToNextQuestion = false
-                   }
+
 
                }
            }

@@ -67,12 +67,6 @@ class QuizViewModel: ObservableObject {
         }
     }
 
-    // MARK: - Answer
-    func selectAnswer(index: Int) {
-        selectedAnswerIndex = index
-    }
-
-
 
     func recordAnswer(selectedIndex: Int) {
         selectedAnswerIndex = selectedIndex

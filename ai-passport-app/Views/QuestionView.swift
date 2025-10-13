@@ -1,56 +1,59 @@
 import SwiftUI
 
-struct QuestionView: View {
-    // ✅ QuizViewModelを監視するObservableObjectとして受け取る
-    @ObservedObject var viewModel: QuizViewModel
 
-    var body: some View {
-        VStack(spacing: 20) {
+ struct QuestionView: View {
+     // ✅ QuizViewModelを監視するObservableObjectとして受け取る
+     @ObservedObject var viewModel: QuizViewModel
+ 
+     var body: some View {
+         VStack(spacing: 20) {
+ 
+             // MARK: - 問題ヘッダー
+             if let quiz = viewModel.currentQuiz {
+                 Text("第\(viewModel.currentQuestionIndex + 1)問")
+                     .font(.title2)
+                     .fontWeight(.bold)
+                     .padding(.top)
+ 
+                 Text(quiz.question)
+                     .font(.headline)
+                     .multilineTextAlignment(.leading)
+                     .padding(.horizontal)
+             }
+ 
+             // MARK: - 選択肢リスト
+             if let quiz = viewModel.currentQuiz {
+                 let choices = quiz.choices
+                 VStack(spacing: 10) {
+                     ForEach(Array(choices.enumerated()), id: \.offset) { index, choiceText in
 
-            // MARK: - 問題ヘッダー
-            if let quiz = viewModel.currentQuiz {
-                Text("第\(viewModel.currentQuestionIndex + 1)問")
-                    .font(.title2)
-                    .fontWeight(.bold)
-                    .padding(.top)
+                        HStack(spacing: 12) {
+                            Text(choiceLabel(for: index))
+                                .font(.headline)
+                                .fontWeight(.semibold)
+                                .foregroundColor(.orange)
 
-                Text(quiz.question)
-                    .font(.headline)
-                    .multilineTextAlignment(.leading)
-                    .padding(.horizontal)
-            }
+                            Text(choiceText)
+                                .font(.body)
+                                .multilineTextAlignment(.leading)
+                            Spacer()
+                         }
 
-            // MARK: - 選択肢リスト
-            if let quiz = viewModel.currentQuiz {
-                let choices = quiz.choices
-                VStack(spacing: 10) {
-                    ForEach(Array(choices.enumerated()), id: \.offset) { index, choiceText in
-                        Button(action: {
-                            // ✅ 選択肢が押されたときにviewModelのメソッドを呼び出す
-                            viewModel.selectAnswer(index: index)
-                        }) {
-                            HStack {
-                                Text(choiceText)
-                                    .font(.body)
-                                Spacer()
-                            }
-                            .padding()
-                            .frame(maxWidth: .infinity)
-                            .background(
-                                // ✅ 選択中の選択肢を青く表示
-                                viewModel.selectedAnswerIndex == index
-                                    ? Color.blue.opacity(0.3)
-                                    : Color.gray.opacity(0.1)
-                            )
-                            .cornerRadius(10)
-                        }
+                        .padding()
+                        .frame(maxWidth: .infinity)
+                        .background(Color.gray.opacity(0.1))
+                        .cornerRadius(10)
+                     }
+                 }
+                 .padding(.horizontal)
+             }
+ 
+ 
+         }
+     }
 
-                    }
-                }
-                .padding(.horizontal)
-            }
-
-
-        }
+    private func choiceLabel(for index: Int) -> String {
+        let labels = ["ア", "イ", "ウ", "エ"]
+        return index < labels.count ? labels[index] : "?"
     }
-}
+ }
