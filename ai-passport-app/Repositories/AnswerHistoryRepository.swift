@@ -2,6 +2,23 @@ import CoreData
 
 class AnswerHistoryRepository {
     private let viewContext = PersistenceController.shared.container.viewContext
+    
+    
+    enum IdentifierGenerator {
+
+        static func chapterNumericId(unitId: String, chapterId: String) -> Int {
+            let unitNumber = numericPart(from: unitId)
+            let chapterNumber = numericPart(from: chapterId)
+            return unitNumber * 1_000 + chapterNumber
+        }
+
+        private static func numericPart(from identifier: String) -> Int {
+            let digits = identifier.compactMap { $0.wholeNumberValue }
+            guard !digits.isEmpty else { return 0 }
+            return digits.reduce(0) { $0 * 10 + $1 }
+        }
+    }
+
 
     func saveOrUpdateAnswer(quizId: String, chapterId: Int, isCorrect: Bool) {
         let request: NSFetchRequest<AnswerHistory> = AnswerHistory.fetchRequest()

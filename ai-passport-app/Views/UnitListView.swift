@@ -5,13 +5,21 @@ struct UnitListView: View {
 
     @ObservedObject var viewModel: UnitListViewModel
     @Binding var selectedUnit: QuizMetadata?
+    @EnvironmentObject private var mainViewState: MainViewState
+    
+    
 
     var body: some View {
         ScrollView {
             VStack(spacing: 8) {
-                if let metadata = viewModel.metadata {
+                if viewModel.isLoading {
+                    ProgressView().padding()
+                } else if let metadata = viewModel.metadata {
                     ForEach(metadata.sorted(by: { $0.key < $1.key }), id: \.key) { key, unit in
-                        Button(action: { selectedUnit = unit }) {
+                        Button(action: {
+                            mainViewState.selectedUnitKey = key
+                            selectedUnit = unit
+                        }) {
                             unitRowView(key: key, unit: unit)
                         }
                     }
@@ -22,7 +30,7 @@ struct UnitListView: View {
             .padding()
         }
         .background(Color(red: 240/255, green: 255/255, blue: 240/255))
-        .onAppear { viewModel.fetchMetadata() }
+        .onAppear { viewModel.refreshIfNeeded() }
     }
 
     private func unitRowView(key: String, unit: QuizMetadata) -> some View {
