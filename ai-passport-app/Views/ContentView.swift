@@ -12,6 +12,7 @@ struct ContentView: View {
 
     @State private var goExplanation = false
     @State private var hasLoaded = false
+    @State private var shouldAdvanceToNextQuestion = false
 
     var body: some View {
         VStack(spacing: 0) {
@@ -23,7 +24,8 @@ struct ContentView: View {
                         quiz: quiz,
                         selectedAnswerIndex: viewModel.selectedAnswerIndex ?? 0,
                         onNext: {
-                            viewModel.moveNext()
+
+                            shouldAdvanceToNextQuestion = true
                             goExplanation = false
                         }
                     )
@@ -93,14 +95,20 @@ struct ContentView: View {
                          }
                      }
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
-                     .onAppear {
-                         if !hasLoaded {
-                             // ✅ 正しいS3階層に合わせて修正
-                             let chapterFilePath = "units/unit1/chapter1.json"
-                             viewModel.fetchQuizzes(from: chapterFilePath)
-                             hasLoaded = true
-                         }
-                     }
-             
-                 }
-             }
+
+                   .onAppear {
+                       if !hasLoaded {
+                           // ✅ 正しいS3階層に合わせて修正
+                           let chapterFilePath = "units/unit1/chapter1.json"
+                           viewModel.fetchQuizzes(from: chapterFilePath)
+                           hasLoaded = true
+                       }
+                   }
+                   .onChange(of: goExplanation) { isExplanationActive in
+                       guard !isExplanationActive, shouldAdvanceToNextQuestion else { return }
+                       viewModel.moveNext()
+                       shouldAdvanceToNextQuestion = false
+                   }
+
+               }
+           }
