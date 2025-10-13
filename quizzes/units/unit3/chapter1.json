@@ -1,0 +1,16 @@
+{
+  "questions": [
+    {
+      "question": "生成AIとは？",
+      "choices": ["AIの一種", "植物の名前", "SNSの略称", "食べ物"],
+      "answerIndex": 0,
+      "explanation": "生成AIとは、大量の学習データをもとに新しい文章や画像、音楽などを自動生成するAI技術です。ChatGPTや画像生成AIもこの分類に含まれます。"
+    },
+    {
+      "question": "スイフトUIは何のためのフレームワーク？",
+      "choices": ["Web開発", "iOS開発", "機械学習", "クラウド管理"],
+      "answerIndex": 1,
+      "explanation": "SwiftUIはAppleが提供するiOS/macOS向けの宣言的UIフレームワークで、コード量を大幅に削減できます。"
+    }
+  ]
+}

@@ -1,0 +1,787 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		0C30DD9A2DFF116F00F25D02 /* ai_passport_appApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C30DD992DFF116F00F25D02 /* ai_passport_appApp.swift */; };
+		0C30DD9C2DFF116F00F25D02 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C30DD9B2DFF116F00F25D02 /* ContentView.swift */; };
+		0C30DD9E2DFF117200F25D02 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0C30DD9D2DFF117200F25D02 /* Assets.xcassets */; };
+		0C30DDA12DFF117200F25D02 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0C30DDA02DFF117200F25D02 /* Preview Assets.xcassets */; };
+		0C30DDA62DFF117200F25D02 /* ai_passport_app.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 0C30DDA42DFF117200F25D02 /* ai_passport_app.xcdatamodeld */; };
+		0C30DDB02DFF117200F25D02 /* ai_passport_appTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C30DDAF2DFF117200F25D02 /* ai_passport_appTests.swift */; };
+		0C30DDBA2DFF117300F25D02 /* ai_passport_appUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C30DDB92DFF117300F25D02 /* ai_passport_appUITests.swift */; };
+		0C30DDBC2DFF117300F25D02 /* ai_passport_appUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C30DDBB2DFF117300F25D02 /* ai_passport_appUITestsLaunchTests.swift */; };
+		0C30DDD52DFF16FE00F25D02 /* AppFrameView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C30DDD42DFF16FE00F25D02 /* AppFrameView.swift */; };
+		0C30DDD72DFF183F00F25D02 /* NavigationRouter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C30DDD62DFF183F00F25D02 /* NavigationRouter.swift */; };
+		0C30DDD92DFF185400F25D02 /* MainRouterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C30DDD82DFF185400F25D02 /* MainRouterView.swift */; };
+		0C30DDDB2DFF1A7F00F25D02 /* UnitListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C30DDDA2DFF1A7F00F25D02 /* UnitListView.swift */; };
+		0C30DDDD2DFF1A8B00F25D02 /* ChapterListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C30DDDC2DFF1A8B00F25D02 /* ChapterListView.swift */; };
+		0C30DDDF2DFF1A9600F25D02 /* QuestionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C30DDDE2DFF1A9600F25D02 /* QuestionView.swift */; };
+		0C30DDE12DFF1AA000F25D02 /* ExplanationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C30DDE02DFF1AA000F25D02 /* ExplanationView.swift */; };
+		0C30DDE32DFF1AAA00F25D02 /* ResultView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C30DDE22DFF1AAA00F25D02 /* ResultView.swift */; };
+		0C30DDE52DFF1AB400F25D02 /* HeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C30DDE42DFF1AB400F25D02 /* HeaderView.swift */; };
+		0C30DDE72DFF1AC000F25D02 /* AnswerAreaView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C30DDE62DFF1AC000F25D02 /* AnswerAreaView.swift */; };
+		0C30DDE92DFF1AC900F25D02 /* BottomTabBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C30DDE82DFF1AC900F25D02 /* BottomTabBarView.swift */; };
+		0C30DDEB2DFF1B7A00F25D02 /* UnitListViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C30DDEA2DFF1B7A00F25D02 /* UnitListViewModel.swift */; };
+		0C30DDED2DFF1B8400F25D02 /* ChapterListViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C30DDEC2DFF1B8400F25D02 /* ChapterListViewModel.swift */; };
+		0C30DDEF2DFF1B8E00F25D02 /* QuizViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C30DDEE2DFF1B8E00F25D02 /* QuizViewModel.swift */; };
+		0C30DDF12DFF1C1D00F25D02 /* NetworkManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C30DDF02DFF1C1D00F25D02 /* NetworkManager.swift */; };
+		0C30DDF52DFF1C7100F25D02 /* AnswerHistoryRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C30DDF42DFF1C7100F25D02 /* AnswerHistoryRepository.swift */; };
+		0C30DDF72DFF1CD800F25D02 /* Quiz.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C30DDF62DFF1CD800F25D02 /* Quiz.swift */; };
+		0C30DDF92DFF1CE300F25D02 /* QuizMetadata.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C30DDF82DFF1CE300F25D02 /* QuizMetadata.swift */; };
+		0C30DDFB2DFF1CEF00F25D02 /* ChapterMetadata.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C30DDFA2DFF1CEF00F25D02 /* ChapterMetadata.swift */; };
+		0C30DDFD2DFF1CFB00F25D02 /* SelectedAnswer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C30DDFC2DFF1CFB00F25D02 /* SelectedAnswer.swift */; };
+		0C30DDFF2DFF1E9A00F25D02 /* PersistenceController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C30DDFE2DFF1E9A00F25D02 /* PersistenceController.swift */; };
+		0CCB45A02E89853900C41D03 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CCB459F2E89853900C41D03 /* Constants.swift */; };
+		0CCB45A22E8994E800C41D03 /* QuizList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CCB45A12E8994E800C41D03 /* QuizList.swift */; };
+		0CCB45A42E89951900C41D03 /* CapterList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CCB45A32E89951900C41D03 /* CapterList.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		0C30DDAC2DFF117200F25D02 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 0C30DD8E2DFF116F00F25D02 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 0C30DD952DFF116F00F25D02;
+			remoteInfo = "ai-passport-app";
+		};
+		0C30DDB62DFF117300F25D02 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 0C30DD8E2DFF116F00F25D02 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 0C30DD952DFF116F00F25D02;
+			remoteInfo = "ai-passport-app";
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		0C30DD962DFF116F00F25D02 /* ai-passport-app.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "ai-passport-app.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		0C30DD992DFF116F00F25D02 /* ai_passport_appApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ai_passport_appApp.swift; sourceTree = "<group>"; };
+		0C30DD9B2DFF116F00F25D02 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		0C30DD9D2DFF117200F25D02 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		0C30DDA02DFF117200F25D02 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		0C30DDA52DFF117200F25D02 /* ai_passport_app.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = ai_passport_app.xcdatamodel; sourceTree = "<group>"; };
+		0C30DDAB2DFF117200F25D02 /* ai-passport-appTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "ai-passport-appTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		0C30DDAF2DFF117200F25D02 /* ai_passport_appTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ai_passport_appTests.swift; sourceTree = "<group>"; };
+		0C30DDB52DFF117300F25D02 /* ai-passport-appUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "ai-passport-appUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		0C30DDB92DFF117300F25D02 /* ai_passport_appUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ai_passport_appUITests.swift; sourceTree = "<group>"; };
+		0C30DDBB2DFF117300F25D02 /* ai_passport_appUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ai_passport_appUITestsLaunchTests.swift; sourceTree = "<group>"; };
+		0C30DDD42DFF16FE00F25D02 /* AppFrameView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppFrameView.swift; sourceTree = "<group>"; };
+		0C30DDD62DFF183F00F25D02 /* NavigationRouter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationRouter.swift; sourceTree = "<group>"; };
+		0C30DDD82DFF185400F25D02 /* MainRouterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainRouterView.swift; sourceTree = "<group>"; };
+		0C30DDDA2DFF1A7F00F25D02 /* UnitListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UnitListView.swift; sourceTree = "<group>"; };
+		0C30DDDC2DFF1A8B00F25D02 /* ChapterListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChapterListView.swift; sourceTree = "<group>"; };
+		0C30DDDE2DFF1A9600F25D02 /* QuestionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuestionView.swift; sourceTree = "<group>"; };
+		0C30DDE02DFF1AA000F25D02 /* ExplanationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExplanationView.swift; sourceTree = "<group>"; };
+		0C30DDE22DFF1AAA00F25D02 /* ResultView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResultView.swift; sourceTree = "<group>"; };
+		0C30DDE42DFF1AB400F25D02 /* HeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeaderView.swift; sourceTree = "<group>"; };
+		0C30DDE62DFF1AC000F25D02 /* AnswerAreaView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnswerAreaView.swift; sourceTree = "<group>"; };
+		0C30DDE82DFF1AC900F25D02 /* BottomTabBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BottomTabBarView.swift; sourceTree = "<group>"; };
+		0C30DDEA2DFF1B7A00F25D02 /* UnitListViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UnitListViewModel.swift; sourceTree = "<group>"; };
+		0C30DDEC2DFF1B8400F25D02 /* ChapterListViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChapterListViewModel.swift; sourceTree = "<group>"; };
+		0C30DDEE2DFF1B8E00F25D02 /* QuizViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuizViewModel.swift; sourceTree = "<group>"; };
+		0C30DDF02DFF1C1D00F25D02 /* NetworkManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkManager.swift; sourceTree = "<group>"; };
+		0C30DDF42DFF1C7100F25D02 /* AnswerHistoryRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnswerHistoryRepository.swift; sourceTree = "<group>"; };
+		0C30DDF62DFF1CD800F25D02 /* Quiz.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Quiz.swift; sourceTree = "<group>"; };
+		0C30DDF82DFF1CE300F25D02 /* QuizMetadata.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuizMetadata.swift; sourceTree = "<group>"; };
+		0C30DDFA2DFF1CEF00F25D02 /* ChapterMetadata.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChapterMetadata.swift; sourceTree = "<group>"; };
+		0C30DDFC2DFF1CFB00F25D02 /* SelectedAnswer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectedAnswer.swift; sourceTree = "<group>"; };
+		0C30DDFE2DFF1E9A00F25D02 /* PersistenceController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersistenceController.swift; sourceTree = "<group>"; };
+		0CCB459F2E89853900C41D03 /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
+		0CCB45A12E8994E800C41D03 /* QuizList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuizList.swift; sourceTree = "<group>"; };
+		0CCB45A32E89951900C41D03 /* CapterList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CapterList.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		0C30DD932DFF116F00F25D02 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		0C30DDA82DFF117200F25D02 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		0C30DDB22DFF117300F25D02 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		0C30DD8D2DFF116F00F25D02 = {
+			isa = PBXGroup;
+			children = (
+				0C30DDA42DFF117200F25D02 /* ai_passport_app.xcdatamodeld */,
+				0C30DD982DFF116F00F25D02 /* ai-passport-app */,
+				0C30DDAE2DFF117200F25D02 /* ai-passport-appTests */,
+				0C30DDB82DFF117300F25D02 /* ai-passport-appUITests */,
+				0C30DD972DFF116F00F25D02 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		0C30DD972DFF116F00F25D02 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				0C30DD962DFF116F00F25D02 /* ai-passport-app.app */,
+				0C30DDAB2DFF117200F25D02 /* ai-passport-appTests.xctest */,
+				0C30DDB52DFF117300F25D02 /* ai-passport-appUITests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		0C30DD982DFF116F00F25D02 /* ai-passport-app */ = {
+			isa = PBXGroup;
+			children = (
+				0CCB459E2E89851D00C41D03 /* Services */,
+				0C30DDD32DFF145300F25D02 /* Resources */,
+				0C30DDD22DFF144500F25D02 /* Framework */,
+				0C30DDCF2DFF141A00F25D02 /* Navigation */,
+				0C30DDCE2DFF140C00F25D02 /* Views */,
+				0C30DDCD2DFF13FD00F25D02 /* ViewModels */,
+				0C30DDCB2DFF13E800F25D02 /* Core */,
+				0C30DDCA2DFF13D100F25D02 /* Repositories */,
+				0C30DDC82DFF13A200F25D02 /* Models */,
+				0C30DDC92DFF13B800F25D02 /* CoreDataModels */,
+				0C30DD9D2DFF117200F25D02 /* Assets.xcassets */,
+				0C30DD9F2DFF117200F25D02 /* Preview Content */,
+			);
+			path = "ai-passport-app";
+			sourceTree = "<group>";
+		};
+		0C30DD9F2DFF117200F25D02 /* Preview Content */ = {
+			isa = PBXGroup;
+			children = (
+				0C30DDA02DFF117200F25D02 /* Preview Assets.xcassets */,
+			);
+			path = "Preview Content";
+			sourceTree = "<group>";
+		};
+		0C30DDAE2DFF117200F25D02 /* ai-passport-appTests */ = {
+			isa = PBXGroup;
+			children = (
+				0C30DDAF2DFF117200F25D02 /* ai_passport_appTests.swift */,
+			);
+			path = "ai-passport-appTests";
+			sourceTree = "<group>";
+		};
+		0C30DDB82DFF117300F25D02 /* ai-passport-appUITests */ = {
+			isa = PBXGroup;
+			children = (
+				0C30DDB92DFF117300F25D02 /* ai_passport_appUITests.swift */,
+				0C30DDBB2DFF117300F25D02 /* ai_passport_appUITestsLaunchTests.swift */,
+			);
+			path = "ai-passport-appUITests";
+			sourceTree = "<group>";
+		};
+		0C30DDC82DFF13A200F25D02 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				0C30DDF62DFF1CD800F25D02 /* Quiz.swift */,
+				0C30DDF82DFF1CE300F25D02 /* QuizMetadata.swift */,
+				0C30DDFA2DFF1CEF00F25D02 /* ChapterMetadata.swift */,
+				0C30DDFC2DFF1CFB00F25D02 /* SelectedAnswer.swift */,
+				0CCB45A12E8994E800C41D03 /* QuizList.swift */,
+				0CCB45A32E89951900C41D03 /* CapterList.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		0C30DDC92DFF13B800F25D02 /* CoreDataModels */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = CoreDataModels;
+			sourceTree = "<group>";
+		};
+		0C30DDCA2DFF13D100F25D02 /* Repositories */ = {
+			isa = PBXGroup;
+			children = (
+				0C30DDF42DFF1C7100F25D02 /* AnswerHistoryRepository.swift */,
+			);
+			path = Repositories;
+			sourceTree = "<group>";
+		};
+		0C30DDCB2DFF13E800F25D02 /* Core */ = {
+			isa = PBXGroup;
+			children = (
+				0C30DDFE2DFF1E9A00F25D02 /* PersistenceController.swift */,
+			);
+			path = Core;
+			sourceTree = "<group>";
+		};
+		0C30DDCD2DFF13FD00F25D02 /* ViewModels */ = {
+			isa = PBXGroup;
+			children = (
+				0C30DDEA2DFF1B7A00F25D02 /* UnitListViewModel.swift */,
+				0C30DDEC2DFF1B8400F25D02 /* ChapterListViewModel.swift */,
+				0C30DDEE2DFF1B8E00F25D02 /* QuizViewModel.swift */,
+			);
+			path = ViewModels;
+			sourceTree = "<group>";
+		};
+		0C30DDCE2DFF140C00F25D02 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				0C30DD9B2DFF116F00F25D02 /* ContentView.swift */,
+				0C30DDDA2DFF1A7F00F25D02 /* UnitListView.swift */,
+				0C30DDDC2DFF1A8B00F25D02 /* ChapterListView.swift */,
+				0C30DDDE2DFF1A9600F25D02 /* QuestionView.swift */,
+				0C30DDE02DFF1AA000F25D02 /* ExplanationView.swift */,
+				0C30DDE22DFF1AAA00F25D02 /* ResultView.swift */,
+				0C30DDE42DFF1AB400F25D02 /* HeaderView.swift */,
+				0C30DDE62DFF1AC000F25D02 /* AnswerAreaView.swift */,
+				0C30DDE82DFF1AC900F25D02 /* BottomTabBarView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		0C30DDCF2DFF141A00F25D02 /* Navigation */ = {
+			isa = PBXGroup;
+			children = (
+				0C30DDD62DFF183F00F25D02 /* NavigationRouter.swift */,
+				0C30DDD82DFF185400F25D02 /* MainRouterView.swift */,
+			);
+			path = Navigation;
+			sourceTree = "<group>";
+		};
+		0C30DDD22DFF144500F25D02 /* Framework */ = {
+			isa = PBXGroup;
+			children = (
+				0C30DD992DFF116F00F25D02 /* ai_passport_appApp.swift */,
+				0C30DDD42DFF16FE00F25D02 /* AppFrameView.swift */,
+			);
+			path = Framework;
+			sourceTree = "<group>";
+		};
+		0C30DDD32DFF145300F25D02 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		0CCB459E2E89851D00C41D03 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				0C30DDF02DFF1C1D00F25D02 /* NetworkManager.swift */,
+				0CCB459F2E89853900C41D03 /* Constants.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		0C30DD952DFF116F00F25D02 /* ai-passport-app */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 0C30DDBF2DFF117300F25D02 /* Build configuration list for PBXNativeTarget "ai-passport-app" */;
+			buildPhases = (
+				0C30DD922DFF116F00F25D02 /* Sources */,
+				0C30DD932DFF116F00F25D02 /* Frameworks */,
+				0C30DD942DFF116F00F25D02 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "ai-passport-app";
+			productName = "ai-passport-app";
+			productReference = 0C30DD962DFF116F00F25D02 /* ai-passport-app.app */;
+			productType = "com.apple.product-type.application";
+		};
+		0C30DDAA2DFF117200F25D02 /* ai-passport-appTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 0C30DDC22DFF117300F25D02 /* Build configuration list for PBXNativeTarget "ai-passport-appTests" */;
+			buildPhases = (
+				0C30DDA72DFF117200F25D02 /* Sources */,
+				0C30DDA82DFF117200F25D02 /* Frameworks */,
+				0C30DDA92DFF117200F25D02 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				0C30DDAD2DFF117200F25D02 /* PBXTargetDependency */,
+			);
+			name = "ai-passport-appTests";
+			productName = "ai-passport-appTests";
+			productReference = 0C30DDAB2DFF117200F25D02 /* ai-passport-appTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		0C30DDB42DFF117300F25D02 /* ai-passport-appUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 0C30DDC52DFF117300F25D02 /* Build configuration list for PBXNativeTarget "ai-passport-appUITests" */;
+			buildPhases = (
+				0C30DDB12DFF117300F25D02 /* Sources */,
+				0C30DDB22DFF117300F25D02 /* Frameworks */,
+				0C30DDB32DFF117300F25D02 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				0C30DDB72DFF117300F25D02 /* PBXTargetDependency */,
+			);
+			name = "ai-passport-appUITests";
+			productName = "ai-passport-appUITests";
+			productReference = 0C30DDB52DFF117300F25D02 /* ai-passport-appUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		0C30DD8E2DFF116F00F25D02 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1520;
+				LastUpgradeCheck = 1520;
+				TargetAttributes = {
+					0C30DD952DFF116F00F25D02 = {
+						CreatedOnToolsVersion = 15.2;
+					};
+					0C30DDAA2DFF117200F25D02 = {
+						CreatedOnToolsVersion = 15.2;
+						TestTargetID = 0C30DD952DFF116F00F25D02;
+					};
+					0C30DDB42DFF117300F25D02 = {
+						CreatedOnToolsVersion = 15.2;
+						TestTargetID = 0C30DD952DFF116F00F25D02;
+					};
+				};
+			};
+			buildConfigurationList = 0C30DD912DFF116F00F25D02 /* Build configuration list for PBXProject "ai-passport-app" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 0C30DD8D2DFF116F00F25D02;
+			productRefGroup = 0C30DD972DFF116F00F25D02 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				0C30DD952DFF116F00F25D02 /* ai-passport-app */,
+				0C30DDAA2DFF117200F25D02 /* ai-passport-appTests */,
+				0C30DDB42DFF117300F25D02 /* ai-passport-appUITests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		0C30DD942DFF116F00F25D02 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				0C30DDA12DFF117200F25D02 /* Preview Assets.xcassets in Resources */,
+				0C30DD9E2DFF117200F25D02 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		0C30DDA92DFF117200F25D02 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		0C30DDB32DFF117300F25D02 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		0C30DD922DFF116F00F25D02 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				0CCB45A02E89853900C41D03 /* Constants.swift in Sources */,
+				0C30DDF12DFF1C1D00F25D02 /* NetworkManager.swift in Sources */,
+				0C30DDDF2DFF1A9600F25D02 /* QuestionView.swift in Sources */,
+				0C30DDED2DFF1B8400F25D02 /* ChapterListViewModel.swift in Sources */,
+				0CCB45A22E8994E800C41D03 /* QuizList.swift in Sources */,
+				0C30DDDD2DFF1A8B00F25D02 /* ChapterListView.swift in Sources */,
+				0C30DDEF2DFF1B8E00F25D02 /* QuizViewModel.swift in Sources */,
+				0C30DDF92DFF1CE300F25D02 /* QuizMetadata.swift in Sources */,
+				0C30DDE72DFF1AC000F25D02 /* AnswerAreaView.swift in Sources */,
+				0C30DDFB2DFF1CEF00F25D02 /* ChapterMetadata.swift in Sources */,
+				0C30DDA62DFF117200F25D02 /* ai_passport_app.xcdatamodeld in Sources */,
+				0C30DDD72DFF183F00F25D02 /* NavigationRouter.swift in Sources */,
+				0C30DDE32DFF1AAA00F25D02 /* ResultView.swift in Sources */,
+				0C30DDD52DFF16FE00F25D02 /* AppFrameView.swift in Sources */,
+				0C30DDDB2DFF1A7F00F25D02 /* UnitListView.swift in Sources */,
+				0CCB45A42E89951900C41D03 /* CapterList.swift in Sources */,
+				0C30DD9C2DFF116F00F25D02 /* ContentView.swift in Sources */,
+				0C30DDFD2DFF1CFB00F25D02 /* SelectedAnswer.swift in Sources */,
+				0C30DDEB2DFF1B7A00F25D02 /* UnitListViewModel.swift in Sources */,
+				0C30DD9A2DFF116F00F25D02 /* ai_passport_appApp.swift in Sources */,
+				0C30DDF52DFF1C7100F25D02 /* AnswerHistoryRepository.swift in Sources */,
+				0C30DDE12DFF1AA000F25D02 /* ExplanationView.swift in Sources */,
+				0C30DDE92DFF1AC900F25D02 /* BottomTabBarView.swift in Sources */,
+				0C30DDF72DFF1CD800F25D02 /* Quiz.swift in Sources */,
+				0C30DDD92DFF185400F25D02 /* MainRouterView.swift in Sources */,
+				0C30DDE52DFF1AB400F25D02 /* HeaderView.swift in Sources */,
+				0C30DDFF2DFF1E9A00F25D02 /* PersistenceController.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		0C30DDA72DFF117200F25D02 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				0C30DDB02DFF117200F25D02 /* ai_passport_appTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		0C30DDB12DFF117300F25D02 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				0C30DDBC2DFF117300F25D02 /* ai_passport_appUITestsLaunchTests.swift in Sources */,
+				0C30DDBA2DFF117300F25D02 /* ai_passport_appUITests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		0C30DDAD2DFF117200F25D02 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 0C30DD952DFF116F00F25D02 /* ai-passport-app */;
+			targetProxy = 0C30DDAC2DFF117200F25D02 /* PBXContainerItemProxy */;
+		};
+		0C30DDB72DFF117300F25D02 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 0C30DD952DFF116F00F25D02 /* ai-passport-app */;
+			targetProxy = 0C30DDB62DFF117300F25D02 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		0C30DDBD2DFF117300F25D02 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.2;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		0C30DDBE2DFF117300F25D02 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.2;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		0C30DDC02DFF117300F25D02 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"ai-passport-app/Preview Content\"";
+				DEVELOPMENT_TEAM = QS83MP74XK;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.example.ai-passport-app";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		0C30DDC12DFF117300F25D02 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"ai-passport-app/Preview Content\"";
+				DEVELOPMENT_TEAM = QS83MP74XK;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.example.ai-passport-app";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		0C30DDC32DFF117300F25D02 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = QS83MP74XK;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.2;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.example.ai-passport-appTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/ai-passport-app.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/ai-passport-app";
+			};
+			name = Debug;
+		};
+		0C30DDC42DFF117300F25D02 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = QS83MP74XK;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.2;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.example.ai-passport-appTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/ai-passport-app.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/ai-passport-app";
+			};
+			name = Release;
+		};
+		0C30DDC62DFF117300F25D02 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = QS83MP74XK;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.example.ai-passport-appUITests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = "ai-passport-app";
+			};
+			name = Debug;
+		};
+		0C30DDC72DFF117300F25D02 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = QS83MP74XK;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.example.ai-passport-appUITests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = "ai-passport-app";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		0C30DD912DFF116F00F25D02 /* Build configuration list for PBXProject "ai-passport-app" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				0C30DDBD2DFF117300F25D02 /* Debug */,
+				0C30DDBE2DFF117300F25D02 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		0C30DDBF2DFF117300F25D02 /* Build configuration list for PBXNativeTarget "ai-passport-app" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				0C30DDC02DFF117300F25D02 /* Debug */,
+				0C30DDC12DFF117300F25D02 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		0C30DDC22DFF117300F25D02 /* Build configuration list for PBXNativeTarget "ai-passport-appTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				0C30DDC32DFF117300F25D02 /* Debug */,
+				0C30DDC42DFF117300F25D02 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		0C30DDC52DFF117300F25D02 /* Build configuration list for PBXNativeTarget "ai-passport-appUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				0C30DDC62DFF117300F25D02 /* Debug */,
+				0C30DDC72DFF117300F25D02 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCVersionGroup section */
+		0C30DDA42DFF117200F25D02 /* ai_passport_app.xcdatamodeld */ = {
+			isa = XCVersionGroup;
+			children = (
+				0C30DDA52DFF117200F25D02 /* ai_passport_app.xcdatamodel */,
+			);
+			currentVersion = 0C30DDA52DFF117200F25D02 /* ai_passport_app.xcdatamodel */;
+			name = ai_passport_app.xcdatamodeld;
+			path = "ai-passport-app/ai_passport_app.xcdatamodeld";
+			sourceTree = "<group>";
+			versionGroupType = wrapper.xcdatamodel;
+		};
+/* End XCVersionGroup section */
+	};
+	rootObject = 0C30DD8E2DFF116F00F25D02 /* Project object */;
+}

@@ -1,0 +1,19 @@
+{
+  "chapters": [
+    {
+      "id": "chapter1",
+      "title": "chapter1",
+      "file": "quizzes/units/unit1/chapter1.json"
+    },
+    {
+      "id": "chapter2",
+      "title": "chapter2",
+      "file": "quizzes/units/unit1/chapter2.json"
+    },
+    {
+      "id": "chapter3",
+      "title": "chapter3",
+      "file": "quizzes/units/unit1/chapter3.json"
+    }
+  ]
+}

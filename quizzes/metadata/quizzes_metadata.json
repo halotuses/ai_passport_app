@@ -1,0 +1,23 @@
+{
+  "unit1": {
+    "version": "1.0",
+    "file": "quizzes/units/unit1/unit_chapters.json",
+    "title": "食欲をそそるもの",
+    "subtitle": "Whetting Your Appetite",
+    "total": 5
+  },
+  "unit2": {
+    "version": "1.0",
+    "file": "quizzes/units/unit2/unit_chapters.json",
+    "title": "Pythonインタープリタの使用",
+    "subtitle": "Using The Python Interpreter",
+    "total": 5
+  },
+  "unit3": {
+    "version": "1.0",
+    "file": "quizzes/units/unit3/unit_chapters.json",
+    "title": "変数と型",
+    "subtitle": "Variables and Data Types",
+    "total": 7
+  }
+}

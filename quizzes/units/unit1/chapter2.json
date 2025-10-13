@@ -1,0 +1,34 @@
+{
+  "questions": [
+    {
+      "question": "自然言語処理とは？",
+      "choices": ["文章や会話を扱うAI技術", "音楽を作るAI", "画像を生成するAI", "車を運転するAI"],
+      "answerIndex": 0,
+      "explanation": "自然言語処理（NLP）は、人間の言語（文章や会話）をコンピューターが理解・処理するためのAI技術です。\\n\\n翻訳、音声認識、要約、感情分析など多くの応用があります。"
+    },
+    {
+      "question": "プロンプトエンジニアリングとは？",
+      "choices": ["AIへの指示文の工夫", "AIの部品交換", "AIの電源管理", "AIのOS設定"],
+      "answerIndex": 0,
+      "explanation": "プロンプトエンジニアリングとは、AIに適切な回答を引き出すために入力する指示文（プロンプト）を工夫・最適化する技術です。\\n\\nChatGPTなど生成AIで特に重要となります。"
+    },
+    {
+      "question": "GPTの「T」は何の略？",
+      "choices": ["Transformer", "Transfer", "Turing", "Technology"],
+      "answerIndex": 0,
+      "explanation": "GPTの「T」は Transformer（トランスフォーマー）の略です。\\n\\nTransformerは自然言語処理で非常に効果的なAIモデルの構造です。"
+    },
+    {
+      "question": "AI生成画像のリスクは？",
+      "choices": ["著作権問題", "色覚異常", "高音障害", "電磁波障害"],
+      "answerIndex": 0,
+      "explanation": "AIが生成する画像には著作権問題や倫理的な課題が伴います。\\n\\n学習データが既存作品を含む場合、権利侵害リスクも生じます。"
+    },
+    {
+      "question": "LLMは何の略？",
+      "choices": ["Large Language Model", "Long Life Machine", "Light Learning Method", "Logical Line Map"],
+      "answerIndex": 0,
+      "explanation": "LLMは Large Language Model（大規模言語モデル）の略です。\\n\\n膨大なテキストデータを学習し、高度な自然言語処理が可能になります。"
+    }
+  ]
+}

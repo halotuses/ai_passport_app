@@ -1,0 +1,34 @@
+{
+  "questions": [
+    {
+      "question": "ChatGPTの開発企業は？",
+      "choices": ["OpenAI", "Google", "Meta", "Amazon"],
+      "answerIndex": 0,
+      "explanation": "ChatGPTはOpenAIによって開発されています。\\n\\nGPT-3やGPT-4などのモデル群を展開しています。"
+    },
+    {
+      "question": "Diffusionモデルは主に何を生成？",
+      "choices": ["画像", "音楽", "動画", "ロボット動作"],
+      "answerIndex": 0,
+      "explanation": "Diffusionモデルはノイズから画像を段階的に生成するAI技術です。\\n\\nStable Diffusionなどが代表例です。"
+    },
+    {
+      "question": "強化学習で用いるのは？",
+      "choices": ["報酬", "質問文", "画像ノイズ", "温度調整"],
+      "answerIndex": 0,
+      "explanation": "強化学習ではエージェントが行動し、報酬を得ることで最適な行動を学習します。\\n\\nロボット制御やゲームAIなどに応用されます。"
+    },
+    {
+      "question": "GPTの事前学習は？",
+      "choices": ["自己教師あり学習", "強化学習", "教師あり学習", "教師なし学習"],
+      "answerIndex": 0,
+      "explanation": "GPTの事前学習は自己教師あり学習によって行われます。\\n\\n文脈予測を通じて大量のテキストを学習します。"
+    },
+    {
+      "question": "AI倫理問題の例は？",
+      "choices": ["偏見・差別リスク", "電波障害", "温暖化", "地震予測"],
+      "answerIndex": 0,
+      "explanation": "AIには学習データの偏りによる差別や偏見のリスクが存在します。\\n\\n倫理的な配慮が求められる重要な課題です。"
+    }
+  ]
+}
