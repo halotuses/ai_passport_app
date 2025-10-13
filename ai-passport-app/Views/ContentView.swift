@@ -10,6 +10,8 @@ struct ContentView: View {
     @ObservedObject var viewModel: QuizViewModel
     let onQuizEnd: () -> Void
     
+    @EnvironmentObject private var mainViewState: MainViewState
+    
     @State private var goExplanation = false
     @State private var hasLoaded = false
     
@@ -27,9 +29,10 @@ struct ContentView: View {
                         
                         onNext: {
                             
-                            
-                            goExplanation = false
                             viewModel.moveNext()
+                            withAnimation {
+                                goExplanation = false
+                            }
                             
                         }
                     )
@@ -108,7 +111,10 @@ struct ContentView: View {
                 hasLoaded = true
             }
         }
-        
+        .onChange(of: mainViewState.navigationResetToken) { _ in
+            goExplanation = false
+            viewModel.reset()
+        }
         
     }
 }
