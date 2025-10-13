@@ -8,14 +8,16 @@ import Foundation
 @MainActor
 class QuizViewModel: ObservableObject {
     
+    // MARK: - Published States
     @Published var quizzes: [Quiz] = []
     @Published var currentQuestionIndex: Int = 0
     @Published var selectedAnswerIndex: Int? = nil
     @Published var selectedAnswers: [Int?] = []
     @Published var isLoaded: Bool = false
     @Published var hasError: Bool = false
+    @Published var showResultView: Bool = false   // ✅ 結果画面表示フラグを追加
     
-    
+    // MARK: - Identifiers
     var unitId: String = ""
     var chapterId: String = ""
     
@@ -29,6 +31,7 @@ class QuizViewModel: ObservableObject {
         currentQuestionIndex = 0
         selectedAnswerIndex = nil
         selectedAnswers = []
+        showResultView = false
         
         // ✅ URL生成ロジックを安全化
         var normalizedPath = chapterFilePath
@@ -75,6 +78,7 @@ class QuizViewModel: ObservableObject {
     }
     
     
+    // MARK: - Answer Record
     func recordAnswer(selectedIndex: Int) {
         selectedAnswerIndex = selectedIndex
         
@@ -97,17 +101,22 @@ class QuizViewModel: ObservableObject {
         )
     }
     
+    // MARK: - Navigation
     func moveNext() {
         guard hasQuizzes else { return }
         
         if currentQuestionIndex < quizzes.count - 1 {
             currentQuestionIndex += 1
         } else {
-            currentQuestionIndex = quizzes.count
+            // ✅ 最後の問題を終えたら結果画面へ
+            showResult()
         }
         
         selectedAnswerIndex = nil
-        
+    }
+    
+    func showResult() {
+        showResultView = true
     }
     
     // MARK: - Computed
@@ -116,8 +125,6 @@ class QuizViewModel: ObservableObject {
     var hasNextQuestion: Bool {
         hasQuizzes && (currentQuestionIndex + 1) < quizzes.count
     }
-    
-    
     
     var isFinished: Bool {
         hasQuizzes && currentQuestionIndex >= quizzes.count
@@ -155,7 +162,6 @@ class QuizViewModel: ObservableObject {
         hasError = false
         chapterId = ""
         unitId = ""
-        
-        
+        showResultView = false
     }
 }

@@ -13,7 +13,7 @@ struct ExplanationView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 16) {
                 
-                // MARK: 正誤
+                // MARK: - 正誤表示
                 HStack {
                     Text(selectedAnswerIndex == quiz.answerIndex ? "正解 ✅" : "不正解 ❌")
                         .font(.headline)
@@ -25,13 +25,13 @@ struct ExplanationView: View {
                     Spacer()
                 }
                 
-                // MARK: 問題文
+                // MARK: - 問題文
                 Text(quiz.question)
                     .font(.title3)
                     .fontWeight(.bold)
                     .padding(.top, 4)
                 
-                // MARK: 選択肢と正解表示
+                // MARK: - 選択肢と正解表示
                 VStack(alignment: .leading, spacing: 6) {
                     ForEach(Array(quiz.choices.enumerated()), id: \.offset) { index, choice in
                         HStack {
@@ -49,20 +49,29 @@ struct ExplanationView: View {
                 
                 Divider()
                 
-                // MARK: 解説文
+                // MARK: - 解説文
                 Text(quiz.explanation ?? "解説はありません。")
                     .font(.body)
                     .multilineTextAlignment(.leading)
                 
                 Spacer(minLength: 24)
                 
-                // MARK: 次の問題へ
+                // MARK: - 次の問題 or 結果表示ボタン
                 Button(action: {
-                    onNextQuestion()
+                    // ① まず解説画面を閉じる
                     onDismiss()
                     
+                    // ② 少し遅延して、次の処理を行う
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
+                        if hasNextQuestion {
+                            // 次の問題へ進む
+                            onNextQuestion()
+                        } else {
+                            // 結果画面へ遷移
+                            mainViewState.showResult()
+                        }
+                    }
                 }) {
-                    
                     Text(hasNextQuestion ? "次の問題へ" : "結果表示")
                         .frame(maxWidth: .infinity)
                         .padding()
@@ -77,6 +86,5 @@ struct ExplanationView: View {
         .onChange(of: mainViewState.navigationResetToken) { _ in
             onDismiss()
         }
-        
     }
 }
