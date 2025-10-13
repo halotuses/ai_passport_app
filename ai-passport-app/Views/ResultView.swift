@@ -7,14 +7,6 @@ struct ResultView: View {
 
     var body: some View {
         VStack(spacing: 20) {
-            // ヘッダー
-            Text("学習アプリ")
-                .font(.title2)
-                .fontWeight(.bold)
-                .padding(.top, 20)
-                .foregroundColor(.black)
-                .frame(maxWidth: .infinity)
-                .background(Color(red: 0.8, green: 1.0, blue: 0.8))
 
             Spacer()
 
@@ -44,6 +36,7 @@ struct ResultView: View {
 
             Spacer()
         }
+        .padding(.top, 20)
         .navigationBarBackButtonHidden(true)
     }
 

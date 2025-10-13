@@ -41,52 +41,66 @@ struct ContentView: View {
                     .padding()
             }
 
-            // MARK: - エラーまたはデータ無し
-            else if viewModel.hasError || viewModel.quizzes.isEmpty {
-                VStack(spacing: 12) {
-                    Text("問題データが見つかりませんでした。")
-                        .foregroundColor(.secondary)
 
-                    Button("前に戻る") {
-                        onQuizEnd()
-                    }
-                }
-                .padding()
-            }
+             
+                         // MARK: - エラーまたはデータ無し
+                         else if viewModel.hasError || viewModel.quizzes.isEmpty {
+                             VStack(spacing: 12) {
+                                 Text("問題データが見つかりませんでした。")
+                                     .foregroundColor(.secondary)
+             
+                                 Button("前に戻る") {
+                                     onQuizEnd()
+                                 }
+                             }
+                             .padding()
+                         }
+             
+                         // MARK: - クイズ完了
+                         else if viewModel.isFinished {
+                             ResultView(
+                                 correctCount: viewModel.correctCount,
+                                 totalCount: viewModel.totalCount,
+                                 onRestart: onQuizEnd
+                             )
+                         }
+             
+                         // MARK: - 問題画面
+                         else {
 
-            // MARK: - クイズ完了
-            else if viewModel.isFinished {
-                ResultView(
-                    correctCount: viewModel.correctCount,
-                    totalCount: viewModel.totalCount,
-                    onRestart: onQuizEnd
-                )
-            }
+                            VStack(spacing: 0) {
+                                QuestionView(viewModel: viewModel)
+                                    .padding(.top, 12)
+             
 
-            // MARK: - 問題画面
-            else {
-                QuestionView(viewModel: viewModel)
+                                Spacer(minLength: 0)
+             
 
-                Divider()
-                    .padding(.vertical, 8)
-
-                AnswerAreaView(
-                    choices: viewModel.currentQuiz?.choices ?? [],
-                    selectAction: { selectedIndex in
-                        viewModel.recordAnswer(selectedIndex: selectedIndex)
-                        goExplanation = true
-                    }
-                )
-            }
-        }
-        .onAppear {
-            if !hasLoaded {
-                // ✅ 正しいS3階層に合わせて修正
-                let chapterFilePath = "units/unit1/chapter1.json"
-                viewModel.fetchQuizzes(from: chapterFilePath)
-                hasLoaded = true
-            }
-        }
-
-    }
-}
+                                Divider()
+                                    .padding(.top, 12)
+            
+                                AnswerAreaView(
+                                    choices: viewModel.currentQuiz?.choices ?? [],
+                                    selectAction: { selectedIndex in
+                                        viewModel.recordAnswer(selectedIndex: selectedIndex)
+                                        goExplanation = true
+                                    }
+                                )
+                                .padding(.top, 12)
+                                .padding(.bottom, 8)
+                            }
+                            .frame(maxWidth: .infinity, maxHeight: .infinity)
+                         }
+                     }
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                     .onAppear {
+                         if !hasLoaded {
+                             // ✅ 正しいS3階層に合わせて修正
+                             let chapterFilePath = "units/unit1/chapter1.json"
+                             viewModel.fetchQuizzes(from: chapterFilePath)
+                             hasLoaded = true
+                         }
+                     }
+             
+                 }
+             }

@@ -14,7 +14,7 @@ class QuizViewModel: ObservableObject {
     @Published var selectedAnswers: [Int?] = []
     @Published var isLoaded: Bool = false
     @Published var hasError: Bool = false
-    @Published var isSubmitted: Bool = false
+
 
     var unitId: String = ""
     var chapterId: String = ""
@@ -72,10 +72,7 @@ class QuizViewModel: ObservableObject {
         selectedAnswerIndex = index
     }
 
-    func submitAnswer() {
-        guard currentQuestionIndex < quizzes.count else { return }
-        isSubmitted = true
-    }
+
 
     func recordAnswer(selectedIndex: Int) {
         selectedAnswerIndex = selectedIndex
@@ -102,7 +99,7 @@ class QuizViewModel: ObservableObject {
     func moveNext() {
         currentQuestionIndex += 1
         selectedAnswerIndex = nil
-        isSubmitted = false
+
     }
 
     // MARK: - Computed
@@ -142,6 +139,6 @@ class QuizViewModel: ObservableObject {
         selectedAnswers = Array(repeating: nil, count: quizzes.count)
         isLoaded = !quizzes.isEmpty
         hasError = false
-        isSubmitted = false
+
     }
 }

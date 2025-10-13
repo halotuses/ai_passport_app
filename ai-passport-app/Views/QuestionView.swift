@@ -44,25 +44,13 @@ struct QuestionView: View {
                             )
                             .cornerRadius(10)
                         }
-                        // ✅ 回答後は選択できないようにする
-                        .disabled(viewModel.isSubmitted)
+
                     }
                 }
                 .padding(.horizontal)
             }
 
-            // MARK: - ボタン群
-            VStack(spacing: 15) {
-                Button(action: {
-                    viewModel.submitAnswer()
-                }) {
-                    Text("解答する")
-                        .fontWeight(.semibold)
-                        .frame(maxWidth: .infinity)
-                }
-                .buttonStyle(.borderedProminent)
-                .disabled(viewModel.isSubmitted)
-            }
+
         }
     }
 }
