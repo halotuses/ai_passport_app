@@ -1,15 +1,20 @@
-// ViewModels/QuizViewModel.swift
+//
+//  QuizViewModel.swift
+//  ai-passport-app
+//
+
 import Foundation
 
 @MainActor
 class QuizViewModel: ObservableObject {
 
     @Published var quizzes: [Quiz] = []
-    @Published var currentIndex: Int = 0
+    @Published var currentQuestionIndex: Int = 0
     @Published var selectedAnswerIndex: Int? = nil
     @Published var selectedAnswers: [Int?] = []
     @Published var isLoaded: Bool = false
     @Published var hasError: Bool = false
+    @Published var isSubmitted: Bool = false
 
     var unitId: String = ""
     var chapterId: String = ""
@@ -18,55 +23,74 @@ class QuizViewModel: ObservableObject {
 
     // MARK: - Load
     func fetchQuizzes(from chapterFilePath: String) {
-        // いったん初期化
         isLoaded = false
         hasError = false
         quizzes = []
-        currentIndex = 0
+        currentQuestionIndex = 0
         selectedAnswerIndex = nil
         selectedAnswers = []
 
-        let fullURL = Constants.url(chapterFilePath)
+        // ✅ URL生成ロジックを安全化
+        var normalizedPath = chapterFilePath
+        if normalizedPath.hasPrefix("/") {
+            normalizedPath.removeFirst()
+        }
+        // ✅ “quizzes/” の二重付与を防止
+        if !normalizedPath.hasPrefix("quizzes/") {
+            normalizedPath = "quizzes/" + normalizedPath
+        }
+
+        let fullURL = Constants.url(normalizedPath)
+        print("📡 fetchQuizzes called with path: \(chapterFilePath)")
+        print("🌐 fullURL resolved as: \(fullURL)")
+
         NetworkManager.fetchQuizList(from: fullURL) { [weak self] result in
             guard let self else { return }
+
             if let qs = result?.questions, !qs.isEmpty {
                 self.quizzes = qs
                 self.selectedAnswers = Array(repeating: nil, count: qs.count)
-                self.currentIndex = 0
+                self.currentQuestionIndex = 0
                 self.selectedAnswerIndex = nil
                 self.isLoaded = true
                 self.hasError = false
+                print("✅ Loaded \(qs.count) quizzes successfully.")
             } else {
-                // データなし or 失敗
                 self.quizzes = []
-                
-                print("✅ loaded quizzes:", self.quizzes.count)
                 self.selectedAnswers = []
-                self.currentIndex = 0
+                self.currentQuestionIndex = 0
                 self.selectedAnswerIndex = nil
-                self.isLoaded = true          // ロードは完了
-                self.hasError = true          // ただし中身は空
+                self.isLoaded = true
+                self.hasError = true
+                print("⚠️ Failed to load quizzes or quiz list is empty.")
             }
         }
     }
 
     // MARK: - Answer
+    func selectAnswer(index: Int) {
+        selectedAnswerIndex = index
+    }
+
+    func submitAnswer() {
+        guard currentQuestionIndex < quizzes.count else { return }
+        isSubmitted = true
+    }
+
     func recordAnswer(selectedIndex: Int) {
         selectedAnswerIndex = selectedIndex
 
-        if currentIndex < selectedAnswers.count {
-            selectedAnswers[currentIndex] = selectedIndex
+        if currentQuestionIndex < selectedAnswers.count {
+            selectedAnswers[currentQuestionIndex] = selectedIndex
         } else {
             selectedAnswers.append(selectedIndex)
         }
 
-        guard currentIndex < quizzes.count else { return }
-        let quiz = quizzes[currentIndex]
+        guard currentQuestionIndex < quizzes.count else { return }
+        let quiz = quizzes[currentQuestionIndex]
         let isCorrect = (selectedIndex == quiz.answerIndex)
         let chapterIdInt = Int(chapterId) ?? 0
-
-        // 安定キー（章ID#インデックス）
-        let stableQuizId = "\(chapterId)#\(currentIndex)"
+        let stableQuizId = "\(chapterId)#\(currentQuestionIndex)"
 
         repository.saveOrUpdateAnswer(
             quizId: stableQuizId,
@@ -76,16 +100,16 @@ class QuizViewModel: ObservableObject {
     }
 
     func moveNext() {
-        currentIndex += 1
+        currentQuestionIndex += 1
         selectedAnswerIndex = nil
+        isSubmitted = false
     }
 
     // MARK: - Computed
     private var hasQuizzes: Bool { !quizzes.isEmpty }
 
     var isFinished: Bool {
-        // 「問題が1問以上ある」かつ「最後まで到達」でのみ true
-        hasQuizzes && currentIndex >= quizzes.count
+        hasQuizzes && currentQuestionIndex >= quizzes.count
     }
 
     var totalCount: Int { quizzes.count }
@@ -108,15 +132,16 @@ class QuizViewModel: ObservableObject {
     }
 
     var currentQuiz: Quiz? {
-        (currentIndex < quizzes.count) ? quizzes[currentIndex] : nil
+        (currentQuestionIndex < quizzes.count) ? quizzes[currentQuestionIndex] : nil
     }
 
     // MARK: - Reset
     func reset() {
-        currentIndex = 0
+        currentQuestionIndex = 0
         selectedAnswerIndex = nil
         selectedAnswers = Array(repeating: nil, count: quizzes.count)
         isLoaded = !quizzes.isEmpty
         hasError = false
+        isSubmitted = false
     }
 }

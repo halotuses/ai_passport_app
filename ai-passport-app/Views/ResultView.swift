@@ -1,41 +1,63 @@
-// Views/ResultView.swift
 import SwiftUI
 
 struct ResultView: View {
-    @ObservedObject var viewModel: QuizViewModel
-    let onClose: () -> Void
-
-    private var headerMessage: String {
-        switch viewModel.accuracy {
-        case 90...100: return "素晴らしい！"
-        case 70..<90:  return "よくできました！"
-        case 50..<70:  return "あと少し！"
-        default:       return "ここから伸びる！"
-        }
-    }
+    let correctCount: Int
+    let totalCount: Int
+    let onRestart: () -> Void
 
     var body: some View {
-        VStack(spacing: 16) {
-            Text(headerMessage)
-                .font(.title2).bold()
+        VStack(spacing: 20) {
+            // ヘッダー
+            Text("学習アプリ")
+                .font(.title2)
+                .fontWeight(.bold)
+                .padding(.top, 20)
+                .foregroundColor(.black)
+                .frame(maxWidth: .infinity)
+                .background(Color(red: 0.8, green: 1.0, blue: 0.8))
 
-            VStack(spacing: 8) {
-                Text("正解数：\(viewModel.correctCount) / \(viewModel.totalCount)")
-                Text("正答率：\(viewModel.accuracy)%")
-            }
-            .font(.headline)
+            Spacer()
 
-            Button(action: onClose) {
+            // ✅ 「第◯問」の表示を削除
+            // 結果メッセージのみ表示
+            Text(resultMessage)
+                .font(.title3)
+                .fontWeight(.semibold)
+                .padding(.bottom, 8)
+
+            // 結果詳細
+            Text("正解数：\(correctCount) / \(totalCount)")
+                .font(.body)
+            Text("正答率：\(Int(Double(correctCount) / Double(totalCount) * 100))%")
+                .font(.body)
+
+            // トップに戻るボタン
+            Button(action: onRestart) {
                 Text("トップに戻る")
-                    .frame(maxWidth: .infinity)
+                    .fontWeight(.medium)
                     .padding()
-                    .background(Color.accentColor.opacity(0.15))
-                    .cornerRadius(12)
+                    .frame(width: 220)
+                    .background(Color.blue.opacity(0.1))
+                    .cornerRadius(10)
             }
-            .padding(.top, 8)
+            .padding(.top, 20)
 
             Spacer()
         }
-        .padding()
+        .navigationBarBackButtonHidden(true)
+    }
+
+    private var resultMessage: String {
+        let rate = Double(correctCount) / Double(totalCount)
+        switch rate {
+        case 1.0:
+            return "完璧です！"
+        case 0.7...:
+            return "よくできました！"
+        case 0.4...:
+            return "あと少し！"
+        default:
+            return "もう一度チャレンジ！"
+        }
     }
 }
