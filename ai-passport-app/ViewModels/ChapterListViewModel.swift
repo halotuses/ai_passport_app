@@ -34,9 +34,6 @@ class ChapterListViewModel: ObservableObject {
                 self.calculateCorrectCounts()
             }
             
-            
-            
-            
         }
     }
     
