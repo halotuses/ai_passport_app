@@ -1,4 +1,3 @@
-// Views/ContentView.swift
 import SwiftUI
 
 /// 出題画面（読み込み → 出題 → 解説 → 結果）
@@ -7,55 +6,29 @@ struct ContentView: View {
     @ObservedObject var viewModel: QuizViewModel
     let onQuizEnd: () -> Void
 
-    @State private var goExplanation = false
-    @State private var hasLoaded: Bool = false
+    @State private var showExplanation = false
+    @State private var hasLoaded = false
 
     var body: some View {
         VStack(spacing: 0) {
 
-            // 隠しリンク（説明画面へ）
-            NavigationLink(isActive: $goExplanation) {
-                if let quiz = viewModel.currentQuiz, let answer = viewModel.selectedAnswerIndex {
-                    ExplanationView(
-                        quiz: quiz,
-                        selectedAnswerIndex: answer,
-                        onNext: {
-                            viewModel.moveNext()
-                            goExplanation = false
-                        }
-                    )
-                } else {
-                    VStack(spacing: 12) {
-                        Text("次の問題へ進みます")
-                        Button("OK") {
-                            viewModel.moveNext()
-                            goExplanation = false
-                        }
-                    }
-                    .padding()
-                }
-            } label: { EmptyView() }.hidden()
-
-            // ローディング
+            // MARK: - 出題／解説の切り替え
             if !viewModel.isLoaded {
                 ProgressView("読み込み中…").padding()
             }
-            // エラー/空データ
             else if viewModel.hasError || viewModel.quizzes.isEmpty {
                 VStack(spacing: 12) {
                     Text("問題データが見つかりませんでした。")
                         .foregroundColor(.secondary)
                     Button("単元に戻る") {
-                        onQuizEnd()   // 親に“閉じる”を委譲
+                        onQuizEnd()
                     }
                 }
                 .padding()
             }
-            // 結果
             else if viewModel.isFinished {
                 ResultView(viewModel: viewModel, onClose: onQuizEnd)
             }
-            // 出題
             else {
                 QuestionView(
                     question: viewModel.currentQuiz?.question,
@@ -68,9 +41,27 @@ struct ContentView: View {
                     choices: viewModel.currentQuiz?.choices ?? [],
                     selectAction: { selectedIndex in
                         viewModel.recordAnswer(selectedIndex: selectedIndex)
-                        goExplanation = true
+                        showExplanation = true     // ← 解説画面を表示
                     }
                 )
+            }
+        }
+        // ✅ NavigationStack 用に modern API を使用
+        .navigationDestination(isPresented: $showExplanation) {
+            if let quiz = viewModel.currentQuiz {
+                ExplanationView(
+                    quiz: quiz,
+                    selectedAnswerIndex: viewModel.selectedAnswerIndex ?? 0,
+                    onNext: {
+                        // ✅ moveNext() 後に戻り遷移
+                        viewModel.moveNext()
+                        showExplanation = false
+                    }
+                )
+            } else {
+                Text("解説データを読み込めませんでした。")
+                    .foregroundColor(.secondary)
+                    .padding()
             }
         }
         .navigationTitle("第\(viewModel.currentIndex + 1)問")

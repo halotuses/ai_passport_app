@@ -1,71 +1,72 @@
-// Views/ExplanationView.swift
 import SwiftUI
 
-/// 解説画面
+/// 解説画面（問題の正誤と解説を表示）
 struct ExplanationView: View {
     let quiz: Quiz
     let selectedAnswerIndex: Int
     let onNext: () -> Void
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 16) {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 16) {
 
-            // 正誤判定
-            HStack {
-                Text(selectedAnswerIndex == quiz.answerIndex ? "正解 ✅" : "不正解 ❌")
-                    .font(.subheadline)
-                    .fontWeight(.bold)
-                    .foregroundColor(.white)
-                    .padding(8)
-                    .background(selectedAnswerIndex == quiz.answerIndex ? Color.orange : Color.red)
-                    .cornerRadius(8)
-                Spacer()
-            }
+                // MARK: 正誤
+                HStack {
+                    Text(selectedAnswerIndex == quiz.answerIndex ? "正解 ✅" : "不正解 ❌")
+                        .font(.headline)
+                        .fontWeight(.bold)
+                        .foregroundColor(.white)
+                        .padding(8)
+                        .background(selectedAnswerIndex == quiz.answerIndex ? Color.orange : Color.red)
+                        .cornerRadius(8)
+                    Spacer()
+                }
 
-            // 問題文
-            VStack(alignment: .leading, spacing: 8) {
+                // MARK: 問題文
                 Text(quiz.question)
                     .font(.title3)
                     .fontWeight(.bold)
+                    .padding(.top, 4)
 
-                // 選択肢一覧（正解にマーク）
-                ForEach(Array(quiz.choices.enumerated()), id: \.offset) { index, choice in
-                    HStack {
-                        Text(choice)
-                            .foregroundColor(index == quiz.answerIndex ? .orange : .primary)
-                        if index == quiz.answerIndex {
-                            Text("← 正解")
-                                .font(.caption)
-                                .foregroundColor(.orange)
+                // MARK: 選択肢と正解表示
+                VStack(alignment: .leading, spacing: 6) {
+                    ForEach(Array(quiz.choices.enumerated()), id: \.offset) { index, choice in
+                        HStack {
+                            Text(choice)
+                                .foregroundColor(index == quiz.answerIndex ? .orange : .primary)
+                            if index == quiz.answerIndex {
+                                Text("← 正解")
+                                    .font(.caption)
+                                    .foregroundColor(.orange)
+                            }
                         }
                     }
                 }
-            }
+                .padding(.vertical, 4)
 
-            // 解説
-            ScrollView {
+                Divider()
+
+                // MARK: 解説文
                 Text(quiz.explanation ?? "解説はありません。")
                     .font(.body)
                     .multilineTextAlignment(.leading)
-                    .padding(.top, 4)
-            }
-            .frame(maxHeight: 200)
 
-            Spacer()
+                Spacer(minLength: 24)
 
-            // 次の問題へ
-            Button(action: onNext) {
-                Text("次の問題へ")
-                    .frame(maxWidth: .infinity)
-                    .padding()
-                    .background(Color.accentColor.opacity(0.2))
-                    .cornerRadius(12)
+                // MARK: 次の問題へ
+                Button(action: {
+                    onNext()  // ← 呼び出し元で showExplanation = false
+                }) {
+                    Text("次の問題へ")
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(Color.accentColor.opacity(0.2))
+                        .cornerRadius(12)
+                }
             }
+            .padding()
         }
-        .padding()
         .navigationTitle("解説")
         .navigationBarTitleDisplayMode(.inline)
     }
 }
-
-
