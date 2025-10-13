@@ -4,12 +4,13 @@ import SwiftUI
 struct ExplanationView: View {
     let quiz: Quiz
     let selectedAnswerIndex: Int
+    let hasNextQuestion: Bool
     let onNext: () -> Void
-
+    
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 16) {
-
+                
                 // MARK: 正誤
                 HStack {
                     Text(selectedAnswerIndex == quiz.answerIndex ? "正解 ✅" : "不正解 ❌")
@@ -21,13 +22,13 @@ struct ExplanationView: View {
                         .cornerRadius(8)
                     Spacer()
                 }
-
+                
                 // MARK: 問題文
                 Text(quiz.question)
                     .font(.title3)
                     .fontWeight(.bold)
                     .padding(.top, 4)
-
+                
                 // MARK: 選択肢と正解表示
                 VStack(alignment: .leading, spacing: 6) {
                     ForEach(Array(quiz.choices.enumerated()), id: \.offset) { index, choice in
@@ -43,21 +44,22 @@ struct ExplanationView: View {
                     }
                 }
                 .padding(.vertical, 4)
-
+                
                 Divider()
-
+                
                 // MARK: 解説文
                 Text(quiz.explanation ?? "解説はありません。")
                     .font(.body)
                     .multilineTextAlignment(.leading)
-
+                
                 Spacer(minLength: 24)
-
+                
                 // MARK: 次の問題へ
                 Button(action: {
                     onNext()  // ← 呼び出し元で showExplanation = false
                 }) {
-                    Text("次の問題へ")
+                    
+                    Text(hasNextQuestion ? "次の問題へ" : "結果表示")
                         .frame(maxWidth: .infinity)
                         .padding()
                         .background(Color.accentColor.opacity(0.2))
