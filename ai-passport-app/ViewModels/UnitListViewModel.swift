@@ -1,39 +1,45 @@
-// ViewModels/UnitListViewModel.swift
-import Foundation
 
-/// 単元一覧データ取得用 ViewModel
-class UnitListViewModel: ObservableObject {
+import SwiftUI
 
-    @Published var metadata: QuizMetadataMap?
-    @Published var quizCounts: [String: Int] = [:]
-
-    func fetchMetadata() {
-        NetworkManager.fetchMetadata { [weak self] data in
-            self?.metadata = data
-            self?.calculateTotalCounts()
-        }
-    }
-
-    private func calculateTotalCounts() {
-        guard let metadata = metadata else { return }
-        for (key, unit) in metadata {
-            fetchChapterCount(for: key, unit: unit)
-        }
-    }
-
-    private func fetchChapterCount(for key: String, unit: QuizMetadata) {
-        let chapterURL = Constants.url(unit.file)
-        NetworkManager.fetchChapterList(from: chapterURL) { chapterList in
-            var total = 0
-            chapterList?.chapters.forEach { chapter in
-                let quizURL = Constants.url(chapter.file)
-                NetworkManager.fetchQuizList(from: quizURL) { quizList in
-                    total += quizList?.questions.count ?? 0
-                    DispatchQueue.main.async {
-                        self.quizCounts[key] = total
+/// 単元選択画面
+struct UnitListView: View {
+    
+    @ObservedObject var viewModel: UnitListViewModel
+    @Binding var selectedUnit: QuizMetadata?
+    @EnvironmentObject private var mainViewState: MainViewState
+    
+    var body: some View {
+        ScrollView {
+            VStack(spacing: 8) {
+                if let metadata = viewModel.metadata {
+                    ForEach(metadata.sorted(by: { $0.key < $1.key }), id: \.key) { key, unit in
+                        
+                        Button(action: {
+                            mainViewState.selectedUnitKey = key
+                            selectedUnit = unit
+                        }) {
+                            unitRowView(key: key, unit: unit)
+                        }
                     }
+                } else {
+                    Text("データを読み込み中...").padding()
                 }
             }
+            .padding()
         }
+        .background(Color(red: 240/255, green: 255/255, blue: 240/255))
+        .onAppear { viewModel.fetchMetadata() }
     }
-}
+    
+    private func unitRowView(key: String, unit: QuizMetadata) -> some View {
+        let total = viewModel.quizCounts[key] ?? 0
+        
+        return HStack {
+            Image(systemName: "chevron.right").foregroundColor(.gray)
+            VStack(alignment: .leading, spacing: 4) {
+                Text("\(key). \(unit.title)").font(.system(size: 16, weight: .bold))
+                Text(unit.subtitle).font(.system(size: 13)).italic().foregroundColor(.gray)
+            }
+            Spacer()
+            ZStack {
+                Circle().fill(Color.gray.opacity(0.3)).frame(width: 40, height: 40)

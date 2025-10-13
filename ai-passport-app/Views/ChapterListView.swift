@@ -2,11 +2,13 @@ import SwiftUI
 
 /// 章選択画面
 struct ChapterListView: View {
-
+    
+    let unitKey: String
+    
     let unit: QuizMetadata
     @ObservedObject var viewModel: ChapterListViewModel
     @Binding var selectedChapter: ChapterMetadata?
-
+    
     var body: some View {
         ScrollView {
             VStack(spacing: 8) {
@@ -19,13 +21,13 @@ struct ChapterListView: View {
             .padding()
         }
         .background(Color(red: 240/255, green: 255/255, blue: 240/255))
-        .onAppear { viewModel.fetchChapters(from: unit.file) }
+        .onAppear { viewModel.fetchChapters(forUnitId: unitKey, filePath: unit.file) }
     }
-
+    
     private func chapterRowView(chapter: ChapterMetadata) -> some View {
         let totalCount = viewModel.quizCounts[chapter.id] ?? 0
         let correctCount = viewModel.correctCounts[chapter.id] ?? 0
-
+        
         return HStack {
             Image(systemName: "book.closed")
             Text(chapter.title)

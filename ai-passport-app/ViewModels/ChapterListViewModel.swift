@@ -2,39 +2,78 @@
 import Foundation
 
 class ChapterListViewModel: ObservableObject {
-
+    
     @Published var chapters: [ChapterMetadata] = []
     @Published var quizCounts: [String: Int] = [:]
     @Published var correctCounts: [String: Int] = [:]
-
+    
     private let repository = AnswerHistoryRepository()
-
-    func fetchChapters(from filePath: String) {
+    
+    private var currentUnitId: String = ""
+    
+    func fetchChapters(forUnitId unitId: String, filePath: String) {
+        if unitId.hasPrefix("unit") {
+            currentUnitId = unitId
+        } else {
+            currentUnitId = extractUnitIdentifier(from: filePath)
+        }
+        chapters = []
+        quizCounts.removeAll()
+        correctCounts.removeAll()
+        
+        
         let fullURL = Constants.url(filePath)
         NetworkManager.fetchChapterList(from: fullURL) { [weak self] result in
-            self?.chapters = result?.chapters ?? []
-            self?.calculateQuizCounts()
-            self?.calculateCorrectCounts()
+            
+            guard let self else { return }
+            
+            let fetchedChapters = result?.chapters ?? []
+            DispatchQueue.main.async {
+                self.chapters = fetchedChapters
+                self.calculateQuizCounts()
+                self.calculateCorrectCounts()
+            }
+            
+            
+            
+            
         }
     }
-
+    
     private func calculateQuizCounts() {
         for chapter in chapters {
             let quizURL = Constants.url(chapter.file)
             NetworkManager.fetchQuizList(from: quizURL) { [weak self] quizList in
                 DispatchQueue.main.async {
-                    self?.quizCounts[chapter.id] = quizList?.questions.count ?? 0
+                    guard let self else { return }
+                    guard self.chapters.contains(chapter) else { return }
+                    self.quizCounts[chapter.id] = quizList?.questions.count ?? 0
                 }
             }
         }
     }
-
+    
     private func calculateCorrectCounts() {
-        DispatchQueue.main.async {
+        DispatchQueue.main.async { [weak self] in
+            guard let self else { return }
+            
+            
+            
             for chapter in self.chapters {
-                let chapterIdInt = Int(chapter.id) ?? 0
-                self.correctCounts[chapter.id] = self.repository.countCorrectAnswers(for: chapterIdInt)
+                let identifier = IdentifierGenerator.chapterNumericId(unitId: self.currentUnitId, chapterId: chapter.id)
+                self.correctCounts[chapter.id] = self.repository.countCorrectAnswers(for: identifier)
             }
         }
     }
+    
+    
+    
+    private func extractUnitIdentifier(from path: String) -> String {
+        let components = path.split(separator: "/")
+        if let unitComponent = components.first(where: { $0.hasPrefix("unit") }) {
+            return String(unitComponent)
+        }
+        return ""
+    }
+    
 }

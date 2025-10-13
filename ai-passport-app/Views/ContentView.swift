@@ -105,17 +105,36 @@ struct ContentView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         
         .onAppear {
-            if !hasLoaded {
-                // ✅ 正しいS3階層に合わせて修正
-                let chapterFilePath = "units/unit1/chapter1.json"
-                viewModel.fetchQuizzes(from: chapterFilePath)
-                hasLoaded = true
-            }
+            guard !hasLoaded else { return }
+            loadQuizzes()
+            hasLoaded = true
         }
+        .onChange(of: chapter.id) { _ in
+            loadQuizzes()
+        }
+        
+        
         .onChange(of: mainViewState.navigationResetToken) { _ in
             goExplanation = false
             viewModel.reset()
         }
         
+    }
+}
+
+private extension ContentView {
+    func loadQuizzes() {
+        let chapterFilePath = chapter.file
+        viewModel.unitId = extractUnitIdentifier(from: chapterFilePath)
+        viewModel.chapterId = chapter.id
+        viewModel.fetchQuizzes(from: chapterFilePath)
+    }
+    
+    func extractUnitIdentifier(from path: String) -> String {
+        let components = path.split(separator: "/")
+        if let unitComponent = components.first(where: { $0.hasPrefix("unit") }) {
+            return String(unitComponent)
+        }
+        return ""
     }
 }

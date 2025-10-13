@@ -41,8 +41,11 @@ class QuizViewModel: ObservableObject {
         }
         
         let fullURL = Constants.url(normalizedPath)
+        
+#if DEBUG
         print("📡 fetchQuizzes called with path: \(chapterFilePath)")
         print("🌐 fullURL resolved as: \(fullURL)")
+#endif
         
         NetworkManager.fetchQuizList(from: fullURL) { [weak self] result in
             guard let self else { return }
@@ -54,7 +57,9 @@ class QuizViewModel: ObservableObject {
                 self.selectedAnswerIndex = nil
                 self.isLoaded = true
                 self.hasError = false
+#if DEBUG
                 print("✅ Loaded \(qs.count) quizzes successfully.")
+#endif
             } else {
                 self.quizzes = []
                 self.selectedAnswers = []
@@ -62,7 +67,9 @@ class QuizViewModel: ObservableObject {
                 self.selectedAnswerIndex = nil
                 self.isLoaded = true
                 self.hasError = true
+#if DEBUG
                 print("⚠️ Failed to load quizzes or quiz list is empty.")
+#endif
             }
         }
     }
@@ -80,8 +87,8 @@ class QuizViewModel: ObservableObject {
         guard currentQuestionIndex < quizzes.count else { return }
         let quiz = quizzes[currentQuestionIndex]
         let isCorrect = (selectedIndex == quiz.answerIndex)
-        let chapterIdInt = Int(chapterId) ?? 0
-        let stableQuizId = "\(chapterId)#\(currentQuestionIndex)"
+        let chapterIdInt = IdentifierGenerator.chapterNumericId(unitId: unitId, chapterId: chapterId)
+        let stableQuizId = "\(unitId)-\(chapterId)#\(currentQuestionIndex)"
         
         repository.saveOrUpdateAnswer(
             quizId: stableQuizId,
@@ -146,6 +153,9 @@ class QuizViewModel: ObservableObject {
         selectedAnswers = Array(repeating: nil, count: quizzes.count)
         isLoaded = !quizzes.isEmpty
         hasError = false
+        chapterId = ""
+        unitId = ""
+        
         
     }
 }
