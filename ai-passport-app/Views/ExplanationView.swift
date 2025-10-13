@@ -5,7 +5,10 @@ struct ExplanationView: View {
     let quiz: Quiz
     let selectedAnswerIndex: Int
     let hasNextQuestion: Bool
-    let onNext: () -> Void
+    let onNextQuestion: () -> Void
+    let onDismiss: () -> Void
+    
+    @EnvironmentObject private var mainViewState: MainViewState
     
     var body: some View {
         ScrollView {
@@ -56,7 +59,8 @@ struct ExplanationView: View {
                 
                 // MARK: 次の問題へ
                 Button(action: {
-                    onNext()  // ← 呼び出し元で showExplanation = false
+                    onNextQuestion()
+                    onDismiss()
                 }) {
                     
                     Text(hasNextQuestion ? "次の問題へ" : "結果表示")
@@ -70,5 +74,8 @@ struct ExplanationView: View {
         }
         .navigationTitle("解説")
         .navigationBarTitleDisplayMode(.inline)
+        .onChange(of: mainViewState.navigationResetToken) { _ in
+            onDismiss()
+        }
     }
 }
