@@ -12,7 +12,7 @@ struct AppFrameView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            HeaderView(title: "学習アプリ")
+            HeaderView()
             Divider()
             MainRouterView()
             Divider()

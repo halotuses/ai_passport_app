@@ -8,6 +8,8 @@ struct ChapterListView: View {
     let unit: QuizMetadata
     @ObservedObject var viewModel: ChapterListViewModel
     @Binding var selectedChapter: ChapterMetadata?
+    @EnvironmentObject private var mainViewState: MainViewState
+    
     
     var body: some View {
         ScrollView {
@@ -21,7 +23,10 @@ struct ChapterListView: View {
             .padding()
         }
         .background(Color(red: 240/255, green: 255/255, blue: 240/255))
-        .onAppear { viewModel.fetchChapters(forUnitId: unitKey, filePath: unit.file) }
+        .onAppear {
+            mainViewState.setHeader(title: unit.title)
+            viewModel.fetchChapters(forUnitId: unitKey, filePath: unit.file)
+        }
     }
     
     private func chapterRowView(chapter: ChapterMetadata) -> some View {

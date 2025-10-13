@@ -93,12 +93,29 @@ struct ContentView: View {
             }
         }
         .onAppear {
+            updateHeaderForCurrentState()
             guard !hasLoaded else { return }
             loadQuizzes()
             hasLoaded = true
         }
         .onChange(of: chapter.id) { _ in
+            updateHeaderForCurrentState()
             loadQuizzes()
+        }
+        .onChange(of: viewModel.currentQuestionIndex) { _ in
+            updateHeaderForCurrentState()
+        }
+        .onChange(of: viewModel.quizzes.count) { _ in
+            updateHeaderForCurrentState()
+        }
+        .onChange(of: viewModel.isLoaded) { _ in
+            updateHeaderForCurrentState()
+        }
+        .onChange(of: viewModel.hasError) { _ in
+            updateHeaderForCurrentState()
+        }
+        .onChange(of: showExplanation) { _ in
+            updateHeaderForCurrentState()
         }
     }
 }
@@ -135,4 +152,19 @@ private extension ContentView {
         viewModel.finishQuiz()
         closeExplanation()
     }
+    
+    
+    func updateHeaderForCurrentState() {
+        if showExplanation {
+            mainViewState.setHeader(title: "解説", backButton: .toChapterList)
+        } else if viewModel.totalCount > 0 && viewModel.currentQuestionIndex >= viewModel.totalCount {
+            mainViewState.setHeader(title: "結果", backButton: .toChapterList)
+        } else if viewModel.isLoaded && viewModel.totalCount > 0 {
+            let questionNumber = min(viewModel.currentQuestionIndex + 1, viewModel.totalCount)
+            mainViewState.setHeader(title: "第\(questionNumber)問", backButton: .quizToChapterList)
+        } else {
+            mainViewState.setHeader(title: chapter.title, backButton: .quizToChapterList)
+        }
+    }
+    
 }

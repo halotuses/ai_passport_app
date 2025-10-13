@@ -30,7 +30,10 @@ struct UnitListView: View {
             .padding()
         }
         .background(Color(red: 240/255, green: 255/255, blue: 240/255))
-        .onAppear { viewModel.refreshIfNeeded() }
+        .onAppear {
+            mainViewState.setHeader(title: "学習アプリ")
+            viewModel.refreshIfNeeded()
+        }
     }
 
     private func unitRowView(key: String, unit: QuizMetadata) -> some View {
