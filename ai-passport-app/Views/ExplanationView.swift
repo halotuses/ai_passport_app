@@ -59,6 +59,8 @@ struct ExplanationView: View {
                 
                 // MARK: - 次の問題 or 結果表示ボタン
                 Button(action: {
+                    onDismiss()
+                    
                     if hasNextQuestion {
                         onNextQuestion()
                     } else {
