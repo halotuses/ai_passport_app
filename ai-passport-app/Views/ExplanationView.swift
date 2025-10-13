@@ -67,3 +67,5 @@ struct ExplanationView: View {
         .navigationBarTitleDisplayMode(.inline)
     }
 }
+
+
