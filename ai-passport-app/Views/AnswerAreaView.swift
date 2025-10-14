@@ -22,11 +22,21 @@ struct AnswerAreaView: View {
                                 Text(label(for: index))
                                     .font(.title2)
                                     .fontWeight(.bold)
-                                    .frame(width: buttonWidth, height: 50)
-                                    .background(Color.themeMain)
+                                    .frame(width: buttonWidth, height: 52)
+                                    .background(
+                                        LinearGradient(
+                                            colors: [Color.themeSecondary, Color.themeMain],
+                                            startPoint: .topLeading,
+                                            endPoint: .bottomTrailing
+                                        )
+                                    )
                                     .foregroundColor(.white)
-                                    .cornerRadius(12)
-                                    .shadow(color: Color.black.opacity(0.08), radius: 6, x: 0, y: 3)
+                                    .cornerRadius(14)
+                                    .overlay(
+                                        RoundedRectangle(cornerRadius: 14)
+                                            .stroke(Color.white.opacity(0.18), lineWidth: 1)
+                                    )
+                                    .shadow(color: Color.themeSecondary.opacity(0.25), radius: 10, x: 0, y: 6)
                             }
                         }
                     }

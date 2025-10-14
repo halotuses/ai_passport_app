@@ -36,7 +36,13 @@ struct ChapterListView: View {
         return HStack(spacing: 16) {
             Image(systemName: "book.closed")
                 .font(.system(size: 20, weight: .semibold))
-                .foregroundColor(.themeMain)
+                .foregroundStyle(
+                    LinearGradient(
+                        colors: [Color.themeMain, Color.themeSecondary],
+                        startPoint: .top,
+                        endPoint: .bottom
+                    )
+                )
             VStack(alignment: .leading, spacing: 4) {
                 Text(chapter.title)
                     .font(.system(size: 16, weight: .bold))
@@ -48,20 +54,35 @@ struct ChapterListView: View {
             Spacer()
             ZStack {
                 Circle()
-                    .fill(Color.themeMain.opacity(0.18))
-                    .frame(width: 50, height: 50)
+                    .fill(
+                        LinearGradient(
+                            colors: [Color.themeQuaternary.opacity(0.28), Color.themeSecondary.opacity(0.28)],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                    )
+                    .frame(width: 52, height: 52)
                 Text("\(correctCount)/\(totalCount)")
                     .font(.system(size: 12, weight: .bold))
                     .foregroundColor(.themeTextPrimary)
             }
         }
-        .padding(12)
-        .background(Color.themeSurfaceElevated)
-        .cornerRadius(12)
-        .overlay(
-            RoundedRectangle(cornerRadius: 12)
-                .stroke(Color.themeMain.opacity(0.1), lineWidth: 1)
+        .padding(14)
+        .background(
+            RoundedRectangle(cornerRadius: 18)
+                .fill(
+                    LinearGradient(
+                        colors: [Color.themeSurfaceElevated, Color.themeSurfaceAlt],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                )
         )
-        .shadow(color: Color.black.opacity(0.05), radius: 10, x: 0, y: 4)
+        .cornerRadius(18)
+        .overlay(
+            RoundedRectangle(cornerRadius: 18)
+                .stroke(Color.themeMain.opacity(0.12), lineWidth: 1)
+        )
+        .shadow(color: Color.themeShadowSoft, radius: 12, x: 0, y: 6)
     }
 }

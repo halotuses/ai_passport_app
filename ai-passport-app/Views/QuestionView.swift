@@ -17,36 +17,42 @@ struct QuestionView: View {
                         .multilineTextAlignment(.leading)
                         .foregroundColor(.themeTextPrimary)
 
-                    VStack(spacing: 10) {
+                    VStack(spacing: 12) {
                         ForEach(Array(quiz.choices.enumerated()), id: \.offset) { index, choiceText in
-                            HStack(alignment: .center, spacing: 12) {
+                            HStack(alignment: .top, spacing: 14) {
                                 Text(choiceLabel(for: index))
-                                    .font(.headline)
+                                    .font(.subheadline)
                                     .fontWeight(.bold)
-                                    .foregroundColor(.white)
-                                    .frame(width: 44, height: 44)
-                                    .background(
-                                        Circle()
-                                            .fill(
-                                                LinearGradient(colors: [Color.themeMain, Color.themeAccent], startPoint: .topLeading, endPoint: .bottomTrailing)
-                                            )
-                                    )
+                                    .padding(.vertical, 6)
+                                    .padding(.horizontal, 12)
+                                    .background(Color.themePillBackground)
+                                    .foregroundColor(.themeTextSecondary)
+                                    .clipShape(Capsule())
 
                                 Text(choiceText)
                                     .font(.body)
                                     .multilineTextAlignment(.leading)
                                     .foregroundColor(.themeTextPrimary)
-                                Spacer()
+                                Spacer(minLength: 8)
                             }
-                            .padding()
-                            .frame(maxWidth: .infinity)
-                            .background(Color.themeSurfaceElevated)
-                            .cornerRadius(12)
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 12)
-                                    .stroke(Color.themeMain.opacity(0.12), lineWidth: 1)
+                            .padding(.vertical, 16)
+                            .padding(.horizontal, 18)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .background(
+                                RoundedRectangle(cornerRadius: 18)
+                                    .fill(
+                                        LinearGradient(
+                                            colors: [Color.themeSurfaceElevated, Color.themeSurfaceAlt],
+                                            startPoint: .topLeading,
+                                            endPoint: .bottomTrailing
+                                        )
+                                    )
                             )
-                            .shadow(color: Color.black.opacity(0.05), radius: 10, x: 0, y: 4)
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 18)
+                                    .stroke(Color.themeMain.opacity(0.08), lineWidth: 1)
+                            )
+                            .shadow(color: Color.themeShadowSoft, radius: 12, x: 0, y: 6)
                         }
                     }
                 }

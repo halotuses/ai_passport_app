@@ -57,9 +57,15 @@ struct BottomTabBarView: View {
             .padding()
 
             .background(
-                RoundedRectangle(cornerRadius: 12)
-                    .fill(Color.themeMain)
-                    .shadow(color: Color.themeMainHover.opacity(0.25), radius: 16, x: 0, y: 8)
+                RoundedRectangle(cornerRadius: 18)
+                    .fill(
+                        LinearGradient(
+                            colors: [Color.themeSecondary, Color.themeMain],
+                            startPoint: .leading,
+                            endPoint: .trailing
+                        )
+                    )
+                    .shadow(color: Color.themeSecondary.opacity(0.25), radius: 16, x: 0, y: 8)
             )
             .opacity(isHovering ? 1 : 0)
             .animation(.easeInOut(duration: 0.2), value: isHovering)

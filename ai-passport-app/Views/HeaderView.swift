@@ -25,7 +25,7 @@ struct HeaderView: View {
                         }
                         .padding(.horizontal, 8)
                         .padding(.vertical, 6)
-                        .background(Color.white.opacity(0.2))
+                        .background(Color.white.opacity(0.18))
                         .cornerRadius(12)
                     }
                     .foregroundColor(.white)
@@ -38,8 +38,14 @@ struct HeaderView: View {
         .padding(.vertical, 10)
         .padding(.horizontal, 16)
         .frame(maxWidth: .infinity)
-        .background(Color.themeMain)
+        .background(
+            LinearGradient(
+                colors: [Color.themeMain, Color.themeSecondary],
+                startPoint: .leading,
+                endPoint: .trailing
+            )
+        )
         .foregroundColor(.white)
-        .shadow(color: Color.themeMainHover.opacity(0.2), radius: 12, x: 0, y: 6)
+        .shadow(color: Color.themeSecondary.opacity(0.25), radius: 12, x: 0, y: 6)
     }
 }

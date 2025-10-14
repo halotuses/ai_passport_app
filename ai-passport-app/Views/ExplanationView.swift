@@ -63,7 +63,13 @@ struct ExplanationView: View {
             }
             .padding()
         }
-        .background(Color.themeBase)
+        .background(
+            LinearGradient(
+                colors: [Color.themeBase, Color.themeSurfaceAlt.opacity(0.9)],
+                startPoint: .top,
+                endPoint: .bottom
+            )
+        )
         .onChange(of: mainViewState.navigationResetToken) { _ in
             onDismiss()
         }
@@ -80,10 +86,16 @@ struct ExplanationView: View {
                 Text(hasNextQuestion ? "次の問題へ" : "結果表示")
                     .frame(maxWidth: .infinity)
                     .padding()
-                    .background(Color.themeMain)
+                    .background(
+                        LinearGradient(
+                            colors: [Color.themeSecondary, Color.themeMain],
+                            startPoint: .leading,
+                            endPoint: .trailing
+                        )
+                    )
                     .foregroundColor(.white)
                     .cornerRadius(12)
-                    .shadow(color: Color.themeMainHover.opacity(0.3), radius: 12, x: 0, y: 6)
+                    .shadow(color: Color.themeSecondary.opacity(0.25), radius: 12, x: 0, y: 6)
                     .padding(.horizontal)
                     .padding(.bottom, 8)
             }
@@ -126,8 +138,9 @@ private extension ExplanationView {
         )
         .overlay(
             RoundedRectangle(cornerRadius: 12)
-                .stroke(highlightColor ?? Color.clear, lineWidth: highlightColor == nil ? 0 : 1.5)
+                .stroke(highlightColor ?? Color.themeMain.opacity(0.08), lineWidth: highlightColor == nil ? 1 : 1.5)
         )
+        .shadow(color: Color.themeShadowSoft.opacity(highlightColor == nil ? 0.6 : 1), radius: 8, x: 0, y: 4)
     }
 
     func choiceTags(isCorrectChoice: Bool, isSelectedChoice: Bool) -> [ChoiceTagType] {
