@@ -68,9 +68,9 @@ final class MainViewState: ObservableObject {
 
 extension MainViewState.HeaderBackButton {
     /// クイズ画面向け：章一覧に戻るが、ラベルは「単元選択に戻る」
-    static let quizToChapterList = Self(title: "◀ 単元選択に戻る", destination: .chapterList)
+    static let quizToChapterList = Self(title: "◀ 単元", destination: .chapterList)
     /// 章一覧に戻る際の標準ラベル
-    static let toChapterList = Self(title: "◀ 章選択に戻る", destination: .chapterList)
+    static let toChapterList = Self(title: "◀ 章", destination: .chapterList)
     /// 単元一覧に戻る際のラベル
-    static let toUnitList = Self(title: "◀ 単元選択に戻る", destination: .unitList)
+    static let toUnitList = Self(title: "◀ 単元", destination: .unitList)
 }
