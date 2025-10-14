@@ -156,7 +156,8 @@ private extension ContentView {
     
     func updateHeaderForCurrentState() {
         if showExplanation {
-            mainViewState.setHeader(title: "章", backButton: .toChapterList)
+            let questionNumber = min(viewModel.currentQuestionIndex + 1, viewModel.totalCount)
+            mainViewState.setHeader(title: "第\(questionNumber)問", backButton: .toChapterList)
         } else if viewModel.totalCount > 0 && viewModel.currentQuestionIndex >= viewModel.totalCount {
             mainViewState.setHeader(title: "結果", backButton: .toChapterList)
         } else if viewModel.isLoaded && viewModel.totalCount > 0 {
