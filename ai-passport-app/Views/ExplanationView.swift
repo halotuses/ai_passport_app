@@ -10,6 +10,12 @@ struct ExplanationView: View {
     let onDismiss: () -> Void
     @EnvironmentObject private var mainViewState: MainViewState
     
+    private var isAnswerCorrect: Bool {
+        selectedAnswerIndex == quiz.answerIndex
+    }
+
+    
+    
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 16) {
@@ -33,17 +39,12 @@ struct ExplanationView: View {
                     .padding(.top, 4)
                 
                 // MARK: - 選択肢と正解表示
-                VStack(alignment: .leading, spacing: 6) {
+                VStack(alignment: .leading, spacing: 8) {
                     ForEach(Array(quiz.choices.enumerated()), id: \.offset) { index, choice in
-                        HStack {
-                            Text(choice)
-                                .foregroundColor(index == quiz.answerIndex ? .orange : .primary)
-                            if index == quiz.answerIndex {
-                                Text("← 正解")
-                                    .font(.caption)
-                                    .foregroundColor(.orange)
-                            }
-                        }
+                        choiceRow(for: choice,
+                                  isCorrectChoice: index == quiz.answerIndex,
+                                  isSelectedChoice: index == selectedAnswerIndex,
+                                  isAnswerCorrect: isAnswerCorrect)
                     }
                 }
                 .padding(.vertical, 4)
@@ -81,6 +82,93 @@ struct ExplanationView: View {
                     .padding(.horizontal)
                     .padding(.bottom, 8)
             }
+        }
+    }
+}
+
+
+private extension ExplanationView {
+    enum ChoiceTagType: String {
+        case correct = "正解"
+        case selected = "回答"
+    }
+
+    @ViewBuilder
+    func choiceRow(for text: String,
+                   isCorrectChoice: Bool,
+                   isSelectedChoice: Bool,
+                   isAnswerCorrect: Bool) -> some View {
+        let tags = choiceTags(isCorrectChoice: isCorrectChoice, isSelectedChoice: isSelectedChoice)
+        let highlightColor = choiceHighlightColor(isCorrectChoice: isCorrectChoice,
+                                                  isSelectedChoice: isSelectedChoice,
+                                                  isAnswerCorrect: isAnswerCorrect)
+
+        HStack(alignment: .center, spacing: 12) {
+            Text(text)
+                .foregroundColor(.primary)
+
+            Spacer(minLength: 8)
+
+            ForEach(tags, id: \.self) { tag in
+                tagView(for: tag, isAnswerCorrect: isAnswerCorrect)
+            }
+        }
+        .padding(.horizontal, 12)
+        .padding(.vertical, 10)
+        .background(
+            RoundedRectangle(cornerRadius: 12)
+                .fill(highlightColor ?? Color.clear)
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 12)
+                .stroke(highlightColor ?? Color.clear, lineWidth: highlightColor == nil ? 0 : 1.5)
+        )
+    }
+
+    func choiceTags(isCorrectChoice: Bool, isSelectedChoice: Bool) -> [ChoiceTagType] {
+        var tags: [ChoiceTagType] = []
+        if isCorrectChoice { tags.append(.correct) }
+        if isSelectedChoice { tags.append(.selected) }
+        return tags
+    }
+
+    func choiceHighlightColor(isCorrectChoice: Bool,
+                              isSelectedChoice: Bool,
+                              isAnswerCorrect: Bool) -> Color? {
+        if isAnswerCorrect {
+            return isCorrectChoice ? Color.blue.opacity(0.2) : nil
+        } else if isCorrectChoice || isSelectedChoice {
+            return Color.green.opacity(0.2)
+        }
+        return nil
+    }
+
+    @ViewBuilder
+    func tagView(for type: ChoiceTagType, isAnswerCorrect: Bool) -> some View {
+        let color = tagColor(for: type, isAnswerCorrect: isAnswerCorrect)
+
+        Text(type.rawValue)
+            .font(.caption)
+            .fontWeight(.semibold)
+            .foregroundColor(.white)
+            .padding(.horizontal, 8)
+            .padding(.vertical, 4)
+            .background(
+                Capsule()
+                    .fill(color)
+            )
+    }
+
+    func tagColor(for type: ChoiceTagType, isAnswerCorrect: Bool) -> Color {
+        if isAnswerCorrect {
+            switch type {
+            case .correct:
+                return .blue
+            case .selected:
+                return .red
+            }
+        } else {
+            return .green
         }
     }
 }

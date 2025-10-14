@@ -10,6 +10,9 @@ struct HeaderView: View {
             Text(mainViewState.headerTitle)
                 .font(.title2)
                 .fontWeight(.bold)
+                .lineLimit(1)
+                .minimumScaleFactor(0.7)
+                .allowsTightening(true)
 
             HStack {
                 if let backButton = mainViewState.headerBackButton {
