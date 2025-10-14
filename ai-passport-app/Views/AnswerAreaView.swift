@@ -25,7 +25,7 @@ struct AnswerAreaView: View {
                                     .frame(width: buttonWidth, height: 52)
                                     .background(
                                         LinearGradient(
-                                            colors: [Color.themeQuaternary, Color.themeSecondary],
+                                            colors: [Color.themeAnswerGradientStart, Color.themeAnswerGradientEnd],
                                             startPoint: .topLeading,
                                             endPoint: .bottomTrailing
                                         )
@@ -36,7 +36,7 @@ struct AnswerAreaView: View {
                                         RoundedRectangle(cornerRadius: 14)
                                             .stroke(Color.white.opacity(0.18), lineWidth: 1)
                                     )
-                                    .shadow(color: Color.themeQuaternary.opacity(0.28), radius: 10, x: 0, y: 6)
+                                    .shadow(color: Color.themeAnswerGradientEnd.opacity(0.28), radius: 10, x: 0, y: 6)
                             }
                         }
                     }

@@ -21,4 +21,7 @@ extension Color {
     static let themeShadowSoft = Color.black.opacity(0.08)
     static let themeCorrect = Color(red: 119/255, green: 221/255, blue: 119/255)
     static let themeIncorrect = Color(red: 246/255, green: 114/255, blue: 128/255)
+    
+    static let themeAnswerGradientStart = Color(red: 255/255, green: 224/255, blue: 102/255)
+    static let themeAnswerGradientEnd = Color(red: 255/255, green: 195/255, blue: 0/255)
 }
