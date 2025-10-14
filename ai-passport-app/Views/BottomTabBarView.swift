@@ -24,7 +24,9 @@ struct BottomTabBarView: View {
                     
                     VStack {
                         Image(systemName: "house.fill")
-                        Text("ホーム").font(.caption)
+                        Text("ホーム")
+                            .font(.caption)
+                            .fontWeight(.semibold)
                     }
                 }
                 .buttonStyle(.plain)
@@ -34,14 +36,18 @@ struct BottomTabBarView: View {
                 
                 VStack {
                     Image(systemName: "person.fill")
-                    Text("アカウント").font(.caption)
+                    Text("アカウント")
+                        .font(.caption)
+                        .fontWeight(.semibold)
                 }
                 .allowsHitTesting(isHovering)
                 .foregroundColor(.white.opacity(0.8))
                 Spacer()
                 VStack {
                     Image(systemName: "gearshape.fill")
-                    Text("設定").font(.caption)
+                    Text("設定")
+                        .font(.caption)
+                        .fontWeight(.semibold)
                 }
                 .allowsHitTesting(isHovering)
                 .foregroundColor(.white.opacity(0.8))

@@ -19,11 +19,18 @@ struct QuestionView: View {
 
                     VStack(spacing: 10) {
                         ForEach(Array(quiz.choices.enumerated()), id: \.offset) { index, choiceText in
-                            HStack(spacing: 12) {
+                            HStack(alignment: .center, spacing: 12) {
                                 Text(choiceLabel(for: index))
                                     .font(.headline)
-                                    .fontWeight(.semibold)
-                                    .foregroundColor(.themeMain)
+                                    .fontWeight(.bold)
+                                    .foregroundColor(.white)
+                                    .frame(width: 44, height: 44)
+                                    .background(
+                                        Circle()
+                                            .fill(
+                                                LinearGradient(colors: [Color.themeMain, Color.themeAccent], startPoint: .topLeading, endPoint: .bottomTrailing)
+                                            )
+                                    )
 
                                 Text(choiceText)
                                     .font(.body)
