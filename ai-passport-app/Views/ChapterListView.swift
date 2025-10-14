@@ -22,7 +22,7 @@ struct ChapterListView: View {
             }
             .padding()
         }
-        .background(Color(red: 240/255, green: 255/255, blue: 240/255))
+        .background(Color.themeBase)
         .onAppear {
             mainViewState.setHeader(title: unit.title, backButton: .toUnitList)
             viewModel.fetchChapters(forUnitId: unitKey, filePath: unit.file)
@@ -33,19 +33,34 @@ struct ChapterListView: View {
         let totalCount = viewModel.quizCounts[chapter.id] ?? 0
         let correctCount = viewModel.correctCounts[chapter.id] ?? 0
         
-        return HStack {
+        return HStack(spacing: 16) {
             Image(systemName: "book.closed")
-            Text(chapter.title)
-                .font(.system(size: 16, weight: .bold))
+                .font(.system(size: 20, weight: .semibold))
+                .foregroundColor(.themeMain)
+            VStack(alignment: .leading, spacing: 4) {
+                Text(chapter.title)
+                    .font(.system(size: 16, weight: .bold))
+                    .foregroundColor(.themeTextPrimary)
+                Text("正解数 / 問題数")
+                    .font(.caption)
+                    .foregroundColor(.themeTextSecondary)
+            }
             Spacer()
             ZStack {
-                Circle().fill(Color.gray.opacity(0.3)).frame(width: 50, height: 50)
+                Circle()
+                    .fill(Color.themeMain.opacity(0.18))
+                    .frame(width: 50, height: 50)
                 Text("\(correctCount)/\(totalCount)")
                     .font(.system(size: 12, weight: .bold))
+                    .foregroundColor(.themeTextPrimary)
             }
         }
-        .padding(10)
-        .background(Color(white: 0.97))
-        .cornerRadius(8)
+        .padding(12)
+        .background(Color.themeSurfaceElevated)
+        .cornerRadius(12)
+        .overlay(
+            RoundedRectangle(cornerRadius: 12)
+                .stroke(Color.themeMain.opacity(0.1), lineWidth: 1)
+        )
     }
 }

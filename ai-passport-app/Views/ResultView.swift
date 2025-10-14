@@ -16,12 +16,15 @@ struct ResultView: View {
                 .font(.title3)
                 .fontWeight(.semibold)
                 .padding(.bottom, 8)
+                .foregroundColor(.themeTextPrimary)
 
             // 結果詳細
             Text("正解数：\(correctCount) / \(totalCount)")
                 .font(.body)
+                .foregroundColor(.themeTextPrimary)
             Text("正答率：\(Int(Double(correctCount) / Double(totalCount) * 100))%")
                 .font(.body)
+                .foregroundColor(.themeTextSecondary)
 
             // トップに戻るボタン
             Button(action: onRestart) {
@@ -29,8 +32,9 @@ struct ResultView: View {
                     .fontWeight(.medium)
                     .padding()
                     .frame(width: 220)
-                    .background(Color.blue.opacity(0.1))
-                    .cornerRadius(10)
+                    .background(Color.themeMain)
+                    .foregroundColor(.white)
+                    .cornerRadius(12)
             }
             .padding(.top, 20)
 
@@ -38,6 +42,8 @@ struct ResultView: View {
         }
         .padding(.top, 20)
         .navigationBarBackButtonHidden(true)
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(Color.themeBase)
     }
 
     private var resultMessage: String {

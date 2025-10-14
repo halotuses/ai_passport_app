@@ -22,17 +22,22 @@ struct QuestionView: View {
                                 Text(choiceLabel(for: index))
                                     .font(.headline)
                                     .fontWeight(.semibold)
-                                    .foregroundColor(.orange)
+                                    .foregroundColor(.themeAccent)
 
                                 Text(choiceText)
                                     .font(.body)
                                     .multilineTextAlignment(.leading)
+                                    .foregroundColor(.themeTextPrimary)
                                 Spacer()
                             }
                             .padding()
                             .frame(maxWidth: .infinity)
-                            .background(Color.gray.opacity(0.1))
-                            .cornerRadius(10)
+                            .background(Color.themeSurfaceElevated)
+                            .cornerRadius(12)
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 12)
+                                    .stroke(Color.themeMain.opacity(0.12), lineWidth: 1)
+                            )
                         }
                     }
                 }

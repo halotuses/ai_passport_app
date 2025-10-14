@@ -29,6 +29,7 @@ struct BottomTabBarView: View {
                 }
                 .buttonStyle(.plain)
                 .allowsHitTesting(isHovering)
+                .foregroundColor(.white)
                 Spacer()
                 
                 VStack {
@@ -36,17 +37,23 @@ struct BottomTabBarView: View {
                     Text("アカウント").font(.caption)
                 }
                 .allowsHitTesting(isHovering)
+                .foregroundColor(.white.opacity(0.8))
                 Spacer()
                 VStack {
                     Image(systemName: "gearshape.fill")
                     Text("設定").font(.caption)
                 }
                 .allowsHitTesting(isHovering)
+                .foregroundColor(.white.opacity(0.8))
                 Spacer()
                 
             }
             .padding()
             .background(Color.gray.opacity(0.2))
+            .background(
+                RoundedRectangle(cornerRadius: 24)
+                    .fill(Color.themeMain)
+            )
             .opacity(isHovering ? 1 : 0)
             .animation(.easeInOut(duration: 0.2), value: isHovering)
         }

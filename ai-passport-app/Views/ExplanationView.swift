@@ -27,7 +27,7 @@ struct ExplanationView: View {
                         .fontWeight(.bold)
                         .foregroundColor(.white)
                         .padding(8)
-                        .background(selectedAnswerIndex == quiz.answerIndex ? Color.orange : Color.red)
+                        .background(selectedAnswerIndex == quiz.answerIndex ? Color.themeMain : Color.themeAccent)
                         .cornerRadius(8)
                     Spacer()
                 }
@@ -37,6 +37,7 @@ struct ExplanationView: View {
                     .font(.title3)
                     .fontWeight(.bold)
                     .padding(.top, 4)
+                    .foregroundColor(.themeTextPrimary)
                 
                 // MARK: - 選択肢と正解表示
                 VStack(alignment: .leading, spacing: 8) {
@@ -55,12 +56,13 @@ struct ExplanationView: View {
                 Text(quiz.explanation ?? "解説はありません。")
                     .font(.body)
                     .multilineTextAlignment(.leading)
+                    .foregroundColor(.themeTextPrimary)
                 
                 Spacer(minLength: 80) // 下のボタン分の余白
             }
             .padding()
         }
-
+        .background(Color.themeBase)
         .onChange(of: mainViewState.navigationResetToken) { _ in
             onDismiss()
         }
@@ -77,7 +79,8 @@ struct ExplanationView: View {
                 Text(hasNextQuestion ? "次の問題へ" : "結果表示")
                     .frame(maxWidth: .infinity)
                     .padding()
-                    .background(Color.green.opacity(0.2))
+                    .background(Color.themeMain)
+                    .foregroundColor(.white)
                     .cornerRadius(12)
                     .padding(.horizontal)
                     .padding(.bottom, 8)
@@ -105,7 +108,7 @@ private extension ExplanationView {
 
         HStack(alignment: .center, spacing: 12) {
             Text(text)
-                .foregroundColor(.primary)
+                .foregroundColor(.themeTextPrimary)
 
             Spacer(minLength: 8)
 
@@ -136,9 +139,9 @@ private extension ExplanationView {
                               isSelectedChoice: Bool,
                               isAnswerCorrect: Bool) -> Color? {
         if isAnswerCorrect {
-            return isCorrectChoice ? Color.green.opacity(0.2) : nil
+            return isCorrectChoice ? Color.themeMain.opacity(0.18) : nil
         } else if isCorrectChoice || isSelectedChoice {
-            return Color.red.opacity(0.2)
+            return Color.themeAccent.opacity(0.18)
         }
         return nil
     }
@@ -160,20 +163,11 @@ private extension ExplanationView {
     }
 
     func tagColor(for type: ChoiceTagType, isAnswerCorrect: Bool) -> Color {
-        if isAnswerCorrect {
-            switch type {
-            case .correct:
-                return .mint
-            case .selected:
-                return .mint
-            }
-        } else {
-            switch type {
-            case .correct:
-                return .blue
-            case .selected:
-                return .yellow
-            }
+        switch type {
+        case .correct:
+            return Color.themeMain
+        case .selected:
+            return isAnswerCorrect ? Color.themeMain : Color.themeAccent
         }
     }
 }

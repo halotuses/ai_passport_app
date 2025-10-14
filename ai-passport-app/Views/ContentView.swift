@@ -56,6 +56,7 @@ struct ContentView: View {
                     Spacer(minLength: 0)
 
                     Divider()
+                        .background(Color.themeMain.opacity(0.2))
                         .padding(.top, 12)
 
                     AnswerAreaView(
@@ -74,6 +75,7 @@ struct ContentView: View {
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(Color.themeBase)
         .sheet(isPresented: $showExplanation) {
             if let quiz = explanationQuiz {
                 ExplanationView(

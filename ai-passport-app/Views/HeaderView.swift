@@ -25,11 +25,10 @@ struct HeaderView: View {
                         }
                         .padding(.horizontal, 8)
                         .padding(.vertical, 6)
-                        .background(Color.white.opacity(0.6))
+                        .background(Color.white.opacity(0.18))
                         .cornerRadius(12)
                     }
-                    .foregroundColor(.black)
-                    .buttonStyle(.plain)
+                    .foregroundColor(.white)
                     .accessibilityLabel(backButton.title)
                 }
 
@@ -39,7 +38,7 @@ struct HeaderView: View {
         .padding(.vertical, 10)
         .padding(.horizontal, 16)
         .frame(maxWidth: .infinity)
-        .background(Color.green.opacity(0.3))
-        .foregroundColor(.black)
+        .background(Color.themeMain)
+        .foregroundColor(.white)
     }
 }
