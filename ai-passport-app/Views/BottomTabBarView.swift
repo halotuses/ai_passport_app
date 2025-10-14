@@ -5,34 +5,58 @@ struct BottomTabBarView: View {
     @EnvironmentObject private var router: NavigationRouter
     @EnvironmentObject private var mainViewState: MainViewState
     
+#if os(iOS)
+    @State private var isHovering = true
+#else
+    @State private var isHovering = false
+#endif
+    
+    
     var body: some View {
-        HStack {
-            Spacer()
-            Button(action: {
-                withAnimation {
-                    mainViewState.reset(router: router)
+        ZStack {
+            HStack {
+                Spacer()
+                Button(action: {
+                    withAnimation {
+                        mainViewState.reset(router: router)
+                    }
+                }) {
+                    
+                    VStack {
+                        Image(systemName: "house.fill")
+                        Text("ホーム").font(.caption)
+                    }
                 }
-            }) {
+                .buttonStyle(.plain)
+                .allowsHitTesting(isHovering)
+                Spacer()
                 
                 VStack {
-                    Image(systemName: "house.fill")
-                    Text("ホーム").font(.caption)
+                    Image(systemName: "person.fill")
+                    Text("アカウント").font(.caption)
                 }
+                .allowsHitTesting(isHovering)
+                Spacer()
+                VStack {
+                    Image(systemName: "gearshape.fill")
+                    Text("設定").font(.caption)
+                }
+                .allowsHitTesting(isHovering)
+                Spacer()
+                
             }
-            .buttonStyle(.plain)
-            Spacer()
-            VStack {
-                Image(systemName: "person.fill")
-                Text("アカウント").font(.caption)
-            }
-            Spacer()
-            VStack {
-                Image(systemName: "gearshape.fill")
-                Text("設定").font(.caption)
-            }
-            Spacer()
+            .padding()
+            .background(Color.gray.opacity(0.2))
+            .opacity(isHovering ? 1 : 0)
+            .animation(.easeInOut(duration: 0.2), value: isHovering)
         }
-        .padding()
-        .background(Color.gray.opacity(0.2))
+        .frame(height: 80)
+        .frame(maxWidth: .infinity)
+        .contentShape(Rectangle())
+        .onHover { hovering in
+            withAnimation(.easeInOut(duration: 0.2)) {
+                isHovering = hovering
+            }
+        }
     }
 }
