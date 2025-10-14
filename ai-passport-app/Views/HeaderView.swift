@@ -13,6 +13,8 @@ struct HeaderView: View {
                 .lineLimit(1)
                 .minimumScaleFactor(0.7)
                 .allowsTightening(true)
+                .frame(maxWidth: .infinity)
+                .padding(.horizontal, mainViewState.headerBackButton == nil ? 20 : 88)
 
             HStack {
                 if let backButton = mainViewState.headerBackButton {
