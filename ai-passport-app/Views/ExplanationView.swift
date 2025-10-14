@@ -59,8 +59,7 @@ struct ExplanationView: View {
             }
             .padding()
         }
-        .navigationTitle("解説")
-        .navigationBarTitleDisplayMode(.inline)
+
         .onChange(of: mainViewState.navigationResetToken) { _ in
             onDismiss()
         }

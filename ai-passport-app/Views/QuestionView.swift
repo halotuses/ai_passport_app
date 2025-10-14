@@ -8,13 +8,6 @@ struct QuestionView: View {
     var body: some View {
         VStack(spacing: 20) {
             
-            // MARK: - 問題ヘッダー
-            if viewModel.currentQuiz != nil {
-                Text("第\(viewModel.currentQuestionIndex + 1)問")
-                    .font(.title2)
-                    .fontWeight(.bold)
-                    .padding(.top)
-            }
             
             // MARK: - 選択肢リスト
             if let quiz = viewModel.currentQuiz {
@@ -42,8 +35,6 @@ struct QuestionView: View {
                 }
                 .padding(.horizontal)
             }
-            
-            
         }
     }
     
