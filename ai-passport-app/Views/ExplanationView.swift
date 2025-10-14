@@ -77,7 +77,7 @@ struct ExplanationView: View {
                 Text(hasNextQuestion ? "次の問題へ" : "結果表示")
                     .frame(maxWidth: .infinity)
                     .padding()
-                    .background(Color.blue.opacity(0.2))
+                    .background(Color.green.opacity(0.2))
                     .cornerRadius(12)
                     .padding(.horizontal)
                     .padding(.bottom, 8)
@@ -136,9 +136,9 @@ private extension ExplanationView {
                               isSelectedChoice: Bool,
                               isAnswerCorrect: Bool) -> Color? {
         if isAnswerCorrect {
-            return isCorrectChoice ? Color.blue.opacity(0.2) : nil
+            return isCorrectChoice ? Color.green.opacity(0.2) : nil
         } else if isCorrectChoice || isSelectedChoice {
-            return Color.green.opacity(0.2)
+            return Color.red.opacity(0.2)
         }
         return nil
     }
@@ -163,12 +163,17 @@ private extension ExplanationView {
         if isAnswerCorrect {
             switch type {
             case .correct:
-                return .blue
+                return .mint
             case .selected:
-                return .red
+                return .mint
             }
         } else {
-            return .green
+            switch type {
+            case .correct:
+                return .blue
+            case .selected:
+                return .yellow
+            }
         }
     }
 }
