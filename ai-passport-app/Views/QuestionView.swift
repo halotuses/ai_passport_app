@@ -8,29 +8,32 @@ struct QuestionView: View {
     var body: some View {
         VStack(spacing: 20) {
             
-            
-            // MARK: - 選択肢リスト
+
             if let quiz = viewModel.currentQuiz {
-                let choices = quiz.choices
-                VStack(spacing: 10) {
-                    ForEach(Array(choices.enumerated()), id: \.offset) { index, choiceText in
-                        
-                        HStack(spacing: 12) {
-                            Text(choiceLabel(for: index))
-                                .font(.headline)
-                                .fontWeight(.semibold)
-                                .foregroundColor(.orange)
-                            
-                            Text(choiceText)
-                                .font(.body)
-                                .multilineTextAlignment(.leading)
-                            Spacer()
+                VStack(alignment: .leading, spacing: 16) {
+                    Text(quiz.question)
+                        .font(.title3)
+                        .fontWeight(.semibold)
+                        .multilineTextAlignment(.leading)
+
+                    VStack(spacing: 10) {
+                        ForEach(Array(quiz.choices.enumerated()), id: \.offset) { index, choiceText in
+                            HStack(spacing: 12) {
+                                Text(choiceLabel(for: index))
+                                    .font(.headline)
+                                    .fontWeight(.semibold)
+                                    .foregroundColor(.orange)
+
+                                Text(choiceText)
+                                    .font(.body)
+                                    .multilineTextAlignment(.leading)
+                                Spacer()
+                            }
+                            .padding()
+                            .frame(maxWidth: .infinity)
+                            .background(Color.gray.opacity(0.1))
+                            .cornerRadius(10)
                         }
-                        
-                        .padding()
-                        .frame(maxWidth: .infinity)
-                        .background(Color.gray.opacity(0.1))
-                        .cornerRadius(10)
                     }
                 }
                 .padding(.horizontal)

@@ -24,7 +24,7 @@ struct ChapterListView: View {
         }
         .background(Color(red: 240/255, green: 255/255, blue: 240/255))
         .onAppear {
-            mainViewState.setHeader(title: unit.title)
+            mainViewState.setHeader(title: unit.title, backButton: .toUnitList)
             viewModel.fetchChapters(forUnitId: unitKey, filePath: unit.file)
         }
     }

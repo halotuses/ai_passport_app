@@ -156,14 +156,14 @@ private extension ContentView {
     
     func updateHeaderForCurrentState() {
         if showExplanation {
-            mainViewState.setHeader(title: "解説", backButton: .toChapterList)
+            mainViewState.setHeader(title: "章", backButton: .toChapterList)
         } else if viewModel.totalCount > 0 && viewModel.currentQuestionIndex >= viewModel.totalCount {
             mainViewState.setHeader(title: "結果", backButton: .toChapterList)
         } else if viewModel.isLoaded && viewModel.totalCount > 0 {
             let questionNumber = min(viewModel.currentQuestionIndex + 1, viewModel.totalCount)
-            mainViewState.setHeader(title: "第\(questionNumber)問", backButton: .quizToChapterList)
+            mainViewState.setHeader(title: "第\(questionNumber)問", backButton: .toChapterList)
         } else {
-            mainViewState.setHeader(title: chapter.title, backButton: .quizToChapterList)
+            mainViewState.setHeader(title: chapter.title, backButton: .toChapterList)
         }
     }
     
