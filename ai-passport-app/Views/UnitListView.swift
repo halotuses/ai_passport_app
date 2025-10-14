@@ -69,5 +69,6 @@ struct UnitListView: View {
             RoundedRectangle(cornerRadius: 12)
                 .stroke(Color.themeMain.opacity(0.1), lineWidth: 1)
         )
+        .shadow(color: Color.black.opacity(0.05), radius: 10, x: 0, y: 4)
     }
 }

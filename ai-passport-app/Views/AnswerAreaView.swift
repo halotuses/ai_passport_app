@@ -23,9 +23,10 @@ struct AnswerAreaView: View {
                                     .font(.title2)
                                     .fontWeight(.bold)
                                     .frame(width: buttonWidth, height: 50)
-                                    .background(Color.themeAccent)
+                                    .background(Color.themeMain)
                                     .foregroundColor(.white)
                                     .cornerRadius(12)
+                                    .shadow(color: Color.black.opacity(0.08), radius: 6, x: 0, y: 3)
                             }
                         }
                     }

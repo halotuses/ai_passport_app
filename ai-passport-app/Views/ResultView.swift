@@ -36,6 +36,7 @@ struct ResultView: View {
                     .foregroundColor(.white)
                     .cornerRadius(12)
             }
+            .shadow(color: Color.themeMainHover.opacity(0.3), radius: 12, x: 0, y: 6)
             .padding(.top, 20)
 
             Spacer()

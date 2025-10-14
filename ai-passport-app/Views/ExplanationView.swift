@@ -22,12 +22,13 @@ struct ExplanationView: View {
                 
                 // MARK: - 正誤表示
                 HStack {
-                    Text(selectedAnswerIndex == quiz.answerIndex ? "正解 ✅" : "不正解 ❌")
+                    let isCorrect = selectedAnswerIndex == quiz.answerIndex
+                    Text(isCorrect ? "正解 ✅" : "不正解 ❌")
                         .font(.headline)
                         .fontWeight(.bold)
                         .foregroundColor(.white)
                         .padding(8)
-                        .background(selectedAnswerIndex == quiz.answerIndex ? Color.themeMain : Color.themeAccent)
+                        .background(isCorrect ? Color.themeCorrect : Color.themeIncorrect)
                         .cornerRadius(8)
                     Spacer()
                 }
@@ -82,6 +83,7 @@ struct ExplanationView: View {
                     .background(Color.themeMain)
                     .foregroundColor(.white)
                     .cornerRadius(12)
+                    .shadow(color: Color.themeMainHover.opacity(0.3), radius: 12, x: 0, y: 6)
                     .padding(.horizontal)
                     .padding(.bottom, 8)
             }
@@ -139,10 +141,17 @@ private extension ExplanationView {
                               isSelectedChoice: Bool,
                               isAnswerCorrect: Bool) -> Color? {
         if isAnswerCorrect {
-            return isCorrectChoice ? Color.themeMain.opacity(0.18) : nil
-        } else if isCorrectChoice || isSelectedChoice {
-            return Color.themeAccent.opacity(0.18)
+            return isCorrectChoice ? Color.themeCorrect.opacity(0.22) : nil
         }
+        
+        if isCorrectChoice {
+            return Color.themeCorrect.opacity(0.22)
+        }
+
+        if isSelectedChoice {
+            return Color.themeIncorrect.opacity(0.18)
+        }
+
         return nil
     }
 
@@ -165,9 +174,9 @@ private extension ExplanationView {
     func tagColor(for type: ChoiceTagType, isAnswerCorrect: Bool) -> Color {
         switch type {
         case .correct:
-            return Color.themeMain
+            return Color.themeCorrect
         case .selected:
-            return isAnswerCorrect ? Color.themeMain : Color.themeAccent
+            return isAnswerCorrect ? Color.themeCorrect : Color.themeIncorrect
         }
     }
 }

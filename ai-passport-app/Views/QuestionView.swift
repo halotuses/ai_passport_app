@@ -15,6 +15,7 @@ struct QuestionView: View {
                         .font(.title3)
                         .fontWeight(.semibold)
                         .multilineTextAlignment(.leading)
+                        .foregroundColor(.themeTextPrimary)
 
                     VStack(spacing: 10) {
                         ForEach(Array(quiz.choices.enumerated()), id: \.offset) { index, choiceText in
@@ -22,7 +23,7 @@ struct QuestionView: View {
                                 Text(choiceLabel(for: index))
                                     .font(.headline)
                                     .fontWeight(.semibold)
-                                    .foregroundColor(.themeAccent)
+                                    .foregroundColor(.themeMain)
 
                                 Text(choiceText)
                                     .font(.body)
@@ -38,6 +39,7 @@ struct QuestionView: View {
                                 RoundedRectangle(cornerRadius: 12)
                                     .stroke(Color.themeMain.opacity(0.12), lineWidth: 1)
                             )
+                            .shadow(color: Color.black.opacity(0.05), radius: 10, x: 0, y: 4)
                         }
                     }
                 }

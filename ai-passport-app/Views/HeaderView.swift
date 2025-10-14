@@ -25,7 +25,7 @@ struct HeaderView: View {
                         }
                         .padding(.horizontal, 8)
                         .padding(.vertical, 6)
-                        .background(Color.white.opacity(0.18))
+                        .background(Color.white.opacity(0.2))
                         .cornerRadius(12)
                     }
                     .foregroundColor(.white)
@@ -40,5 +40,6 @@ struct HeaderView: View {
         .frame(maxWidth: .infinity)
         .background(Color.themeMain)
         .foregroundColor(.white)
+        .shadow(color: Color.themeMainHover.opacity(0.2), radius: 12, x: 0, y: 6)
     }
 }

@@ -34,6 +34,11 @@ struct ContentView: View {
                     Button("前に戻る") {
                         onQuizEnd()
                     }
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 10)
+                    .background(Color.themeButtonSecondary)
+                    .foregroundColor(.themeTextPrimary)
+                    .cornerRadius(10)
                 }
                 .padding()
             }
