@@ -4,6 +4,8 @@ import Foundation
 final class HomeViewModel: ObservableObject {
     @Published private(set) var totalQuestions: Int = 0
     @Published private(set) var totalCorrect: Int = 0
+    @Published private(set) var totalIncorrect: Int = 0
+    @Published private(set) var totalAnswered: Int = 0
     @Published private(set) var completionRate: Double = 0
     @Published private(set) var daysUntilExam: Int? = nil
     @Published private(set) var encouragementMessage: String = ""
@@ -41,6 +43,8 @@ final class HomeViewModel: ObservableObject {
 
     func reloadProgress(currentDate: Date = Date()) {
         totalCorrect = repository.totalCorrectAnswerCount()
+        totalIncorrect = repository.totalIncorrectAnswerCount()
+        totalAnswered = totalCorrect + totalIncorrect
         if hasLoadedMetadata {
             updateCompletionRate()
             refreshCountdown(from: currentDate)
@@ -77,6 +81,11 @@ final class HomeViewModel: ObservableObject {
         completionRate = min(max(Double(totalCorrect) / Double(totalQuestions), 0), 1)
     }
 
+    var totalUnanswered: Int {
+        max(totalQuestions - totalAnswered, 0)
+    }
+
+    
     private func refreshCountdown(from currentDate: Date) {
         let components = Calendar.current.dateComponents([.day], from: currentDate, to: examDate)
         daysUntilExam = components.day
@@ -115,7 +124,7 @@ final class HomeViewModel: ObservableObject {
             if completionRate > 0.5 {
                 return "着実にステップアップ中！今日も1問解いてみよう🐾"
             } else {
-                return "ゆるキャラと一緒にスタート！小さな一歩から始めよう🌱"
+                return "一緒にスタート！小さな一歩から始めよう🌱"
             }
         }
     }

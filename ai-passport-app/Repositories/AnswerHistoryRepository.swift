@@ -54,7 +54,18 @@ class AnswerHistoryRepository {
     func totalCorrectAnswerCount() -> Int {
         let request: NSFetchRequest<AnswerHistory> = AnswerHistory.fetchRequest()
         request.predicate = NSPredicate(format: "isCorrect == true")
-        
+ 
+        do {
+            return try viewContext.count(for: request)
+        } catch {
+            print("❌ カウント取得失敗: \(error)")
+            return 0
+        }
+    }
+
+    func totalIncorrectAnswerCount() -> Int {
+        let request: NSFetchRequest<AnswerHistory> = AnswerHistory.fetchRequest()
+        request.predicate = NSPredicate(format: "isCorrect == false")
         do {
             return try viewContext.count(for: request)
         } catch {
