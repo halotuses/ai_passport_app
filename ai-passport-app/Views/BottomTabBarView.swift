@@ -57,7 +57,7 @@ struct BottomTabBarView: View {
             .padding()
 
             .background(
-                RoundedRectangle(cornerRadius: 18)
+                RoundedRectangle(cornerRadius: 10)
                     .fill(
                         LinearGradient(
                             colors: [Color.themeSecondary, Color.themeMain],

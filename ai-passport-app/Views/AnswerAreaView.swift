@@ -24,6 +24,7 @@ struct AnswerAreaView: View {
                                     .fontWeight(.bold)
                                     .frame(width: buttonWidth, height: 52)
                                     .background(
+                       
                                         LinearGradient(
                                             colors: [Color.themeAnswerGradientStart, Color.themeAnswerGradientEnd],
                                             startPoint: .topLeading,
