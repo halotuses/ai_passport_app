@@ -31,7 +31,7 @@ struct UnitListView: View {
         }
         .background(Color.themeBase)
         .onAppear {
-            mainViewState.setHeader(title: "学習アプリ")
+            mainViewState.enterUnitSelection()
             viewModel.refreshIfNeeded()
         }
     }

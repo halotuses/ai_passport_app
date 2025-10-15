@@ -5,7 +5,7 @@ import SwiftUI
 struct MainRouterView: View {
     @EnvironmentObject private var router: NavigationRouter
     @EnvironmentObject private var mainViewState: MainViewState
-    
+    @StateObject private var homeViewModel = HomeViewModel()
     @StateObject private var unitListVM = UnitListViewModel()
     @StateObject private var chapterListVM = ChapterListViewModel()
     @StateObject private var quizViewModel  = QuizViewModel()   // ← 参照型VMは StateObject
@@ -15,9 +15,11 @@ struct MainRouterView: View {
             ZStack {
                 Color.themeBase
                     .ignoresSafeArea()
-
+                
                 Group {
-                    if mainViewState.selectedUnit == nil {
+                    if mainViewState.isOnHome {
+                        HomeView(viewModel: homeViewModel)
+                    } else if mainViewState.selectedUnit == nil {
                         // 単元一覧
                         UnitListView(viewModel: unitListVM, selectedUnit: $mainViewState.selectedUnit)
                     } else if let unit = mainViewState.selectedUnit,
@@ -38,6 +40,7 @@ struct MainRouterView: View {
                         }
                     }
                 }
+                .animation(.default, value: mainViewState.isOnHome)
                 .animation(.default, value: mainViewState.selectedUnit == nil)
                 .animation(.default, value: mainViewState.selectedChapter == nil)
             }

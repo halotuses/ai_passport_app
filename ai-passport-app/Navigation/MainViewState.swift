@@ -17,9 +17,9 @@ final class MainViewState: ObservableObject {
     @Published var selectedUnitKey: String? = nil
     @Published var navigationResetToken = UUID()
     @Published var showResultView: Bool = false
-    @Published var headerTitle: String = "学習アプリ"
+    @Published var headerTitle: String = "ホーム"
     @Published var headerBackButton: HeaderBackButton? = nil
-    
+    @Published var isOnHome: Bool = true
     
     /// ホーム画面（単元選択）に戻す
     func reset(router: NavigationRouter) {
@@ -29,6 +29,18 @@ final class MainViewState: ObservableObject {
         router.reset()
         navigationResetToken = UUID()
         showResultView = false
+        enterHome()
+    }
+    
+    /// ホーム画面に遷移
+    func enterHome() {
+        isOnHome = true
+        setHeader(title: "ホーム")
+    }
+    
+    /// 単元一覧（学習開始画面）に遷移
+    func enterUnitSelection() {
+        isOnHome = false
         setHeader(title: "学習アプリ")
         
     }
