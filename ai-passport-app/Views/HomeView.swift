@@ -1,4 +1,11 @@
 import SwiftUI
+import CoreImage.CIFilterBuiltins
+#if canImport(UIKit)
+import UIKit
+#elseif canImport(AppKit)
+import AppKit
+#endif
+
 
 struct HomeView: View {
     @ObservedObject var viewModel: HomeViewModel
@@ -134,16 +141,8 @@ private var progressDetailsText: String? {
             .padding(.vertical, 32)
         }
         .background(
-            LinearGradient(
-                colors: [
-                    Color.themeBase,
-                    Color.themeSurfaceAlt.opacity(0.85),
-                    Color.themeSurfaceElevated.opacity(0.9)
-                ],
-                startPoint: .topLeading,
-                endPoint: .bottomTrailing
-            )
-            .ignoresSafeArea()
+            PaperBackground()
+                .ignoresSafeArea()
         )
         .onAppear {
             mainViewState.enterHome()
@@ -472,9 +471,13 @@ private var progressDetailsText: String? {
             .background(
                 Capsule()
                     .fill(
-                        isSelected
-                        ? LinearGradient(colors: [Color.themeMain, Color.themeSecondary], startPoint: .leading, endPoint: .trailing)
-                        : Color.themeButtonSecondary.opacity(0.6)
+                        LinearGradient(
+                            colors: isSelected
+                                ? [Color.themeMain, Color.themeSecondary]
+                                : Array(repeating: Color.themeButtonSecondary.opacity(0.6), count: 2),
+                            startPoint: .leading,
+                            endPoint: .trailing
+                        )
                     )
             )
             .overlay(
@@ -545,6 +548,61 @@ private extension HomeView {
 
                 centerContent()
             }
+        }
+    }
+}
+private struct PaperBackground: View {
+    private let gradient = LinearGradient(
+        colors: [
+            Color(red: 0.99, green: 0.98, blue: 0.96),
+            Color(red: 0.97, green: 0.94, blue: 0.89),
+            Color(red: 1.0, green: 0.98, blue: 0.94)
+        ],
+        startPoint: .topLeading,
+        endPoint: .bottomTrailing
+    )
+
+    var body: some View {
+        Rectangle()
+            .fill(gradient)
+            .overlay(
+                NoiseTextureView()
+                    .blendMode(.softLight)
+                    .opacity(0.08)
+            )
+    }
+}
+
+private struct NoiseTextureView: View {
+    private static let noiseImage: Image? = {
+        let context = CIContext()
+        let filter = CIFilter.randomGenerator()
+        let size = CGSize(width: 512, height: 512)
+
+        guard
+            let outputImage = filter.outputImage?.cropped(to: CGRect(origin: .zero, size: size)),
+            let cgImage = context.createCGImage(outputImage, from: CGRect(origin: .zero, size: size))
+        else {
+            return nil
+        }
+
+        #if canImport(UIKit)
+        return Image(uiImage: UIImage(cgImage: cgImage))
+        #elseif canImport(AppKit)
+        return Image(nsImage: NSImage(cgImage: cgImage, size: size))
+        #else
+        return Image(decorative: cgImage, scale: 1.0)
+        #endif
+    }()
+
+    var body: some View {
+        if let noiseImage = Self.noiseImage {
+            noiseImage
+                .resizable()
+                .scaledToFill()
+                .clipped()
+        } else {
+            Color.clear
         }
     }
 }
