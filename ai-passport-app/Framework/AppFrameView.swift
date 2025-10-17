@@ -24,3 +24,4 @@ struct AppFrameView: View {
         .environment(\.managedObjectContext, persistenceController.container.viewContext)
     }
 }
+
