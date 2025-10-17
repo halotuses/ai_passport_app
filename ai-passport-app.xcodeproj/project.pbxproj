@@ -36,6 +36,10 @@
 		0C30DDFB2DFF1CEF00F25D02 /* ChapterMetadata.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C30DDFA2DFF1CEF00F25D02 /* ChapterMetadata.swift */; };
 		0C30DDFD2DFF1CFB00F25D02 /* SelectedAnswer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C30DDFC2DFF1CFB00F25D02 /* SelectedAnswer.swift */; };
 		0C30DDFF2DFF1E9A00F25D02 /* PersistenceController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C30DDFE2DFF1E9A00F25D02 /* PersistenceController.swift */; };
+		0C31AD7B2EA2184A007500F7 /* MainViewState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C31AD7A2EA2184A007500F7 /* MainViewState.swift */; };
+		0C31AD7E2EA21882007500F7 /* Color+Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C31AD7C2EA21882007500F7 /* Color+Theme.swift */; };
+		0C31AD7F2EA21882007500F7 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C31AD7D2EA21882007500F7 /* HomeView.swift */; };
+		0C31AD812EA21897007500F7 /* HomeViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C31AD802EA21897007500F7 /* HomeViewModel.swift */; };
 		0CCB45A02E89853900C41D03 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CCB459F2E89853900C41D03 /* Constants.swift */; };
 		0CCB45A22E8994E800C41D03 /* QuizList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CCB45A12E8994E800C41D03 /* QuizList.swift */; };
 		0CCB45A42E89951900C41D03 /* CapterList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CCB45A32E89951900C41D03 /* CapterList.swift */; };
@@ -91,6 +95,10 @@
 		0C30DDFA2DFF1CEF00F25D02 /* ChapterMetadata.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChapterMetadata.swift; sourceTree = "<group>"; };
 		0C30DDFC2DFF1CFB00F25D02 /* SelectedAnswer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectedAnswer.swift; sourceTree = "<group>"; };
 		0C30DDFE2DFF1E9A00F25D02 /* PersistenceController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersistenceController.swift; sourceTree = "<group>"; };
+		0C31AD7A2EA2184A007500F7 /* MainViewState.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MainViewState.swift; sourceTree = "<group>"; };
+		0C31AD7C2EA21882007500F7 /* Color+Theme.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Color+Theme.swift"; sourceTree = "<group>"; };
+		0C31AD7D2EA21882007500F7 /* HomeView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
+		0C31AD802EA21897007500F7 /* HomeViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HomeViewModel.swift; sourceTree = "<group>"; };
 		0CCB459F2E89853900C41D03 /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 		0CCB45A12E8994E800C41D03 /* QuizList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuizList.swift; sourceTree = "<group>"; };
 		0CCB45A32E89951900C41D03 /* CapterList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CapterList.swift; sourceTree = "<group>"; };
@@ -225,6 +233,7 @@
 		0C30DDCD2DFF13FD00F25D02 /* ViewModels */ = {
 			isa = PBXGroup;
 			children = (
+				0C31AD802EA21897007500F7 /* HomeViewModel.swift */,
 				0C30DDEA2DFF1B7A00F25D02 /* UnitListViewModel.swift */,
 				0C30DDEC2DFF1B8400F25D02 /* ChapterListViewModel.swift */,
 				0C30DDEE2DFF1B8E00F25D02 /* QuizViewModel.swift */,
@@ -235,6 +244,8 @@
 		0C30DDCE2DFF140C00F25D02 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				0C31AD7C2EA21882007500F7 /* Color+Theme.swift */,
+				0C31AD7D2EA21882007500F7 /* HomeView.swift */,
 				0C30DD9B2DFF116F00F25D02 /* ContentView.swift */,
 				0C30DDDA2DFF1A7F00F25D02 /* UnitListView.swift */,
 				0C30DDDC2DFF1A8B00F25D02 /* ChapterListView.swift */,
@@ -251,6 +262,7 @@
 		0C30DDCF2DFF141A00F25D02 /* Navigation */ = {
 			isa = PBXGroup;
 			children = (
+				0C31AD7A2EA2184A007500F7 /* MainViewState.swift */,
 				0C30DDD62DFF183F00F25D02 /* NavigationRouter.swift */,
 				0C30DDD82DFF185400F25D02 /* MainRouterView.swift */,
 			);
@@ -415,18 +427,21 @@
 				0CCB45A02E89853900C41D03 /* Constants.swift in Sources */,
 				0C30DDF12DFF1C1D00F25D02 /* NetworkManager.swift in Sources */,
 				0C30DDDF2DFF1A9600F25D02 /* QuestionView.swift in Sources */,
+				0C31AD7F2EA21882007500F7 /* HomeView.swift in Sources */,
 				0C30DDED2DFF1B8400F25D02 /* ChapterListViewModel.swift in Sources */,
 				0CCB45A22E8994E800C41D03 /* QuizList.swift in Sources */,
 				0C30DDDD2DFF1A8B00F25D02 /* ChapterListView.swift in Sources */,
 				0C30DDEF2DFF1B8E00F25D02 /* QuizViewModel.swift in Sources */,
 				0C30DDF92DFF1CE300F25D02 /* QuizMetadata.swift in Sources */,
 				0C30DDE72DFF1AC000F25D02 /* AnswerAreaView.swift in Sources */,
+				0C31AD7E2EA21882007500F7 /* Color+Theme.swift in Sources */,
 				0C30DDFB2DFF1CEF00F25D02 /* ChapterMetadata.swift in Sources */,
 				0C30DDA62DFF117200F25D02 /* ai_passport_app.xcdatamodeld in Sources */,
 				0C30DDD72DFF183F00F25D02 /* NavigationRouter.swift in Sources */,
 				0C30DDE32DFF1AAA00F25D02 /* ResultView.swift in Sources */,
 				0C30DDD52DFF16FE00F25D02 /* AppFrameView.swift in Sources */,
 				0C30DDDB2DFF1A7F00F25D02 /* UnitListView.swift in Sources */,
+				0C31AD7B2EA2184A007500F7 /* MainViewState.swift in Sources */,
 				0CCB45A42E89951900C41D03 /* CapterList.swift in Sources */,
 				0C30DD9C2DFF116F00F25D02 /* ContentView.swift in Sources */,
 				0C30DDFD2DFF1CFB00F25D02 /* SelectedAnswer.swift in Sources */,
@@ -438,6 +453,7 @@
 				0C30DDF72DFF1CD800F25D02 /* Quiz.swift in Sources */,
 				0C30DDD92DFF185400F25D02 /* MainRouterView.swift in Sources */,
 				0C30DDE52DFF1AB400F25D02 /* HeaderView.swift in Sources */,
+				0C31AD812EA21897007500F7 /* HomeViewModel.swift in Sources */,
 				0C30DDFF2DFF1E9A00F25D02 /* PersistenceController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
