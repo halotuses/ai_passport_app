@@ -105,22 +105,17 @@ struct ResultView: View {
                             Image(systemName: "chevron.right")
                                 .font(.subheadline)
                                 .fontWeight(.semibold)
-                                .foregroundColor(.themeTextSecondary)
+
                         }
                         .padding()
                         .frame(maxWidth: .infinity)
                         .background(
-                            RoundedRectangle(cornerRadius: 16, style: .continuous)
-                                .fill(Color.themeSurface)
+                            LinearGradient(colors: [Color.themeMain, Color.themeAccent], startPoint: .leading, endPoint: .trailing)
                         )
-                        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+                        .foregroundColor(.white)
+                        .cornerRadius(16)
                     }
-                    .foregroundColor(.themeTextPrimary)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 16, style: .continuous)
-                            .stroke(Color.themeMain.opacity(0.18), lineWidth: 1)
-                    )
-                    .shadow(color: Color.themeShadowSoft, radius: 10, x: 0, y: 6)
+                    .shadow(color: Color.themeMainHover.opacity(0.3), radius: 16, x: 0, y: 10)
 
                     Button(action: onBackToUnitSelection) {
                         HStack {
@@ -133,32 +128,45 @@ struct ResultView: View {
                             Image(systemName: "chevron.right")
                                 .font(.subheadline)
                                 .fontWeight(.semibold)
-                                .foregroundColor(.themeTextSecondary)
+
                         }
                         .padding()
                         .frame(maxWidth: .infinity)
                         .background(
-                            RoundedRectangle(cornerRadius: 16, style: .continuous)
-                                .fill(Color.themeSurface)
+                            LinearGradient(colors: [Color.themeMain, Color.themeAccent], startPoint: .leading, endPoint: .trailing)
                         )
-                        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+                        .foregroundColor(.white)
+                        .cornerRadius(16)
                     }
-                    .foregroundColor(.themeTextPrimary)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 16, style: .continuous)
-                            .stroke(Color.themeMain.opacity(0.18), lineWidth: 1)
+                    .shadow(color: Color.themeMainHover.opacity(0.3), radius: 16, x: 0, y: 10)
+                }
+
+                Button(action: onRestart) {
+                    HStack {
+                        Image(systemName: "arrow.uturn.backward")
+                            .font(.headline)
+                        Text("トップに戻る")
+                            .font(.headline)
+                            .fontWeight(.semibold)
+                    }
+
+                    .padding()
+                    .frame(maxWidth: .infinity)
+                    .background(
+                        LinearGradient(colors: [Color.themeMain, Color.themeAccent], startPoint: .leading, endPoint: .trailing)
                     )
-                    .shadow(color: Color.themeShadowSoft, radius: 10, x: 0, y: 6)
+                    .foregroundColor(.white)
+                    .cornerRadius(16)
                 }
                 
+                .shadow(color: Color.themeMainHover.opacity(0.3), radius: 16, x: 0, y: 10)
+
                 Text(encouragementMessage)
                     .font(.footnote)
                     .foregroundColor(.themeTextSecondary)
                     .multilineTextAlignment(.center)
             }
             .padding(.horizontal)
-
-            Spacer()
         }
         .padding(.vertical, 20)
         .navigationBarBackButtonHidden(true)
