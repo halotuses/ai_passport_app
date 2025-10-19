@@ -76,7 +76,8 @@ private var progressDetailsText: String? {
             LegendItem(kind: .unanswered, label: "未回答", count: unanswered, color: Color.themeButtonSecondary, percentageText: percentageText(for: unanswered))
         ]
     }
-
+    private let legendColumns: [GridItem] = Array(repeating: GridItem(.flexible(), spacing: 12), count: 2)
+    
     private var progressSegments: [ProgressSegment] {
         let unanswered = max(viewModel.totalUnanswered, 0)
         let segments = [
@@ -208,7 +209,7 @@ private var progressDetailsText: String? {
                     Divider()
                         .background(Color.themeButtonSecondary.opacity(0.4))
 
-                    VStack(alignment: .leading, spacing: 10) {
+                    LazyVGrid(columns: legendColumns, alignment: .leading, spacing: 12) {
                         ForEach(progressLegendItems) { item in
                             legendRow(for: item)
                         }
@@ -279,36 +280,46 @@ private var progressDetailsText: String? {
     }
 
     private func legendRow(for item: LegendItem) -> some View {
-        HStack(spacing: 12) {
-            Circle()
-                .fill(item.color)
-                .frame(width: 12, height: 12)
-                .opacity(item.count == 0 ? 0.4 : 1)
+        VStack(alignment: .leading, spacing: 8) {
+            HStack(spacing: 10) {
+                Circle()
+                    .fill(item.color)
+                    .frame(width: 12, height: 12)
+                    .opacity(item.count == 0 ? 0.4 : 1)
 
-            Text(item.label)
-                .font(.footnote.weight(.semibold))
-                .foregroundColor(.themeTextPrimary)
+                Text(item.label)
+                    .font(.footnote.weight(.semibold))
+                    .foregroundColor(.themeTextPrimary)
 
-            Spacer()
-
-            HStack(spacing: 6) {
-                Text("\(item.count)問")
-                    .font(.footnote)
-                    .foregroundColor(.themeTextSecondary)
+                Spacer()
 
                 if let percentageText = item.percentageText {
                     Text(percentageText)
-                        .font(.caption)
+                        .font(.caption.weight(.semibold))
                         .foregroundColor(item.count == 0 ? .themeTextSecondary : item.color)
-                        .padding(.horizontal, 8)
+                        .padding(.horizontal, 10)
                         .padding(.vertical, 4)
                         .background(
                             Capsule()
-                                .fill(item.color.opacity(0.15))
+                                .fill(item.color.opacity(0.18))
                         )
                 }
             }
+            
+            Text("\(item.count)問")
+                .font(.footnote)
+                .foregroundColor(.themeTextSecondary)
         }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(14)
+        .background(
+            RoundedRectangle(cornerRadius: 16)
+                .fill(Color.white.opacity(0.55))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 16)
+                        .stroke(Color.white.opacity(0.7), lineWidth: 0.6)
+                )
+        )
     }
 
     private func quickExamButton(daysFromNow offset: Int) -> some View {
