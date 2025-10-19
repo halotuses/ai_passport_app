@@ -52,9 +52,6 @@ struct MainRouterView: View {
                         )
                     }
                 }
-                .animation(.default, value: mainViewState.isOnHome)
-                .animation(.default, value: mainViewState.selectedUnit == nil)
-                .animation(.default, value: mainViewState.selectedChapter == nil)
             }
         }
     }
