@@ -6,7 +6,6 @@ import UIKit
 import AppKit
 #endif
 
-
 struct HomeView: View {
     @ObservedObject var viewModel: HomeViewModel
     @EnvironmentObject private var mainViewState: MainViewState
