@@ -244,7 +244,7 @@ private var progressDetailsText: String? {
             HStack(spacing: 12) {
                 Image(systemName: "play.fill")
                     .font(.headline)
-                Text("単元を選んで学習する")
+                Text("学習を始める")
                     .font(.headline)
                     .textCase(.none)
                 Spacer()
