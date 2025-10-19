@@ -91,7 +91,7 @@ final class MainViewState: ObservableObject {
     func handleBackAction(_ backButton: HeaderBackButton, router: NavigationRouter) {
         switch backButton.destination {
         case .unitList:
-            reset(router: router)
+            backToUnitSelection(router: router)
         case .chapterList:
             backToChapterSelection(router: router)
         }
