@@ -85,7 +85,6 @@ struct HomeView: View {
             LegendItem(kind: .unanswered, label: "未回答", count: unanswered, color: Color.themeButtonSecondary, percentageText: percentageText(for: unanswered))
         ]
     }
-    private let legendColumns: [GridItem] = Array(repeating: GridItem(.flexible(), spacing: 12), count: 2)
     
     private var progressPercentageDenominator: Int? {
         if viewModel.totalQuestions > 0 {
@@ -227,8 +226,7 @@ struct HomeView: View {
                     
                     Divider()
                         .background(Color.themeButtonSecondary.opacity(0.4))
-                    
-                    LazyVGrid(columns: legendColumns, alignment: .leading, spacing: 12) {
+                    VStack(spacing: 12) {
                         ForEach(progressLegendItems) { item in
                             legendRow(for: item)
                         }
@@ -299,45 +297,48 @@ struct HomeView: View {
     }
     
     private func legendRow(for item: LegendItem) -> some View {
-        VStack(alignment: .leading, spacing: 8) {
-            HStack(spacing: 10) {
-                Circle()
-                    .fill(item.color)
-                    .frame(width: 12, height: 12)
-                    .opacity(item.count == 0 ? 0.4 : 1)
+        HStack(spacing: 14) {
+            Circle()
+                .fill(item.color)
+                .frame(width: 12, height: 12)
+                .opacity(item.count == 0 ? 0.4 : 1)
+
+            VStack(alignment: .leading, spacing: 4) {
                 
                 Text(item.label)
                     .font(.footnote.weight(.semibold))
                     .foregroundColor(.themeTextPrimary)
-                
-                Spacer()
-                
-                if let percentageText = item.percentageText {
-                    Text(percentageText)
-                        .font(.caption.weight(.semibold))
-                        .foregroundColor(item.count == 0 ? .themeTextSecondary : item.color)
-                        .padding(.horizontal, 10)
-                        .padding(.vertical, 4)
-                        .background(
-                            Capsule()
-                                .fill(item.color.opacity(0.18))
-                        )
-                }
+
+                Text("\(item.count)問")
+                    .font(.footnote)
+                    .foregroundColor(.themeTextSecondary)
             }
-            
-            Text("\(item.count)問")
-                .font(.footnote)
-                .foregroundColor(.themeTextSecondary)
+
+            Spacer()
+
+            if let percentageText = item.percentageText {
+                Text(percentageText)
+                    .font(.caption.weight(.semibold))
+                    .foregroundColor(item.count == 0 ? .themeTextSecondary : item.color)
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 6)
+                    .background(
+                        Capsule()
+                            .fill(item.color.opacity(0.18))
+                    )
+            }
+
         }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(14)
+        .padding(.vertical, 14)
+        .padding(.horizontal, 18)
         .background(
-            RoundedRectangle(cornerRadius: 16)
-                .fill(Color.white.opacity(0.55))
+            RoundedRectangle(cornerRadius: 18, style: .continuous)
+                .fill(Color.white.opacity(0.72))
                 .overlay(
-                    RoundedRectangle(cornerRadius: 16)
-                        .stroke(Color.white.opacity(0.7), lineWidth: 0.6)
+                    RoundedRectangle(cornerRadius: 18, style: .continuous)
+                        .stroke(Color.white.opacity(0.65), lineWidth: 0.6)
                 )
+                .shadow(color: Color.themeShadowSoft.opacity(0.35), radius: 14, x: 0, y: 6)
         )
     }
     
