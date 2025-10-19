@@ -32,6 +32,35 @@ final class MainViewState: ObservableObject {
         enterHome()
     }
     
+    
+    /// 章選択画面へ戻す
+    func backToChapterSelection(router: NavigationRouter) {
+        guard selectedUnit != nil else {
+            backToUnitSelection(router: router)
+            return
+        }
+
+        selectedChapter = nil
+        showResultView = false
+        router.reset()
+        navigationResetToken = UUID()
+
+        let unitTitle = selectedUnit?.title ?? "章選択"
+        setHeader(title: unitTitle, backButton: .toUnitList)
+    }
+
+    /// 単元選択画面へ戻す
+    func backToUnitSelection(router: NavigationRouter) {
+        selectedChapter = nil
+        selectedUnit = nil
+        selectedUnitKey = nil
+        showResultView = false
+        router.reset()
+        navigationResetToken = UUID()
+
+        enterUnitSelection()
+    }
+    
     /// ホーム画面に遷移
     func enterHome() {
         isOnHome = true
@@ -68,14 +97,7 @@ final class MainViewState: ObservableObject {
         }
     }
     
-    private func backToChapterSelection(router: NavigationRouter) {
-        selectedChapter = nil
-        showResultView = false
-        router.reset()
-        navigationResetToken = UUID()
-        let unitTitle = selectedUnit?.title ?? "章選択"
-        setHeader(title: unitTitle)
-    }
+
 }
 
 extension MainViewState.HeaderBackButton {

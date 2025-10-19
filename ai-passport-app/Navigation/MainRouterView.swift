@@ -33,11 +33,23 @@ struct MainRouterView: View {
                         )
                     } else if let chapter = mainViewState.selectedChapter {
                         // 出題
-                        ContentView(chapter: chapter, viewModel: quizViewModel) {
-                            // クイズ終了時の戻し処理
-                            quizViewModel.reset()
-                            mainViewState.reset(router: router)
-                        }
+                        ContentView(
+                            chapter: chapter,
+                            viewModel: quizViewModel,
+                            onQuizEnd: {
+                                // クイズ終了時の戻し処理
+                                quizViewModel.reset()
+                                mainViewState.reset(router: router)
+                            },
+                            onBackToChapterSelection: {
+                                quizViewModel.reset()
+                                mainViewState.backToChapterSelection(router: router)
+                            },
+                            onBackToUnitSelection: {
+                                quizViewModel.reset()
+                                mainViewState.backToUnitSelection(router: router)
+                            }
+                        )
                     }
                 }
                 .animation(.default, value: mainViewState.isOnHome)

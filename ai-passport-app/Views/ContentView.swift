@@ -8,6 +8,9 @@ struct ContentView: View {
     let chapter: ChapterMetadata
     @ObservedObject var viewModel: QuizViewModel
     let onQuizEnd: () -> Void
+    let onBackToChapterSelection: () -> Void
+    let onBackToUnitSelection: () -> Void
+    
     
     @EnvironmentObject private var mainViewState: MainViewState
     
@@ -48,7 +51,9 @@ struct ContentView: View {
                 ResultView(
                     correctCount: viewModel.correctCount,
                     totalCount: viewModel.totalCount,
-                    onRestart: onQuizEnd
+                    onRestart: onQuizEnd,
+                    onBackToChapterSelection: onBackToChapterSelection,
+                    onBackToUnitSelection: onBackToUnitSelection
                 )
             }
             

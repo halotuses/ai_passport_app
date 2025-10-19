@@ -4,6 +4,8 @@ struct ResultView: View {
     let correctCount: Int
     let totalCount: Int
     let onRestart: () -> Void
+    let onBackToChapterSelection: () -> Void
+    let onBackToUnitSelection: () -> Void
 
     var body: some View {
         VStack(spacing: 24) {
@@ -91,6 +93,64 @@ struct ResultView: View {
                 }
                 .shadow(color: Color.themeMainHover.opacity(0.3), radius: 16, x: 0, y: 10)
 
+                VStack(spacing: 12) {
+                    Button(action: onBackToChapterSelection) {
+                        HStack {
+                            Image(systemName: "book.closed")
+                                .font(.headline)
+                            Text("章選択に戻る")
+                                .font(.headline)
+                                .fontWeight(.semibold)
+                            Spacer()
+                            Image(systemName: "chevron.right")
+                                .font(.subheadline)
+                                .fontWeight(.semibold)
+                                .foregroundColor(.themeTextSecondary)
+                        }
+                        .padding()
+                        .frame(maxWidth: .infinity)
+                        .background(
+                            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                                .fill(Color.themeSurface)
+                        )
+                        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+                    }
+                    .foregroundColor(.themeTextPrimary)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 16, style: .continuous)
+                            .stroke(Color.themeMain.opacity(0.18), lineWidth: 1)
+                    )
+                    .shadow(color: Color.themeShadowSoft, radius: 10, x: 0, y: 6)
+
+                    Button(action: onBackToUnitSelection) {
+                        HStack {
+                            Image(systemName: "list.bullet.rectangle")
+                                .font(.headline)
+                            Text("単元選択に戻る")
+                                .font(.headline)
+                                .fontWeight(.semibold)
+                            Spacer()
+                            Image(systemName: "chevron.right")
+                                .font(.subheadline)
+                                .fontWeight(.semibold)
+                                .foregroundColor(.themeTextSecondary)
+                        }
+                        .padding()
+                        .frame(maxWidth: .infinity)
+                        .background(
+                            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                                .fill(Color.themeSurface)
+                        )
+                        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+                    }
+                    .foregroundColor(.themeTextPrimary)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 16, style: .continuous)
+                            .stroke(Color.themeMain.opacity(0.18), lineWidth: 1)
+                    )
+                    .shadow(color: Color.themeShadowSoft, radius: 10, x: 0, y: 6)
+                }
+                
                 Text(encouragementMessage)
                     .font(.footnote)
                     .foregroundColor(.themeTextSecondary)
@@ -113,9 +173,9 @@ struct ResultView: View {
         switch rate {
         case 1.0:
             return "完璧です！"
-        case 0.7...:
+        case 0.8...:
             return "よくできました！"
-        case 0.4...:
+        case 0.6...:
             return "あと少し！"
         default:
             return "もう一度チャレンジ！"
@@ -127,9 +187,9 @@ struct ResultView: View {
         switch rate {
         case 1.0:
             return "次のチャレンジもこの調子で頑張りましょう！"
-        case 0.7...:
+        case 0.8...:
             return "あと少しで満点です。復習してさらにレベルアップ！"
-        case 0.4...:
+        case 0.6...:
             return "苦手な部分を振り返って、次回の正解率アップを目指しましょう。"
         default:
             return "焦らずに、解説を見ながら理解を深めていきましょう。"
@@ -150,9 +210,9 @@ struct ResultView: View {
         switch rate {
         case 1.0:
             return "crown.fill"
-        case 0.7...:
+        case 0.8...:
             return "star.fill"
-        case 0.4...:
+        case 0.6...:
             return "flame.fill"
         default:
             return "leaf.fill"
