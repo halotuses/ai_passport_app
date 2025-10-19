@@ -31,7 +31,7 @@ struct ResultView: View {
                         Circle()
                             .fill(Color.themeSurface)
                             .frame(width: 120, height: 120)
-                            .shadow(color: Color.themeMain.opacity(0.2), radius: 18, x: 0, y: 10)
+                            .shadow(color: Color.themeMain.opacity(0.02), radius: 12, x: 0, y: 10)
 
                         Image(systemName: resultIconName)
                             .font(.system(size: 48, weight: .bold))
@@ -89,25 +89,6 @@ struct ResultView: View {
 
                     VStack(spacing: 16) {
                         VStack(spacing: 12) {
-                            Button(action: onBackToUnitSelection) {
-                                HStack {
-                                    Image(systemName: "arrow.uturn.backward")
-                                        .font(.headline)
-                                    Text("単元選択に戻る")
-                                        .font(.headline)
-                                        .fontWeight(.semibold)
-
-                                }
-                                .padding()
-                                .frame(maxWidth: .infinity)
-                                .background(
-                                    LinearGradient(colors: [Color.themeMain, Color.themeAccent], startPoint: .leading, endPoint: .trailing)
-                                )
-                                .foregroundColor(.white)
-                                .cornerRadius(16)
-                            }
-                            .shadow(color: Color.themeMainHover.opacity(0.3), radius: 16, x: 0, y: 10)
-
                             Button(action: onBackToChapterSelection) {
                                 HStack {
                                     Image(systemName: "arrow.uturn.backward")
@@ -117,7 +98,28 @@ struct ResultView: View {
                                         .fontWeight(.semibold)
 
                                 }
-                                .padding()
+                                .padding(.vertical, 12)
+                                .padding(.horizontal, 16)
+                                .frame(maxWidth: .infinity)
+                                .background(
+                                    LinearGradient(colors: [Color.themeMain, Color.themeAccent], startPoint: .leading, endPoint: .trailing)
+                                )
+                                .foregroundColor(.white)
+                                .cornerRadius(16)
+                            }
+                            .shadow(color: Color.themeMainHover.opacity(0.3), radius: 16, x: 0, y: 10)
+
+                            Button(action: onBackToUnitSelection) {
+                                HStack {
+                                    Image(systemName: "arrow.uturn.backward")
+                                        .font(.headline)
+                                    Text("単元選択に戻る")
+                                        .font(.headline)
+                                        .fontWeight(.semibold)
+
+                                }
+                                .padding(.vertical, 12)
+                                .padding(.horizontal, 16)
                                 .frame(maxWidth: .infinity)
                                 .background(
                                     LinearGradient(colors: [Color.themeMain, Color.themeAccent], startPoint: .leading, endPoint: .trailing)
@@ -137,7 +139,8 @@ struct ResultView: View {
                                     .fontWeight(.semibold)
                             }
 
-                            .padding()
+                            .padding(.vertical, 12)
+                            .padding(.horizontal, 16)
                             .frame(maxWidth: .infinity)
                             .background(
                                 LinearGradient(colors: [Color.themeMain, Color.themeAccent], startPoint: .leading, endPoint: .trailing)
