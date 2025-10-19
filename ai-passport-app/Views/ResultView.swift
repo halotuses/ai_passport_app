@@ -24,7 +24,7 @@ struct ResultView: View {
 
                 Image(systemName: resultIconName)
                     .font(.system(size: 48, weight: .bold))
-                    .foregroundColor(Color.themeAccent)
+                    .foregroundColor(resultIconColor)
             }
 
             VStack(spacing: 16) {
@@ -74,31 +74,13 @@ struct ResultView: View {
             .padding(.horizontal)
 
             VStack(spacing: 16) {
-                Button(action: onRestart) {
-                    HStack {
-                        Image(systemName: "arrow.uturn.backward")
-                            .font(.headline)
-                        Text("トップに戻る")
-                            .font(.headline)
-                            .fontWeight(.semibold)
-                    }
-                    
-                    .padding()
-                    .frame(maxWidth: .infinity)
-                    .background(
-                        LinearGradient(colors: [Color.themeMain, Color.themeAccent], startPoint: .leading, endPoint: .trailing)
-                    )
-                    .foregroundColor(.white)
-                    .cornerRadius(16)
-                }
-                .shadow(color: Color.themeMainHover.opacity(0.3), radius: 16, x: 0, y: 10)
 
                 VStack(spacing: 12) {
-                    Button(action: onBackToChapterSelection) {
+                    Button(action: onBackToUnitSelection) {
                         HStack {
-                            Image(systemName: "book.closed")
+                            Image(systemName: "list.bullet.rectangle")
                                 .font(.headline)
-                            Text("章選択に戻る")
+                            Text("単元選択に戻る")
                                 .font(.headline)
                                 .fontWeight(.semibold)
                             Spacer()
@@ -117,11 +99,11 @@ struct ResultView: View {
                     }
                     .shadow(color: Color.themeMainHover.opacity(0.3), radius: 16, x: 0, y: 10)
 
-                    Button(action: onBackToUnitSelection) {
+                    Button(action: onBackToChapterSelection) {
                         HStack {
-                            Image(systemName: "list.bullet.rectangle")
+                            Image(systemName: "book.closed")
                                 .font(.headline)
-                            Text("単元選択に戻る")
+                            Text("章選択に戻る")
                                 .font(.headline)
                                 .fontWeight(.semibold)
                             Spacer()
@@ -226,4 +208,19 @@ struct ResultView: View {
             return "leaf.fill"
         }
     }
+    
+    private var resultIconColor: Color {
+        let rate = accuracy
+        switch rate {
+        case 1.0:
+            return Color(red: 1.0, green: 0.84, blue: 0.0)
+        case 0.8...:
+            return .yellow
+        case 0.6...:
+            return .red
+        default:
+            return .themeAccent
+        }
+    }
+    
 }
