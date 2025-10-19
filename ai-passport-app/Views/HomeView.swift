@@ -10,7 +10,7 @@ struct HomeView: View {
     @ObservedObject var viewModel: HomeViewModel
     @EnvironmentObject private var mainViewState: MainViewState
     @Environment(\.scenePhase) private var scenePhase
-
+    
     private let quickExamOffsets: [Int] = [0, 30, 60, 90]
     
     private var examDateBinding: Binding<Date> {
@@ -19,57 +19,66 @@ struct HomeView: View {
             set: { newDate in viewModel.updateExamDate(newDate) }
         )
     }
-
+    
     private var progressSummaryText: String {
         if viewModel.totalQuestions > 0 {
-            return "全\(viewModel.totalQuestions)問中\(viewModel.totalAnswered)問をクリア"
+            return "全\(viewModel.totalQuestions)問中\(viewModel.totalCorrect)問に正解"
         }
-
+        
         if viewModel.totalAnswered > 0 {
             return "これまでに\(viewModel.totalAnswered)問に挑戦しました"
         }
-
+        
         return viewModel.isLoading
-            ? "学習データを取得しています"
+        ? "学習データを取得しています"
         : "学習を始めると進捗がここに表示されます"
-}
-
-private var progressDetailsText: String? {
-    let unanswered = max(viewModel.totalUnanswered, 0)
-    guard viewModel.totalAnswered > 0 || unanswered > 0 else { return nil }
-
-    return "正解\(viewModel.totalCorrect)問 / 不正解\(viewModel.totalIncorrect)問 / 未回答\(unanswered)問"
     }
-
-    private var completionPercentageText: String {
-        guard viewModel.totalQuestions > 0 else {
-            return viewModel.totalAnswered > 0 ? "進捗率 --" : "進捗率 0%"
+    
+    private var progressDetailsText: String? {
+        let unanswered = max(viewModel.totalUnanswered, 0)
+        guard viewModel.totalAnswered > 0 || unanswered > 0 else { return nil }
+        
+        return "正解\(viewModel.totalCorrect)問 / 不正解\(viewModel.totalIncorrect)問 / 未回答\(unanswered)問"
+    }
+    
+    private var completionPercentageDisplay: (value: String, label: String) {
+        if let percentage = completionPercentageValue {
+            return ("\(percentage)%", "達成度")
         }
         
-        let percentage = Int((viewModel.completionRate * 100).rounded())
-        return "進捗率 \(percentage)%"
+        if viewModel.totalAnswered > 0 {
+            return ("--%", "達成度")
+        }
+        
+        return ("0%", "達成度")
+    }
+    
+    private var completionPercentageValue: Int? {
+        guard viewModel.totalQuestions > 0 else { return nil }
+        
+        return Int((viewModel.completionRate * 100).rounded())
     }
     
     private var accuracyText: String {
         guard viewModel.totalAnswered > 0 else {
             return "正答率 --"
         }
-
+        
         let accuracy = Double(viewModel.totalCorrect) / Double(viewModel.totalAnswered)
         let percentage = Int((accuracy * 100).rounded())
         return "正答率 \(percentage)%"
     }
-
+    
     private var progressLegendItems: [LegendItem] {
         let unanswered = max(viewModel.totalUnanswered, 0)
-        let denominator = viewModel.totalQuestions > 0 ? viewModel.totalQuestions : nil
-
+        let denominator = progressPercentageDenominator
+        
         func percentageText(for count: Int) -> String? {
             guard let denominator, denominator > 0 else { return nil }
             let value = percentage(for: count, total: denominator)
             return "\(value)%"
         }
-
+        
         return [
             LegendItem(kind: .correct, label: "正解", count: viewModel.totalCorrect, color: .themeCorrect, percentageText: percentageText(for: viewModel.totalCorrect)),
             LegendItem(kind: .incorrect, label: "不正解", count: viewModel.totalIncorrect, color: .themeIncorrect, percentageText: percentageText(for: viewModel.totalIncorrect)),
@@ -78,6 +87,16 @@ private var progressDetailsText: String? {
     }
     private let legendColumns: [GridItem] = Array(repeating: GridItem(.flexible(), spacing: 12), count: 2)
     
+    private var progressPercentageDenominator: Int? {
+        if viewModel.totalQuestions > 0 {
+            return viewModel.totalQuestions
+        }
+        
+        let total = viewModel.totalAnswered + max(viewModel.totalUnanswered, 0)
+        return total > 0 ? total : nil
+    }
+    
+    
     private var progressSegments: [ProgressSegment] {
         let unanswered = max(viewModel.totalUnanswered, 0)
         let segments = [
@@ -85,22 +104,22 @@ private var progressDetailsText: String? {
             ProgressSegment(kind: .incorrect, value: Double(viewModel.totalIncorrect), color: .themeIncorrect, count: viewModel.totalIncorrect),
             ProgressSegment(kind: .unanswered, value: Double(unanswered), color: Color.themeButtonSecondary, count: unanswered)
         ]
-
+        
         let activeSegments = segments.filter { $0.value > 0 }
         if activeSegments.isEmpty {
             return [ProgressSegment(kind: .placeholder, value: 1, color: Color.themeButtonSecondary.opacity(0.35), count: 0)]
         }
-
+        
         return activeSegments
     }
-
+    
     private var progressTotalValue: Double {
         progressSegments.reduce(0) { $0 + $1.value }
     }
-
+    
     private var progressSlices: [SegmentSlice] {
         guard progressTotalValue > 0 else { return [] }
-
+        
         var start: Double = 0
         return progressSegments.map { segment in
             let end = start + segment.value
@@ -108,12 +127,12 @@ private var progressDetailsText: String? {
             return SegmentSlice(segment: segment, start: start / progressTotalValue, end: end / progressTotalValue)
         }
     }
-
+    
     private var countdownText: String {
         guard let days = viewModel.daysUntilExam else {
             return "試験日を設定してください"
         }
-
+        
         if days < 0 {
             return "試験日は \(abs(days)) 日前に終了しました"
         } else if days == 0 {
@@ -124,7 +143,7 @@ private var progressDetailsText: String? {
             return "試験まであと \(days) 日"
         }
     }
-
+    
     private var encouragementTitle: String {
         viewModel.daysUntilExam == nil ? "今日のひとこと" : "いまのあなたへのメッセージ"
     }
@@ -152,7 +171,7 @@ private var progressDetailsText: String? {
             }
         }
     }
-
+    
     private var progressCard: some View {
         VStack(alignment: .leading, spacing: 24) {
             HStack(spacing: 12) {
@@ -164,7 +183,7 @@ private var progressDetailsText: String? {
                         Circle()
                             .fill(Color.themeSecondary.opacity(0.15))
                     )
-
+                
                 VStack(alignment: .leading, spacing: 4) {
                     Text("学習進捗")
                         .font(.headline)
@@ -173,7 +192,7 @@ private var progressDetailsText: String? {
                         .font(.subheadline)
                         .foregroundColor(.themeTextSecondary)
                 }
-
+                
                 Spacer()
                 if viewModel.isLoading {
                     ProgressView()
@@ -181,20 +200,20 @@ private var progressDetailsText: String? {
                         .tint(.themeSecondary)
                 }
             }
-
+            
             HStack(alignment: .center, spacing: 28) {
                 MultiSegmentDonutChart(slices: progressSlices) {
                     VStack(spacing: 4) {
-                        Text(completionPercentageText)
-                            .font(.system(size: 22, weight: .heavy))
+                        Text(completionPercentageDisplay.value)
+                            .font(.system(size: 36, weight: .black, design: .rounded))
                             .foregroundColor(.themeTextPrimary)
-                        Text("達成度")
-                            .font(.caption)
+                        Text(completionPercentageDisplay.label)
+                            .font(.caption.weight(.semibold))
                             .foregroundColor(.themeTextSecondary)
                     }
                 }
                 .frame(width: 140, height: 140)
-
+                
                 VStack(alignment: .leading, spacing: 12) {
                     Text(accuracyText)
                         .font(.subheadline.weight(.semibold))
@@ -205,10 +224,10 @@ private var progressDetailsText: String? {
                             .font(.footnote)
                             .foregroundColor(.themeTextSecondary)
                     }
-
+                    
                     Divider()
                         .background(Color.themeButtonSecondary.opacity(0.4))
-
+                    
                     LazyVGrid(columns: legendColumns, alignment: .leading, spacing: 12) {
                         ForEach(progressLegendItems) { item in
                             legendRow(for: item)
@@ -235,7 +254,7 @@ private var progressDetailsText: String? {
                 .shadow(color: Color.themeShadowSoft, radius: 18, x: 0, y: 12)
         )
     }
-
+    
     private var startLearningButton: some View {
         Button {
             withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
@@ -278,7 +297,7 @@ private var progressDetailsText: String? {
         guard total > 0 else { return 0 }
         return Int((Double(count) / Double(total) * 100).rounded())
     }
-
+    
     private func legendRow(for item: LegendItem) -> some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack(spacing: 10) {
@@ -286,13 +305,13 @@ private var progressDetailsText: String? {
                     .fill(item.color)
                     .frame(width: 12, height: 12)
                     .opacity(item.count == 0 ? 0.4 : 1)
-
+                
                 Text(item.label)
                     .font(.footnote.weight(.semibold))
                     .foregroundColor(.themeTextPrimary)
-
+                
                 Spacer()
-
+                
                 if let percentageText = item.percentageText {
                     Text(percentageText)
                         .font(.caption.weight(.semibold))
@@ -321,11 +340,11 @@ private var progressDetailsText: String? {
                 )
         )
     }
-
+    
     private func quickExamButton(daysFromNow offset: Int) -> some View {
         let targetDate = Calendar.current.date(byAdding: .day, value: offset, to: Date()) ?? Date()
         let isSelected = Calendar.current.isDate(viewModel.examDate, inSameDayAs: targetDate)
-
+        
         return Button {
             withAnimation(.easeInOut(duration: 0.2)) {
                 viewModel.updateExamDate(targetDate)
@@ -345,8 +364,8 @@ private var progressDetailsText: String? {
                     .fill(
                         LinearGradient(
                             colors: isSelected
-                                ? [Color.themeMain, Color.themeSecondary]
-                                : Array(repeating: Color.themeButtonSecondary.opacity(0.6), count: 2),
+                            ? [Color.themeMain, Color.themeSecondary]
+                            : Array(repeating: Color.themeButtonSecondary.opacity(0.6), count: 2),
                             startPoint: .leading,
                             endPoint: .trailing
                         )
@@ -370,54 +389,54 @@ private extension HomeView {
             case unanswered
             case placeholder
         }
-
+        
         let kind: Kind
         let value: Double
         let color: Color
         let count: Int
     }
-
+    
     struct SegmentSlice: Identifiable {
         let segment: ProgressSegment
         let start: Double
         let end: Double
-
+        
         var id: ProgressSegment.Kind { segment.kind }
     }
-
+    
     struct LegendItem: Identifiable {
         let kind: ProgressSegment.Kind
         let label: String
         let count: Int
         let color: Color
         let percentageText: String?
-
+        
         var id: ProgressSegment.Kind { kind }
     }
-
+    
     struct MultiSegmentDonutChart<CenterContent: View>: View {
         let slices: [SegmentSlice]
         let lineWidth: CGFloat
         private let centerContent: () -> CenterContent
-
+        
         init(slices: [SegmentSlice], lineWidth: CGFloat = 18, @ViewBuilder centerContent: @escaping () -> CenterContent) {
             self.slices = slices
             self.lineWidth = lineWidth
             self.centerContent = centerContent
         }
-
+        
         var body: some View {
             ZStack {
                 Circle()
                     .stroke(Color.themeButtonSecondary.opacity(0.3), style: StrokeStyle(lineWidth: lineWidth))
-
+                
                 ForEach(slices) { slice in
                     Circle()
                         .trim(from: slice.start, to: slice.end)
                         .stroke(slice.segment.color, style: StrokeStyle(lineWidth: lineWidth, lineCap: .round))
                         .rotationEffect(.degrees(-90))
                 }
-
+                
                 centerContent()
             }
         }
@@ -433,7 +452,7 @@ private struct PaperBackground: View {
         startPoint: .topLeading,
         endPoint: .bottomTrailing
     )
-
+    
     var body: some View {
         Rectangle()
             .fill(gradient)
@@ -450,23 +469,23 @@ private struct NoiseTextureView: View {
         let context = CIContext()
         let filter = CIFilter.randomGenerator()
         let size = CGSize(width: 512, height: 512)
-
+        
         guard
             let outputImage = filter.outputImage?.cropped(to: CGRect(origin: .zero, size: size)),
             let cgImage = context.createCGImage(outputImage, from: CGRect(origin: .zero, size: size))
         else {
             return nil
         }
-
-        #if canImport(UIKit)
+        
+#if canImport(UIKit)
         return Image(uiImage: UIImage(cgImage: cgImage))
-        #elseif canImport(AppKit)
+#elseif canImport(AppKit)
         return Image(nsImage: NSImage(cgImage: cgImage, size: size))
-        #else
+#else
         return Image(decorative: cgImage, scale: 1.0)
-        #endif
+#endif
     }()
-
+    
     var body: some View {
         if let noiseImage = Self.noiseImage {
             noiseImage
