@@ -8,154 +8,160 @@ struct ResultView: View {
     let onBackToUnitSelection: () -> Void
 
     var body: some View {
-        VStack(spacing: 24) {
-            Spacer(minLength: 24)
+        ZStack {
+            LinearGradient(colors: [Color.themeBase, Color.themeMain.opacity(0.08)], startPoint: .top, endPoint: .bottom)
+                .ignoresSafeArea()
 
-            ZStack {
-                Circle()
-                    .fill(
-                        LinearGradient(colors: [Color.themeMain.opacity(0.25), Color.themeAccent.opacity(0.6)], startPoint: .topLeading, endPoint: .bottomTrailing)
-                    )
-                    .frame(width: 160, height: 160)
-                Circle()
-                    .fill(Color.themeSurface)
-                    .frame(width: 120, height: 120)
-                    .shadow(color: Color.themeMain.opacity(0.2), radius: 18, x: 0, y: 10)
+            ScrollView {
+                VStack(spacing: 16) {
+                    Spacer(minLength: 16)
 
-                Image(systemName: resultIconName)
-                    .font(.system(size: 48, weight: .bold))
-                    .foregroundColor(resultIconColor)
-            }
+                    ZStack {
+                        Circle()
+                            .stroke(
+                                LinearGradient(
+                                    colors: [resultIconColor.opacity(0.35), resultIconColor],
+                                    startPoint: .topLeading,
+                                    endPoint: .bottomTrailing
+                                ),
+                                lineWidth: 20
+                            )
+                            .frame(width: 160, height: 160)
 
-            VStack(spacing: 16) {
-                Text(resultMessage)
-                    .font(.title2)
-                    .fontWeight(.bold)
-                    .foregroundColor(.themeTextPrimary)
-                    .multilineTextAlignment(.center)
+                        Circle()
+                            .fill(Color.themeSurface)
+                            .frame(width: 120, height: 120)
+                            .shadow(color: Color.themeMain.opacity(0.2), radius: 18, x: 0, y: 10)
 
-                VStack(spacing: 8) {
-                    Text("正解数")
-                        .font(.subheadline)
-                        .fontWeight(.medium)
-                        .foregroundColor(.themeTextSecondary)
-                    Text("\(correctCount) / \(totalCount)")
-                        .font(.title2)
-                        .fontWeight(.semibold)
-                        .foregroundColor(.themeTextPrimary)
-                }
+                        Image(systemName: resultIconName)
+                            .font(.system(size: 48, weight: .bold))
+                            .foregroundColor(resultIconColor)
+                    }
 
-                VStack(spacing: 12) {
-                    HStack {
-                        Text("正答率")
-                            .font(.subheadline)
-                            .fontWeight(.medium)
-                            .foregroundColor(.themeTextSecondary)
-                        Spacer()
-                        Text("\(accuracyPercentage)%")
-                            .font(.headline)
+                    VStack(spacing: 16) {
+                        Text(resultMessage)
+                            .font(.title2)
                             .fontWeight(.bold)
-                            .foregroundColor(.themeAccent)
-                    }
+                            .foregroundColor(.themeTextPrimary)
+                            .multilineTextAlignment(.center)
 
-                    ProgressView(value: accuracy)
-                        .progressViewStyle(LinearProgressViewStyle(tint: Color.themeAccent))
-                        .frame(height: 8)
-                        .clipShape(Capsule())
-                }
-            }
-            .padding(24)
-            .frame(maxWidth: .infinity)
-            .background(
-                RoundedRectangle(cornerRadius: 24, style: .continuous)
-                    .fill(Color.themeSurface)
-                    .shadow(color: Color.black.opacity(0.06), radius: 20, x: 0, y: 12)
-            )
-            .padding(.horizontal)
-
-            VStack(spacing: 16) {
-
-                VStack(spacing: 12) {
-                    Button(action: onBackToUnitSelection) {
-                        HStack {
-                            Image(systemName: "list.bullet.rectangle")
-                                .font(.headline)
-                            Text("単元選択に戻る")
-                                .font(.headline)
-                                .fontWeight(.semibold)
-                            Spacer()
-                            Image(systemName: "chevron.right")
+                        VStack(spacing: 8) {
+                            Text("正解数")
                                 .font(.subheadline)
+                                .fontWeight(.medium)
+                                .foregroundColor(.themeTextSecondary)
+                            Text("\(correctCount) / \(totalCount)")
+                                .font(.title2)
                                 .fontWeight(.semibold)
+
+                                .foregroundColor(.themeTextPrimary)
 
                         }
-                        .padding()
-                        .frame(maxWidth: .infinity)
-                        .background(
-                            LinearGradient(colors: [Color.themeMain, Color.themeAccent], startPoint: .leading, endPoint: .trailing)
-                        )
-                        .foregroundColor(.white)
-                        .cornerRadius(16)
-                    }
-                    .shadow(color: Color.themeMainHover.opacity(0.3), radius: 16, x: 0, y: 10)
+                        VStack(spacing: 12) {
+                            HStack {
+                                Text("正答率")
+                                    .font(.subheadline)
+                                    .fontWeight(.medium)
+                                    .foregroundColor(.themeTextSecondary)
+                                Spacer()
+                                Text("\(accuracyPercentage)%")
+                                    .font(.headline)
+                                    .fontWeight(.bold)
+                                    .foregroundColor(.themeAccent)
+                            }
 
-                    Button(action: onBackToChapterSelection) {
-                        HStack {
-                            Image(systemName: "book.closed")
-                                .font(.headline)
-                            Text("章選択に戻る")
-                                .font(.headline)
-                                .fontWeight(.semibold)
-                            Spacer()
-                            Image(systemName: "chevron.right")
-                                .font(.subheadline)
-                                .fontWeight(.semibold)
+                            ProgressView(value: accuracy)
+                                .progressViewStyle(LinearProgressViewStyle(tint: Color.themeAccent))
+                                .frame(height: 8)
+                                .clipShape(Capsule())
 
                         }
-                        .padding()
-                        .frame(maxWidth: .infinity)
-                        .background(
-                            LinearGradient(colors: [Color.themeMain, Color.themeAccent], startPoint: .leading, endPoint: .trailing)
-                        )
-                        .foregroundColor(.white)
-                        .cornerRadius(16)
-                    }
-                    .shadow(color: Color.themeMainHover.opacity(0.3), radius: 16, x: 0, y: 10)
-                }
-
-                Button(action: onRestart) {
-                    HStack {
-                        Image(systemName: "arrow.uturn.backward")
-                            .font(.headline)
-                        Text("トップに戻る")
-                            .font(.headline)
-                            .fontWeight(.semibold)
                     }
 
-                    .padding()
+                    .padding(24)
                     .frame(maxWidth: .infinity)
                     .background(
-                        LinearGradient(colors: [Color.themeMain, Color.themeAccent], startPoint: .leading, endPoint: .trailing)
+                        RoundedRectangle(cornerRadius: 24, style: .continuous)
+                            .fill(Color.themeSurface)
+                            .shadow(color: Color.black.opacity(0.06), radius: 20, x: 0, y: 12)
                     )
-                    .foregroundColor(.white)
-                    .cornerRadius(16)
-                }
-                
-                .shadow(color: Color.themeMainHover.opacity(0.3), radius: 16, x: 0, y: 10)
+                    .padding(.horizontal)
 
-                Text(encouragementMessage)
-                    .font(.footnote)
-                    .foregroundColor(.themeTextSecondary)
-                    .multilineTextAlignment(.center)
+                    VStack(spacing: 16) {
+                        VStack(spacing: 12) {
+                            Button(action: onBackToUnitSelection) {
+                                HStack {
+                                    Image(systemName: "arrow.uturn.backward")
+                                        .font(.headline)
+                                    Text("単元選択に戻る")
+                                        .font(.headline)
+                                        .fontWeight(.semibold)
+
+                                }
+                                .padding()
+                                .frame(maxWidth: .infinity)
+                                .background(
+                                    LinearGradient(colors: [Color.themeMain, Color.themeAccent], startPoint: .leading, endPoint: .trailing)
+                                )
+                                .foregroundColor(.white)
+                                .cornerRadius(16)
+                            }
+                            .shadow(color: Color.themeMainHover.opacity(0.3), radius: 16, x: 0, y: 10)
+
+                            Button(action: onBackToChapterSelection) {
+                                HStack {
+                                    Image(systemName: "arrow.uturn.backward")
+                                        .font(.headline)
+                                    Text("章選択に戻る")
+                                        .font(.headline)
+                                        .fontWeight(.semibold)
+
+                                }
+                                .padding()
+                                .frame(maxWidth: .infinity)
+                                .background(
+                                    LinearGradient(colors: [Color.themeMain, Color.themeAccent], startPoint: .leading, endPoint: .trailing)
+                                )
+                                .foregroundColor(.white)
+                                .cornerRadius(16)
+                            }
+                            .shadow(color: Color.themeMainHover.opacity(0.3), radius: 16, x: 0, y: 10)
+                        }
+
+                        Button(action: onRestart) {
+                            HStack {
+                                Image(systemName: "arrow.uturn.backward")
+                                    .font(.headline)
+                                Text("トップに戻る")
+                                    .font(.headline)
+                                    .fontWeight(.semibold)
+                            }
+
+                            .padding()
+                            .frame(maxWidth: .infinity)
+                            .background(
+                                LinearGradient(colors: [Color.themeMain, Color.themeAccent], startPoint: .leading, endPoint: .trailing)
+                            )
+                            .foregroundColor(.white)
+                            .cornerRadius(16)
+                        }
+
+                        .shadow(color: Color.themeMainHover.opacity(0.3), radius: 16, x: 0, y: 10)
+
+                        Text(encouragementMessage)
+                            .font(.footnote)
+                            .foregroundColor(.themeTextSecondary)
+                            .multilineTextAlignment(.center)
+                    }
+                    .padding(.horizontal)
+                    .padding(.bottom, 32)
+                }
+                .frame(maxWidth: .infinity)
+                .padding(.top, 20)
             }
-            .padding(.horizontal)
+
         }
-        .padding(.vertical, 20)
         .navigationBarBackButtonHidden(true)
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(
-            LinearGradient(colors: [Color.themeBase, Color.themeMain.opacity(0.08)], startPoint: .top, endPoint: .bottom)
-        )
     }
 
     private var resultMessage: String {
