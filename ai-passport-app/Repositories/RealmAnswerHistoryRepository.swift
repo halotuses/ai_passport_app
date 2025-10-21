@@ -31,11 +31,11 @@ final class RealmAnswerHistoryRepository {
     }
 
     func saveOrUpdateStatus(quizId: String, status: QuestionStatus) {
-        saveOrUpdateStatus(quizId: quizId, chapterId: nil, status: status, updatedAt: Date())
+        persistStatus(quizId: quizId, chapterId: nil, status: status, updatedAt: Date())
     }
 
     func saveOrUpdateStatus(quizId: String, chapterId: Int, status: QuestionStatus, updatedAt: Date = Date()) {
-        saveOrUpdateStatus(quizId: quizId, chapterId: chapterId, status: status, updatedAt: updatedAt)
+        persistStatus(quizId: quizId, chapterId: chapterId, status: status, updatedAt: updatedAt)
     }
 
     func loadStatuses(chapterId: Int) -> [String: QuestionStatus] {
@@ -74,7 +74,7 @@ final class RealmAnswerHistoryRepository {
         countAnswered(chapterId: chapterId)
     }
 
-    private func saveOrUpdateStatus(quizId: String, chapterId: Int?, status: QuestionStatus, updatedAt: Date) {
+    private func persistStatus(quizId: String, chapterId: Int?, status: QuestionStatus, updatedAt: Date) {
         do {
             let realm = try realm()
             let resolvedChapterId = chapterId ?? IdentifierGenerator.chapterNumericId(fromQuizIdentifier: quizId)
