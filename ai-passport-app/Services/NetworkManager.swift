@@ -1,6 +1,7 @@
 import Foundation
 
 struct NetworkManager {
+    //test
     
     static func fetchMetadata(completion: @escaping (QuizMetadataMap?) -> Void) {
         let path = "quizzes/metadata/quizzes_metadata.json?nocache=\(UUID().uuidString)"
