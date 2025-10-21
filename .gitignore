@@ -1,0 +1,21 @@
+# Xcode
+DerivedData/
+xcuserdata/
+*.xcuserstate
+*.xccheckout
+*.xcworkspace
+
+# CocoaPods
+Pods/
+Podfile.lock
+
+# Swift Package Manager
+.build/
+
+# Realm database files
+*.realm
+*.realm.lock
+*.realm.management
+
+# macOS
+.DS_Store
