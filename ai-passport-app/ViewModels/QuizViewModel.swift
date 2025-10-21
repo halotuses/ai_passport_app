@@ -24,6 +24,7 @@ class QuizViewModel: ObservableObject {
     var chapterId: String = ""
     
     private let repository: RealmAnswerHistoryRepository
+    private let persistenceQueue = DispatchQueue(label: "com.ai-passport.quizAnswerPersistence", qos: .utility)
 
     init(repository: RealmAnswerHistoryRepository = RealmAnswerHistoryRepository()) {
         self.repository = repository
@@ -106,11 +107,16 @@ class QuizViewModel: ObservableObject {
             questionStatuses.append(status)
         }
 
-        repository.saveOrUpdateStatus(
-            quizId: stableQuizId,
-            chapterId: chapterIdInt,
-            status: status
-        )
+        let repository = repository
+        persistenceQueue.async {
+            autoreleasepool {
+                repository.saveOrUpdateStatus(
+                    quizId: stableQuizId,
+                    chapterId: chapterIdInt,
+                    status: status
+                )
+            }
+        }
     }
     
     // MARK: - Navigation
