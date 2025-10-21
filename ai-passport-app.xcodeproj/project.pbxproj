@@ -40,9 +40,15 @@
 		0C31AD7E2EA21882007500F7 /* Color+Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C31AD7C2EA21882007500F7 /* Color+Theme.swift */; };
 		0C31AD7F2EA21882007500F7 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C31AD7D2EA21882007500F7 /* HomeView.swift */; };
 		0C31AD812EA21897007500F7 /* HomeViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C31AD802EA21897007500F7 /* HomeViewModel.swift */; };
+		0C31AD832EA51B97007500F7 /* LegacyAnswerHistoryMigrator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C31AD822EA51B97007500F7 /* LegacyAnswerHistoryMigrator.swift */; };
+		0C87869E2EA6725F0052D2A8 /* QuestionProgressObject.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C87869D2EA6725F0052D2A8 /* QuestionProgressObject.swift */; };
+		0C8786A12EA672D90052D2A8 /* RealmAnswerHistoryRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C8786A02EA672D90052D2A8 /* RealmAnswerHistoryRepository.swift */; };
 		0CCB45A02E89853900C41D03 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CCB459F2E89853900C41D03 /* Constants.swift */; };
 		0CCB45A22E8994E800C41D03 /* QuizList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CCB45A12E8994E800C41D03 /* QuizList.swift */; };
 		0CCB45A42E89951900C41D03 /* CapterList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CCB45A32E89951900C41D03 /* CapterList.swift */; };
+		2B63F89F4CE1CD0E16123851 /* Pods_ai_passport_app.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B6D8C50DB3A51823B125E337 /* Pods_ai_passport_app.framework */; };
+		42A1F52C68FCFD4E23C1AD3B /* Pods_ai_passport_appTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CD4D1B17350B13D73E50E963 /* Pods_ai_passport_appTests.framework */; };
+		D4D414550206AE8AFFD822D8 /* Pods_ai_passport_app_ai_passport_appUITests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8B7A668C0E0F2C0A2AD7E56D /* Pods_ai_passport_app_ai_passport_appUITests.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -99,9 +105,21 @@
 		0C31AD7C2EA21882007500F7 /* Color+Theme.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Color+Theme.swift"; sourceTree = "<group>"; };
 		0C31AD7D2EA21882007500F7 /* HomeView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
 		0C31AD802EA21897007500F7 /* HomeViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HomeViewModel.swift; sourceTree = "<group>"; };
+		0C31AD822EA51B97007500F7 /* LegacyAnswerHistoryMigrator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LegacyAnswerHistoryMigrator.swift; sourceTree = "<group>"; };
+		0C87869D2EA6725F0052D2A8 /* QuestionProgressObject.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuestionProgressObject.swift; sourceTree = "<group>"; };
+		0C8786A02EA672D90052D2A8 /* RealmAnswerHistoryRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RealmAnswerHistoryRepository.swift; sourceTree = "<group>"; };
 		0CCB459F2E89853900C41D03 /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 		0CCB45A12E8994E800C41D03 /* QuizList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuizList.swift; sourceTree = "<group>"; };
 		0CCB45A32E89951900C41D03 /* CapterList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CapterList.swift; sourceTree = "<group>"; };
+		132FB8E45FA8448778A70AEB /* Pods-ai-passport-app.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ai-passport-app.release.xcconfig"; path = "Target Support Files/Pods-ai-passport-app/Pods-ai-passport-app.release.xcconfig"; sourceTree = "<group>"; };
+		1DF2ED86DEEC2D2F21257F72 /* Pods-ai-passport-app.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ai-passport-app.debug.xcconfig"; path = "Target Support Files/Pods-ai-passport-app/Pods-ai-passport-app.debug.xcconfig"; sourceTree = "<group>"; };
+		336BE6D1C0A308AF4E7A9E15 /* Pods-ai-passport-app-ai-passport-appUITests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ai-passport-app-ai-passport-appUITests.release.xcconfig"; path = "Target Support Files/Pods-ai-passport-app-ai-passport-appUITests/Pods-ai-passport-app-ai-passport-appUITests.release.xcconfig"; sourceTree = "<group>"; };
+		7F8273B1F996AF32F4992DBA /* Pods-ai-passport-appTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ai-passport-appTests.debug.xcconfig"; path = "Target Support Files/Pods-ai-passport-appTests/Pods-ai-passport-appTests.debug.xcconfig"; sourceTree = "<group>"; };
+		84A9496E4896FB90AB023593 /* Pods-ai-passport-app-ai-passport-appUITests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ai-passport-app-ai-passport-appUITests.debug.xcconfig"; path = "Target Support Files/Pods-ai-passport-app-ai-passport-appUITests/Pods-ai-passport-app-ai-passport-appUITests.debug.xcconfig"; sourceTree = "<group>"; };
+		8B7A668C0E0F2C0A2AD7E56D /* Pods_ai_passport_app_ai_passport_appUITests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_ai_passport_app_ai_passport_appUITests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		B6D8C50DB3A51823B125E337 /* Pods_ai_passport_app.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_ai_passport_app.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		CD4D1B17350B13D73E50E963 /* Pods_ai_passport_appTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_ai_passport_appTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		E4B787EA25C061AD998509ED /* Pods-ai-passport-appTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ai-passport-appTests.release.xcconfig"; path = "Target Support Files/Pods-ai-passport-appTests/Pods-ai-passport-appTests.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -109,6 +127,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2B63F89F4CE1CD0E16123851 /* Pods_ai_passport_app.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -116,6 +135,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				42A1F52C68FCFD4E23C1AD3B /* Pods_ai_passport_appTests.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -123,6 +143,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D4D414550206AE8AFFD822D8 /* Pods_ai_passport_app_ai_passport_appUITests.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -137,6 +158,8 @@
 				0C30DDAE2DFF117200F25D02 /* ai-passport-appTests */,
 				0C30DDB82DFF117300F25D02 /* ai-passport-appUITests */,
 				0C30DD972DFF116F00F25D02 /* Products */,
+				B11A5685E32A1A5120F45777 /* Pods */,
+				8C1E3FE58FAF2F8C2D1A6328 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -197,6 +220,7 @@
 		0C30DDC82DFF13A200F25D02 /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				0C87869F2EA672720052D2A8 /* Persistance */,
 				0C30DDF62DFF1CD800F25D02 /* Quiz.swift */,
 				0C30DDF82DFF1CE300F25D02 /* QuizMetadata.swift */,
 				0C30DDFA2DFF1CEF00F25D02 /* ChapterMetadata.swift */,
@@ -218,6 +242,7 @@
 			isa = PBXGroup;
 			children = (
 				0C30DDF42DFF1C7100F25D02 /* AnswerHistoryRepository.swift */,
+				0C8786A02EA672D90052D2A8 /* RealmAnswerHistoryRepository.swift */,
 			);
 			path = Repositories;
 			sourceTree = "<group>";
@@ -226,6 +251,7 @@
 			isa = PBXGroup;
 			children = (
 				0C30DDFE2DFF1E9A00F25D02 /* PersistenceController.swift */,
+				0C31AD822EA51B97007500F7 /* LegacyAnswerHistoryMigrator.swift */,
 			);
 			path = Core;
 			sourceTree = "<group>";
@@ -285,6 +311,14 @@
 			path = Resources;
 			sourceTree = "<group>";
 		};
+		0C87869F2EA672720052D2A8 /* Persistance */ = {
+			isa = PBXGroup;
+			children = (
+				0C87869D2EA6725F0052D2A8 /* QuestionProgressObject.swift */,
+			);
+			path = Persistance;
+			sourceTree = "<group>";
+		};
 		0CCB459E2E89851D00C41D03 /* Services */ = {
 			isa = PBXGroup;
 			children = (
@@ -294,6 +328,29 @@
 			path = Services;
 			sourceTree = "<group>";
 		};
+		8C1E3FE58FAF2F8C2D1A6328 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				B6D8C50DB3A51823B125E337 /* Pods_ai_passport_app.framework */,
+				8B7A668C0E0F2C0A2AD7E56D /* Pods_ai_passport_app_ai_passport_appUITests.framework */,
+				CD4D1B17350B13D73E50E963 /* Pods_ai_passport_appTests.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		B11A5685E32A1A5120F45777 /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				1DF2ED86DEEC2D2F21257F72 /* Pods-ai-passport-app.debug.xcconfig */,
+				132FB8E45FA8448778A70AEB /* Pods-ai-passport-app.release.xcconfig */,
+				84A9496E4896FB90AB023593 /* Pods-ai-passport-app-ai-passport-appUITests.debug.xcconfig */,
+				336BE6D1C0A308AF4E7A9E15 /* Pods-ai-passport-app-ai-passport-appUITests.release.xcconfig */,
+				7F8273B1F996AF32F4992DBA /* Pods-ai-passport-appTests.debug.xcconfig */,
+				E4B787EA25C061AD998509ED /* Pods-ai-passport-appTests.release.xcconfig */,
+			);
+			path = Pods;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -301,9 +358,11 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 0C30DDBF2DFF117300F25D02 /* Build configuration list for PBXNativeTarget "ai-passport-app" */;
 			buildPhases = (
+				9205A4B190C4C5341C2766EA /* [CP] Check Pods Manifest.lock */,
 				0C30DD922DFF116F00F25D02 /* Sources */,
 				0C30DD932DFF116F00F25D02 /* Frameworks */,
 				0C30DD942DFF116F00F25D02 /* Resources */,
+				72349E85C331260E468397C6 /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -318,6 +377,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 0C30DDC22DFF117300F25D02 /* Build configuration list for PBXNativeTarget "ai-passport-appTests" */;
 			buildPhases = (
+				E27E8104379DB4E0BC315D81 /* [CP] Check Pods Manifest.lock */,
 				0C30DDA72DFF117200F25D02 /* Sources */,
 				0C30DDA82DFF117200F25D02 /* Frameworks */,
 				0C30DDA92DFF117200F25D02 /* Resources */,
@@ -336,9 +396,11 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 0C30DDC52DFF117300F25D02 /* Build configuration list for PBXNativeTarget "ai-passport-appUITests" */;
 			buildPhases = (
+				C5E7CB8B2588A066BDF0AF99 /* [CP] Check Pods Manifest.lock */,
 				0C30DDB12DFF117300F25D02 /* Sources */,
 				0C30DDB22DFF117300F25D02 /* Frameworks */,
 				0C30DDB32DFF117300F25D02 /* Resources */,
+				337BC97B5B60693AAB4A61A4 /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -419,6 +481,109 @@
 		};
 /* End PBXResourcesBuildPhase section */
 
+/* Begin PBXShellScriptBuildPhase section */
+		337BC97B5B60693AAB4A61A4 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-ai-passport-app-ai-passport-appUITests/Pods-ai-passport-app-ai-passport-appUITests-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-ai-passport-app-ai-passport-appUITests/Pods-ai-passport-app-ai-passport-appUITests-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-ai-passport-app-ai-passport-appUITests/Pods-ai-passport-app-ai-passport-appUITests-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		72349E85C331260E468397C6 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-ai-passport-app/Pods-ai-passport-app-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-ai-passport-app/Pods-ai-passport-app-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-ai-passport-app/Pods-ai-passport-app-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		9205A4B190C4C5341C2766EA /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-ai-passport-app-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		C5E7CB8B2588A066BDF0AF99 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-ai-passport-app-ai-passport-appUITests-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		E27E8104379DB4E0BC315D81 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-ai-passport-appTests-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
 		0C30DD922DFF116F00F25D02 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
@@ -432,6 +597,7 @@
 				0CCB45A22E8994E800C41D03 /* QuizList.swift in Sources */,
 				0C30DDDD2DFF1A8B00F25D02 /* ChapterListView.swift in Sources */,
 				0C30DDEF2DFF1B8E00F25D02 /* QuizViewModel.swift in Sources */,
+				0C31AD832EA51B97007500F7 /* LegacyAnswerHistoryMigrator.swift in Sources */,
 				0C30DDF92DFF1CE300F25D02 /* QuizMetadata.swift in Sources */,
 				0C30DDE72DFF1AC000F25D02 /* AnswerAreaView.swift in Sources */,
 				0C31AD7E2EA21882007500F7 /* Color+Theme.swift in Sources */,
@@ -439,8 +605,10 @@
 				0C30DDA62DFF117200F25D02 /* ai_passport_app.xcdatamodeld in Sources */,
 				0C30DDD72DFF183F00F25D02 /* NavigationRouter.swift in Sources */,
 				0C30DDE32DFF1AAA00F25D02 /* ResultView.swift in Sources */,
+				0C8786A12EA672D90052D2A8 /* RealmAnswerHistoryRepository.swift in Sources */,
 				0C30DDD52DFF16FE00F25D02 /* AppFrameView.swift in Sources */,
 				0C30DDDB2DFF1A7F00F25D02 /* UnitListView.swift in Sources */,
+				0C87869E2EA6725F0052D2A8 /* QuestionProgressObject.swift in Sources */,
 				0C31AD7B2EA2184A007500F7 /* MainViewState.swift in Sources */,
 				0CCB45A42E89951900C41D03 /* CapterList.swift in Sources */,
 				0C30DD9C2DFF116F00F25D02 /* ContentView.swift in Sources */,
@@ -612,6 +780,7 @@
 		};
 		0C30DDC02DFF117300F25D02 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 1DF2ED86DEEC2D2F21257F72 /* Pods-ai-passport-app.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -641,6 +810,7 @@
 		};
 		0C30DDC12DFF117300F25D02 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 132FB8E45FA8448778A70AEB /* Pods-ai-passport-app.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -670,6 +840,7 @@
 		};
 		0C30DDC32DFF117300F25D02 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 7F8273B1F996AF32F4992DBA /* Pods-ai-passport-appTests.debug.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
@@ -690,6 +861,7 @@
 		};
 		0C30DDC42DFF117300F25D02 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = E4B787EA25C061AD998509ED /* Pods-ai-passport-appTests.release.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
@@ -710,6 +882,7 @@
 		};
 		0C30DDC62DFF117300F25D02 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 84A9496E4896FB90AB023593 /* Pods-ai-passport-app-ai-passport-appUITests.debug.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_STYLE = Automatic;
@@ -728,6 +901,7 @@
 		};
 		0C30DDC72DFF117300F25D02 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 336BE6D1C0A308AF4E7A9E15 /* Pods-ai-passport-app-ai-passport-appUITests.release.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_STYLE = Automatic;

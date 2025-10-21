@@ -1,48 +1,52 @@
 .
 ├── Assets.xcassets
-│   ├── AccentColor.colorset
-│   ├── AppIcon.appiconset
-│   └── Contents.json
+│   ├── AccentColor.colorset
+│   ├── AppIcon.appiconset
+│   └── Contents.json
 ├── Core
-│   └── PersistenceController.swift
+│   ├── LegacyAnswerHistoryMigrator.swift
+│   └── PersistenceController.swift
 ├── CoreDataModels
 ├── Framework
-│   ├── AppFrameView.swift
-│   └── ai_passport_appApp.swift
+│   ├── AppFrameView.swift
+│   └── ai_passport_appApp.swift
 ├── Models
-│   ├── CapterList.swift
-│   ├── ChapterMetadata.swift
-│   ├── Quiz.swift
-│   ├── QuizList.swift
-│   ├── QuizMetadata.swift
-│   └── SelectedAnswer.swift
+│   ├── CapterList.swift
+│   ├── ChapterMetadata.swift
+│   ├── Persistence
+│   │   └── QuestionProgressObject.swift
+│   ├── Quiz.swift
+│   ├── QuizList.swift
+│   ├── QuizMetadata.swift
+│   └── SelectedAnswer.swift
 ├── Navigation
-│   ├── MainRouterView.swift
-│   └── NavigationRouter.swift
+│   ├── MainRouterView.swift
+│   └── NavigationRouter.swift
 ├── Preview Content
-│   └── Preview Assets.xcassets
+│   └── Preview Assets.xcassets
 ├── Repositories
-│   └── AnswerHistoryRepository.swift
+│   └── RealmAnswerHistoryRepository.swift
 ├── Resources
 ├── Services
-│   ├── Constants.swift
-│   └── NetworkManager.swift
+│   ├── Constants.swift
+│   └── NetworkManager.swift
 ├── ViewModels
-│   ├── ChapterListViewModel.swift
-│   ├── QuizViewModel.swift
-│   └── UnitListViewModel.swift
+│   ├── ChapterListViewModel.swift
+│   ├── HomeViewModel.swift
+│   ├── QuizViewModel.swift
+│   └── UnitListViewModel.swift
 ├── Views
-│   ├── AnswerAreaView.swift
-│   ├── BottomTabBarView.swift
-│   ├── ChapterListView.swift
-│   ├── ContentView.swift
-│   ├── ExplanationView.swift
-│   ├── HeaderView.swift
-│   ├── QuestionView.swift
-│   ├── ResultView.swift
-│   └── UnitListView.swift
+│   ├── AnswerAreaView.swift
+│   ├── BottomTabBarView.swift
+│   ├── ChapterListView.swift
+│   ├── ContentView.swift
+│   ├── ExplanationView.swift
+│   ├── HeaderView.swift
+│   ├── QuestionView.swift
+│   ├── ResultView.swift
+│   └── UnitListView.swift
 ├── ai_passport_app.xcdatamodeld
-│   └── ai_passport_app.xcdatamodel
+│   └── ai_passport_app.xcdatamodel
 └── structure.txt
 
-18 directories, 28 files
+18 directories, 30 files

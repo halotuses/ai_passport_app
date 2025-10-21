@@ -16,12 +16,18 @@ class QuizViewModel: ObservableObject {
     @Published var isLoaded: Bool = false
     @Published var hasError: Bool = false
     @Published var showResultView: Bool = false   // ✅ 結果画面表示フラグを追加
+    @Published var questionStatuses: [QuestionStatus] = []
+    
     
     // MARK: - Identifiers
     var unitId: String = ""
     var chapterId: String = ""
     
-    private let repository = AnswerHistoryRepository()
+    private let repository: RealmAnswerHistoryRepository
+
+    init(repository: RealmAnswerHistoryRepository = RealmAnswerHistoryRepository()) {
+        self.repository = repository
+    }
     
     // MARK: - Load
     func fetchQuizzes(from chapterFilePath: String) {
@@ -32,6 +38,7 @@ class QuizViewModel: ObservableObject {
         selectedAnswerIndex = nil
         selectedAnswers = []
         showResultView = false
+        questionStatuses = []
         // ✅ URL生成ロジックを安全化
         var normalizedPath = chapterFilePath
         if normalizedPath.hasPrefix("/") {
@@ -54,6 +61,12 @@ class QuizViewModel: ObservableObject {
                 self.selectedAnswerIndex = nil
                 self.isLoaded = true
                 self.hasError = false
+                let chapterNumericId = IdentifierGenerator.chapterNumericId(unitId: self.unitId, chapterId: self.chapterId)
+                let storedStatuses = self.repository.loadStatuses(chapterId: chapterNumericId)
+                self.questionStatuses = qs.enumerated().map { index, _ in
+                    let quizId = "\(self.unitId)-\(self.chapterId)#\(index)"
+                    return storedStatuses[quizId] ?? .unanswered
+                }
                 
             } else {
                 self.quizzes = []
@@ -62,6 +75,7 @@ class QuizViewModel: ObservableObject {
                 self.selectedAnswerIndex = nil
                 self.isLoaded = true
                 self.hasError = true
+                self.questionStatuses = []
                 
             }
         }
@@ -84,10 +98,18 @@ class QuizViewModel: ObservableObject {
         let chapterIdInt = IdentifierGenerator.chapterNumericId(unitId: unitId, chapterId: chapterId)
         let stableQuizId = "\(unitId)-\(chapterId)#\(currentQuestionIndex)"
         
-        repository.saveOrUpdateAnswer(
+
+        let status: QuestionStatus = isCorrect ? .correct : .incorrect
+        if questionStatuses.indices.contains(currentQuestionIndex) {
+            questionStatuses[currentQuestionIndex] = status
+        } else {
+            questionStatuses.append(status)
+        }
+
+        repository.saveOrUpdateStatus(
             quizId: stableQuizId,
             chapterId: chapterIdInt,
-            isCorrect: isCorrect
+            status: status
         )
     }
     
@@ -155,5 +177,6 @@ class QuizViewModel: ObservableObject {
         chapterId = ""
         unitId = ""
         showResultView = false
+        questionStatuses = Array(repeating: .unanswered, count: quizzes.count)
     }
 }

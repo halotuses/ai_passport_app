@@ -12,12 +12,16 @@ final class HomeViewModel: ObservableObject {
     @Published private(set) var isLoading: Bool = false
     @Published private(set) var examDate: Date
 
-    private let repository = AnswerHistoryRepository()
+    private let repository: RealmAnswerHistoryRepository
     private var hasLoadedMetadata = false
 
     private static let examDateStorageKey = "home.examDate"
 
-    init(currentDate: Date = Date()) {
+    init(
+        currentDate: Date = Date(),
+        repository: RealmAnswerHistoryRepository = RealmAnswerHistoryRepository()
+    ) {
+        self.repository = repository
         if let storedDate = Self.storedExamDate() {
             examDate = storedDate
         } else if let defaultDate = Calendar.current.date(byAdding: .day, value: 90, to: currentDate) {
@@ -44,7 +48,7 @@ final class HomeViewModel: ObservableObject {
     func reloadProgress(currentDate: Date = Date()) {
         totalCorrect = repository.totalCorrectAnswerCount()
         totalIncorrect = repository.totalIncorrectAnswerCount()
-        totalAnswered = totalCorrect + totalIncorrect
+        totalAnswered = repository.totalAnsweredCount()
         if hasLoadedMetadata {
             updateCompletionRate()
             refreshCountdown(from: currentDate)

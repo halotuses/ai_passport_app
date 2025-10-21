@@ -7,9 +7,14 @@ class ChapterListViewModel: ObservableObject {
     @Published var quizCounts: [String: Int] = [:]
     @Published var correctCounts: [String: Int] = [:]
     
-    private let repository = AnswerHistoryRepository()
+    private let repository: RealmAnswerHistoryRepository
     
     private var currentUnitId: String = ""
+    
+    init(repository: RealmAnswerHistoryRepository = RealmAnswerHistoryRepository()) {
+        self.repository = repository
+    }
+    
     
     func fetchChapters(forUnitId unitId: String, filePath: String) {
         if unitId.hasPrefix("unit") {
