@@ -79,8 +79,15 @@ final class RealmAnswerHistoryRepository {
             let realm = try realm()
             let resolvedChapterId = chapterId ?? IdentifierGenerator.chapterNumericId(fromQuizIdentifier: quizId)
             try realm.write {
-                let object = realm.object(ofType: QuestionProgressObject.self, forPrimaryKey: quizId) ?? QuestionProgressObject()
-                object.quizId = quizId
+                let object: QuestionProgressObject
+                if let existing = realm.object(ofType: QuestionProgressObject.self, forPrimaryKey: quizId) {
+                    object = existing
+                } else {
+                    let newObject = QuestionProgressObject()
+                    newObject.quizId = quizId
+                    object = newObject
+                }
+
                 if let resolvedChapterId {
                     object.chapterId = resolvedChapterId
                 }
