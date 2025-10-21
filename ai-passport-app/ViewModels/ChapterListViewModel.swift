@@ -56,14 +56,20 @@ class ChapterListViewModel: ObservableObject {
     }
     
     private func calculateCorrectCounts() {
-        DispatchQueue.main.async { [weak self] in
+        DispatchQueue.global(qos: .userInitiated).async { [weak self] in
             guard let self else { return }
-            
-            
+            var counts: [String: Int] = [:]
             
             for chapter in self.chapters {
                 let identifier = IdentifierGenerator.chapterNumericId(unitId: self.currentUnitId, chapterId: chapter.id)
-                self.correctCounts[chapter.id] = self.repository.countCorrectAnswers(for: identifier)
+                let statuses = self.repository.loadStatuses(chapterId: identifier)
+                let correctCount = statuses.values.filter { $0 == .correct }.count
+                counts[chapter.id] = correctCount
+            }
+            
+            DispatchQueue.main.async { [weak self] in
+                guard let self else { return }
+                self.correctCounts = counts
             }
         }
     }
