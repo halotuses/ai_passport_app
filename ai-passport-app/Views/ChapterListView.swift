@@ -79,6 +79,7 @@ struct ChapterListView: View {
         .shadow(color: Color.themeShadowSoft, radius: 12, x: 0, y: 6)
     }
 }
+
 private struct CircularProgressView: View {
     let progress: Double
     let correctCount: Int
