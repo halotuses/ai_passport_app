@@ -30,7 +30,7 @@ final class UnitListViewModel: ObservableObject {
         }
     }
     
-    private static func buildQuizCounts(from metadata: QuizMetadataMap?) -> [String: Int] {
+
         private static func buildInitialQuizCounts(from metadata: QuizMetadataMap?) -> [String: Int] {
         guard let metadata else { return [:] }
         var counts: [String: Int] = [:]
