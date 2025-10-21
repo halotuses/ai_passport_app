@@ -4,6 +4,8 @@ xcuserdata/
 *.xcuserstate
 *.xccheckout
 *.xcworkspace
+*.zip
+*.txt
 
 # CocoaPods
 Pods/
@@ -17,5 +19,5 @@ Podfile.lock
 *.realm.lock
 *.realm.management
 
-# macOS
+# macOS system files
 .DS_Store

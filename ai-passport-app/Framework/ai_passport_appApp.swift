@@ -13,6 +13,7 @@ struct ai_passport_appApp: SwiftUI.App {
         let repository = RealmAnswerHistoryRepository(configuration: configuration)
         LegacyAnswerHistoryMigrator(repository: repository).migrateIfNeeded()
     }
+    
 
     var body: some Scene {
         WindowGroup {
