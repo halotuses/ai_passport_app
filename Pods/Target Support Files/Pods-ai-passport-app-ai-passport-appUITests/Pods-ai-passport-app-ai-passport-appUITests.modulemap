@@ -1,6 +1,0 @@
-framework module Pods_ai_passport_app_ai_passport_appUITests {
-  umbrella header "Pods-ai-passport-app-ai-passport-appUITests-umbrella.h"
-
-  export *
-  module * { export * }
-}
