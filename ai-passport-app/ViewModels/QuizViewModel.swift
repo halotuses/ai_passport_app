@@ -118,6 +118,22 @@ class QuizViewModel: ObservableObject {
             }
         }
     }
+    func persistAllStatusesImmediately() {
+        guard !quizzes.isEmpty else { return }
+
+        // 即時反映対応: バックグラウンド保存が残っていれば待機する
+        persistenceQueue.sync { }
+
+        let chapterIdInt = IdentifierGenerator.chapterNumericId(unitId: unitId, chapterId: chapterId)
+        for (index, status) in questionStatuses.enumerated() where status.isAnswered {
+            let stableQuizId = "\(unitId)-\(chapterId)#\(index)"
+            repository.updateAnswerStatusImmediately(
+                quizId: stableQuizId,
+                chapterId: chapterIdInt,
+                status: status
+            )
+        }
+    }
     
     // MARK: - Navigation
     func moveNext() {

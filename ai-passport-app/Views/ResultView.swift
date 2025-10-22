@@ -6,6 +6,7 @@ struct ResultView: View {
     let onRestart: () -> Void
     let onBackToChapterSelection: () -> Void
     let onBackToUnitSelection: () -> Void
+    let onImmediatePersist: () -> Void
 
     var body: some View {
         ZStack {
@@ -165,6 +166,10 @@ struct ResultView: View {
 
         }
         .navigationBarBackButtonHidden(true)
+        .onAppear {
+            // 即時反映対応: 結果画面表示と同時に永続化を完了させる
+            onImmediatePersist()
+        }
     }
 
     private var resultMessage: String {

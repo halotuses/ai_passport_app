@@ -13,6 +13,7 @@ final class ChapterProgressViewModel: ObservableObject, Identifiable {
     private let repository: RealmAnswerHistoryRepository
     private let chapterNumericId: Int
     private var progressToken: NotificationToken?
+    private var answerHistoryObserver: NSObjectProtocol?
 
     init(
         unitId: String,
@@ -26,6 +27,15 @@ final class ChapterProgressViewModel: ObservableObject, Identifiable {
 
         loadInitialProgress()
         observeProgressChanges()
+        
+        answerHistoryObserver = NotificationCenter.default.addObserver(
+            forName: .answerHistoryDidChange,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            // 即時反映対応: 通知受信時に強制再計算
+            self?.refresh()
+        }
     }
 
     func updateTotalQuestions(_ count: Int) {
@@ -67,5 +77,8 @@ final class ChapterProgressViewModel: ObservableObject, Identifiable {
 
     deinit {
         progressToken?.invalidate()
+        if let answerHistoryObserver {
+            NotificationCenter.default.removeObserver(answerHistoryObserver)
+        }
     }
 }

@@ -53,7 +53,11 @@ struct ContentView: View {
                     totalCount: viewModel.totalCount,
                     onRestart: onQuizEnd,
                     onBackToChapterSelection: onBackToChapterSelection,
-                    onBackToUnitSelection: onBackToUnitSelection
+                    onBackToUnitSelection: onBackToUnitSelection,
+                    onImmediatePersist: {
+                        // 即時反映対応: 結果表示前に保存内容を同期
+                        viewModel.persistAllStatusesImmediately()
+                    }
                 )
             }
             

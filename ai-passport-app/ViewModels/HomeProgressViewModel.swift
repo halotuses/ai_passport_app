@@ -21,7 +21,7 @@ final class HomeProgressViewModel: ObservableObject {
             object: nil,
             queue: .main
         ) { [weak self] _ in
-            self?.reloadProgress()
+            self?.refresh()
         }
     }
 

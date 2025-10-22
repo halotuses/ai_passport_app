@@ -47,6 +47,38 @@ final class RealmAnswerHistoryRepository {
         )
     }
     
+    func updateAnswerStatusImmediately(
+        quizId: String,
+        chapterId: Int,
+        status: QuestionStatus,
+        updatedAt: Date = Date()
+    ) {
+        do {
+            let realm = try realm()
+            try realm.write {
+                let _ = realm.create(
+                    QuestionProgressObject.self,
+                    value: [
+                        "quizId": quizId,
+                        "chapterId": chapterId,
+                        "statusRaw": status.rawValue,
+                        "updatedAt": updatedAt
+                    ],
+                    update: .modified
+                )
+            }
+        } catch {
+            print("❌ Realm immediate update failed: \(error)")
+            return
+        }
+
+        NotificationCenter.default.post(
+            name: .answerHistoryDidChange,
+            object: nil,
+            userInfo: ["chapterId": chapterId]
+        )
+    }
+    
     func loadStatuses(chapterId: Int) -> [String: QuestionStatus] {
         do {
             let realm = try realm()
