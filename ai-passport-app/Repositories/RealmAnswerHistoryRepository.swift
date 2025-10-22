@@ -61,9 +61,10 @@ final class RealmAnswerHistoryRepository {
     func questionProgresses(chapterId: Int) -> [QuestionProgress] {
         do {
             let realm = try realm()
-            return realm.objects(QuestionProgressObject.self)
+            let progresses = realm.objects(QuestionProgressObject.self)
                 .filter("chapterId == %d", chapterId)
                 .map(QuestionProgress.init(object:))
+            return Array(progresses)
         } catch {
             print("❌ Realm load failed: \(error)")
             return []
@@ -208,7 +209,7 @@ final class RealmAnswerHistoryRepository {
             let token = results.observe { changes in
                 switch changes {
                 case .initial(let collection), .update(let collection, _, _, _):
-                    let progresses = collection.map(QuestionProgress.init(object:))
+                    let progresses = Array(collection.map(QuestionProgress.init(object:)))
                     DispatchQueue.main.async {
                         onUpdate(progresses)
                     }
