@@ -8,10 +8,15 @@ import AppKit
 
 struct HomeView: View {
     @ObservedObject var viewModel: HomeViewModel
+    @ObservedObject private var progressViewModel: HomeProgressViewModel
     @EnvironmentObject private var mainViewState: MainViewState
     @Environment(\.scenePhase) private var scenePhase
     
     private let quickExamOffsets: [Int] = [0, 30, 60, 90]
+    init(viewModel: HomeViewModel) {
+        self.viewModel = viewModel
+        self._progressViewModel = ObservedObject(wrappedValue: viewModel.progressViewModel)
+    }
     
     private var examDateBinding: Binding<Date> {
         Binding(
@@ -21,24 +26,24 @@ struct HomeView: View {
     }
     
     private var progressSummaryText: String {
-        if viewModel.totalQuestions > 0 {
-            return "全\(viewModel.totalQuestions)問中\(viewModel.totalCorrect)問に正解"
+        if progressViewModel.totalQuestions > 0 {
+            return "全\(progressViewModel.totalQuestions)問中\(progressViewModel.totalCorrect)問に正解"
         }
         
-        if viewModel.totalAnswered > 0 {
-            return "これまでに\(viewModel.totalAnswered)問に挑戦しました"
+        if progressViewModel.totalAnswered > 0 {
+            return "これまでに\(progressViewModel.totalAnswered)問に挑戦しました"
         }
         
-        return viewModel.isLoading
+        return progressViewModel.isLoading
         ? "学習データを取得しています"
         : "学習を始めると進捗がここに表示されます"
     }
     
     private var progressDetailsText: String? {
-        let unanswered = max(viewModel.totalUnanswered, 0)
-        guard viewModel.totalAnswered > 0 || unanswered > 0 else { return nil }
-        
-        return "正解\(viewModel.totalCorrect)問 / 不正解\(viewModel.totalIncorrect)問 / 未回答\(unanswered)問"
+        let unanswered = max(progressViewModel.totalUnanswered, 0)
+        guard progressViewModel.totalAnswered > 0 || unanswered > 0 else { return nil }
+
+        return "正解\(progressViewModel.totalCorrect)問 / 不正解\(progressViewModel.totalIncorrect)問 / 未回答\(unanswered)問"
     }
     
     private var completionPercentageDisplay: (value: String, label: String) {
@@ -46,7 +51,7 @@ struct HomeView: View {
             return ("\(percentage)%", "達成度")
         }
         
-        if viewModel.totalAnswered > 0 {
+        if progressViewModel.totalAnswered > 0 {
             return ("--%", "達成度")
         }
         
@@ -54,23 +59,23 @@ struct HomeView: View {
     }
     
     private var completionPercentageValue: Int? {
-        guard viewModel.totalQuestions > 0 else { return nil }
-        
-        return Int((viewModel.completionRate * 100).rounded())
+        guard progressViewModel.totalQuestions > 0 else { return nil }
+
+        return Int((progressViewModel.completionRate * 100).rounded())
     }
     
     private var accuracyText: String {
-        guard viewModel.totalAnswered > 0 else {
+        guard progressViewModel.totalAnswered > 0 else {
             return "正答率 --"
         }
         
-        let accuracy = Double(viewModel.totalCorrect) / Double(viewModel.totalAnswered)
+        let accuracy = Double(progressViewModel.totalCorrect) / Double(progressViewModel.totalAnswered)
         let percentage = Int((accuracy * 100).rounded())
         return "正答率 \(percentage)%"
     }
     
     private var progressLegendItems: [LegendItem] {
-        let unanswered = max(viewModel.totalUnanswered, 0)
+        let unanswered = max(progressViewModel.totalUnanswered, 0)
         let denominator = progressPercentageDenominator
         
         func percentageText(for count: Int) -> String? {
@@ -80,51 +85,19 @@ struct HomeView: View {
         }
         
         return [
-            LegendItem(kind: .correct, label: "正解", count: viewModel.totalCorrect, color: .themeCorrect, percentageText: percentageText(for: viewModel.totalCorrect)),
-            LegendItem(kind: .incorrect, label: "不正解", count: viewModel.totalIncorrect, color: .themeIncorrect, percentageText: percentageText(for: viewModel.totalIncorrect)),
+            LegendItem(kind: .correct, label: "正解", count: progressViewModel.totalCorrect, color: .themeCorrect, percentageText: percentageText(for: progressViewModel.totalCorrect)),
+            LegendItem(kind: .incorrect, label: "不正解", count: progressViewModel.totalIncorrect, color: .themeIncorrect, percentageText: percentageText(for: progressViewModel.totalIncorrect)),
             LegendItem(kind: .unanswered, label: "未回答", count: unanswered, color: Color.themeButtonSecondary, percentageText: percentageText(for: unanswered))
         ]
     }
     
     private var progressPercentageDenominator: Int? {
-        if viewModel.totalQuestions > 0 {
-            return viewModel.totalQuestions
+        if progressViewModel.totalQuestions > 0 {
+            return progressViewModel.totalQuestions
         }
         
-        let total = viewModel.totalAnswered + max(viewModel.totalUnanswered, 0)
+        let total = progressViewModel.totalAnswered + max(progressViewModel.totalUnanswered, 0)
         return total > 0 ? total : nil
-    }
-    
-    
-    private var progressSegments: [ProgressSegment] {
-        let unanswered = max(viewModel.totalUnanswered, 0)
-        let segments = [
-            ProgressSegment(kind: .correct, value: Double(viewModel.totalCorrect), color: .themeCorrect, count: viewModel.totalCorrect),
-            ProgressSegment(kind: .incorrect, value: Double(viewModel.totalIncorrect), color: .themeIncorrect, count: viewModel.totalIncorrect),
-            ProgressSegment(kind: .unanswered, value: Double(unanswered), color: Color.themeButtonSecondary, count: unanswered)
-        ]
-        
-        let activeSegments = segments.filter { $0.value > 0 }
-        if activeSegments.isEmpty {
-            return [ProgressSegment(kind: .placeholder, value: 1, color: Color.themeButtonSecondary.opacity(0.35), count: 0)]
-        }
-        
-        return activeSegments
-    }
-    
-    private var progressTotalValue: Double {
-        progressSegments.reduce(0) { $0 + $1.value }
-    }
-    
-    private var progressSlices: [SegmentSlice] {
-        guard progressTotalValue > 0 else { return [] }
-        
-        var start: Double = 0
-        return progressSegments.map { segment in
-            let end = start + segment.value
-            defer { start = end }
-            return SegmentSlice(segment: segment, start: start / progressTotalValue, end: end / progressTotalValue)
-        }
     }
     
     private var countdownText: String {
@@ -193,7 +166,7 @@ struct HomeView: View {
                 }
                 
                 Spacer()
-                if viewModel.isLoading {
+                if progressViewModel.isLoading {
                     ProgressView()
                         .progressViewStyle(.circular)
                         .tint(.themeSecondary)
@@ -201,7 +174,11 @@ struct HomeView: View {
             }
             
             HStack(alignment: .center, spacing: 28) {
-                MultiSegmentDonutChart(slices: progressSlices) {
+                CircularProgressView(
+                    progress: progressViewModel.completionRate,
+                    lineWidth: 12,
+                    size: 140
+                ) {
                     VStack(spacing: 4) {
                         Text(completionPercentageDisplay.value)
                             .font(.system(size: 36, weight: .black, design: .rounded))
@@ -211,7 +188,6 @@ struct HomeView: View {
                             .foregroundColor(.themeTextSecondary)
                     }
                 }
-                .frame(width: 140, height: 140)
                 
                 VStack(alignment: .leading, spacing: 12) {
                     Text(accuracyText)
@@ -383,64 +359,20 @@ struct HomeView: View {
 }
 
 private extension HomeView {
-    struct ProgressSegment {
-        enum Kind: Hashable {
-            case correct
-            case incorrect
-            case unanswered
-            case placeholder
-        }
-        
-        let kind: Kind
-        let value: Double
-        let color: Color
-        let count: Int
-    }
-    
-    struct SegmentSlice: Identifiable {
-        let segment: ProgressSegment
-        let start: Double
-        let end: Double
-        
-        var id: ProgressSegment.Kind { segment.kind }
+    enum LegendKind: Hashable {
+        case correct
+        case incorrect
+        case unanswered
     }
     
     struct LegendItem: Identifiable {
-        let kind: ProgressSegment.Kind
+        let kind: LegendKind
         let label: String
         let count: Int
         let color: Color
         let percentageText: String?
-        
-        var id: ProgressSegment.Kind { kind }
-    }
-    
-    struct MultiSegmentDonutChart<CenterContent: View>: View {
-        let slices: [SegmentSlice]
-        let lineWidth: CGFloat
-        private let centerContent: () -> CenterContent
-        
-        init(slices: [SegmentSlice], lineWidth: CGFloat = 18, @ViewBuilder centerContent: @escaping () -> CenterContent) {
-            self.slices = slices
-            self.lineWidth = lineWidth
-            self.centerContent = centerContent
-        }
-        
-        var body: some View {
-            ZStack {
-                Circle()
-                    .stroke(Color.themeButtonSecondary.opacity(0.3), style: StrokeStyle(lineWidth: lineWidth))
-                
-                ForEach(slices) { slice in
-                    Circle()
-                        .trim(from: slice.start, to: slice.end)
-                        .stroke(slice.segment.color, style: StrokeStyle(lineWidth: lineWidth, lineCap: .round))
-                        .rotationEffect(.degrees(-90))
-                }
-                
-                centerContent()
-            }
-        }
+
+        var id: LegendKind { kind }
     }
 }
 private struct PaperBackground: View {

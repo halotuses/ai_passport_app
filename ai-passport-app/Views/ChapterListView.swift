@@ -14,9 +14,9 @@ struct ChapterListView: View {
     var body: some View {
         ScrollView {
             VStack(spacing: 8) {
-                ForEach(viewModel.chapters, id: \.self) { chapter in
-                    Button(action: { selectedChapter = chapter }) {
-                        chapterRowView(chapter: chapter)
+                ForEach(viewModel.progressViewModels) { progressVM in
+                    Button(action: { selectedChapter = progressVM.chapter }) {
+                        ChapterRowItem(viewModel: progressVM)
                     }
                 }
             }
@@ -29,14 +29,13 @@ struct ChapterListView: View {
         }
     }
     
-    private func chapterRowView(chapter: ChapterMetadata) -> some View {
-        let totalCount = viewModel.quizCounts[chapter.id] ?? 0
-        let correctCount = viewModel.correctCounts[chapter.id] ?? 0
-        let progress = totalCount > 0 ? Double(correctCount) / Double(totalCount) : 0
-        
-        
-        return HStack(spacing: 16) {
-            Image(systemName: "book.closed")
+}
+
+private struct ChapterRowItem: View {
+    @ObservedObject var viewModel: ChapterProgressViewModel
+
+    var body: some View {
+        HStack(spacing: 16) {            Image(systemName: "book.closed")
                 .font(.system(size: 20, weight: .semibold))
                 .foregroundStyle(
                     LinearGradient(
@@ -46,16 +45,16 @@ struct ChapterListView: View {
                     )
                 )
             VStack(alignment: .leading, spacing: 4) {
-                Text(chapter.title)
+                Text(viewModel.chapter.title)
                     .font(.system(size: 16, weight: .bold))
                     .foregroundColor(.themeTextPrimary)
 
             }
             Spacer()
-            CircularProgressView(
-                progress: progress,
-                correctCount: correctCount,
-                totalCount: totalCount
+            ProgressBadgeView(
+                correctCount: viewModel.correctCount,
+                totalCount: viewModel.totalQuestions,
+                progress: viewModel.progressRate
             )
         }
         .padding(14)
@@ -75,52 +74,5 @@ struct ChapterListView: View {
                 .stroke(Color.themeMain.opacity(0.12), lineWidth: 1)
         )
         .shadow(color: Color.themeShadowSoft, radius: 12, x: 0, y: 6)
-    }
-}
-
-private struct CircularProgressView: View {
-    let progress: Double
-    let correctCount: Int
-    let totalCount: Int
-    
-    private let size: CGFloat = 56
-    private let lineWidth: CGFloat = 6
-    
-    private var clampedProgress: Double {
-        min(max(progress, 0), 1)
-    }
-    
-    var body: some View {
-        ZStack {
-            Circle()
-                .stroke(Color.themeSecondary.opacity(0.18), lineWidth: lineWidth)
-            
-            Circle()
-                .trim(from: 0, to: clampedProgress)
-                .stroke(
-                    AngularGradient(
-                        gradient: Gradient(colors: [Color.themeMain, Color.themeSecondary]),
-                        center: .center
-                    ),
-                    style: StrokeStyle(lineWidth: lineWidth, lineCap: .round)
-                )
-                .rotationEffect(.degrees(-90))
-            
-            Text("\(correctCount)/\(totalCount)")
-                .font(.system(size: 12, weight: .bold))
-                .foregroundColor(.themeTextPrimary)
-        }
-        .frame(width: size, height: size)
-        .background(
-            Circle()
-                .fill(
-                    LinearGradient(
-                        colors: [Color.themeSurfaceElevated, Color.themeSurfaceAlt],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    )
-                )
-        )
-        .shadow(color: Color.themeShadowSoft.opacity(0.6), radius: 6, x: 0, y: 3)
     }
 }

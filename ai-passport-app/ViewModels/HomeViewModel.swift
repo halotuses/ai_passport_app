@@ -1,28 +1,24 @@
+import Combine
 import Foundation
 
 @MainActor
 final class HomeViewModel: ObservableObject {
-    @Published private(set) var totalQuestions: Int = 0
-    @Published private(set) var totalCorrect: Int = 0
-    @Published private(set) var totalIncorrect: Int = 0
-    @Published private(set) var totalAnswered: Int = 0
-    @Published private(set) var completionRate: Double = 0
+
     @Published private(set) var daysUntilExam: Int? = nil
     @Published private(set) var encouragementMessage: String = ""
-    @Published private(set) var isLoading: Bool = false
+
     @Published private(set) var examDate: Date
 
-    private let repository: RealmAnswerHistoryRepository
-    private var hasLoadedMetadata = false
-    private var answerHistoryObserver: NSObjectProtocol?
+    let progressViewModel: HomeProgressViewModel
 
+    private var cancellables: Set<AnyCancellable> = []
     private static let examDateStorageKey = "home.examDate"
 
     init(
         currentDate: Date = Date(),
-        repository: RealmAnswerHistoryRepository = RealmAnswerHistoryRepository()
+        progressViewModel: HomeProgressViewModel = HomeProgressViewModel()
     ) {
-        self.repository = repository
+        self.progressViewModel = progressViewModel
         if let storedDate = Self.storedExamDate() {
             examDate = storedDate
         } else if let defaultDate = Calendar.current.date(byAdding: .day, value: 90, to: currentDate) {
@@ -33,35 +29,17 @@ final class HomeViewModel: ObservableObject {
 
         refreshCountdown(from: currentDate)
         
-        answerHistoryObserver = NotificationCenter.default.addObserver(
-            forName: .answerHistoryDidChange,
-            object: nil,
-            queue: .main
-        ) { [weak self] _ in
-            self?.reloadProgress()
-        }
+        bindProgressUpdates(currentDate: currentDate)
     }
 
     func refresh(currentDate: Date = Date()) {
-        reloadProgress(currentDate: currentDate)
-
-        if hasLoadedMetadata {
-            updateCompletionRate()
-            refreshCountdown(from: currentDate)
-            return
-        }
-
-        fetchMetadata(currentDate: currentDate)
+        progressViewModel.refresh()
+        refreshCountdown(from: currentDate)
     }
 
     func reloadProgress(currentDate: Date = Date()) {
-        totalCorrect = repository.totalCorrectAnswerCount()
-        totalIncorrect = repository.totalIncorrectAnswerCount()
-        totalAnswered = repository.totalAnsweredCount()
-        if hasLoadedMetadata {
-            updateCompletionRate()
-            refreshCountdown(from: currentDate)
-        }
+        progressViewModel.reloadProgress()
+        refreshCountdown(from: currentDate)
     }
 
     func updateExamDate(_ date: Date, currentDate: Date = Date()) {
@@ -69,35 +47,6 @@ final class HomeViewModel: ObservableObject {
         UserDefaults.standard.set(date.timeIntervalSince1970, forKey: Self.examDateStorageKey)
         refreshCountdown(from: currentDate)
     }
-
-    private func fetchMetadata(currentDate: Date) {
-        guard !isLoading else { return }
-
-        isLoading = true
-        NetworkManager.fetchMetadata { [weak self] metadata in
-            guard let self else { return }
-
-            self.isLoading = false
-            self.hasLoadedMetadata = (metadata != nil)
-            self.totalQuestions = metadata?.values.reduce(0) { $0 + $1.total } ?? 0
-            self.updateCompletionRate()
-            self.refreshCountdown(from: currentDate)
-        }
-    }
-
-    private func updateCompletionRate() {
-        guard totalQuestions > 0 else {
-            completionRate = 0
-            return
-        }
-
-        completionRate = min(max(Double(totalCorrect) / Double(totalQuestions), 0), 1)
-    }
-
-    var totalUnanswered: Int {
-        max(totalQuestions - totalAnswered, 0)
-    }
-
     
     private func refreshCountdown(from currentDate: Date) {
         let components = Calendar.current.dateComponents([.day], from: currentDate, to: examDate)
@@ -142,9 +91,20 @@ final class HomeViewModel: ObservableObject {
         }
     }
     
-    deinit {
-        if let answerHistoryObserver {
-            NotificationCenter.default.removeObserver(answerHistoryObserver)
-        }
+    private func bindProgressUpdates(currentDate: Date) {
+        progressViewModel.objectWillChange
+            .sink { [weak self] _ in
+                guard let self else { return }
+                self.refreshCountdown(from: Date())
+                self.objectWillChange.send()
+            }
+            .store(in: &cancellables)
     }
+    var totalQuestions: Int { progressViewModel.totalQuestions }
+    var totalCorrect: Int { progressViewModel.totalCorrect }
+    var totalIncorrect: Int { progressViewModel.totalIncorrect }
+    var totalAnswered: Int { progressViewModel.totalAnswered }
+    var completionRate: Double { progressViewModel.completionRate }
+    var totalUnanswered: Int { progressViewModel.totalUnanswered }
+    var isLoading: Bool { progressViewModel.isLoading }
 }
