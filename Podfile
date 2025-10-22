@@ -1,20 +1,25 @@
+# iOS 15以上をサポート
 platform :ios, '15.0'
 
 use_frameworks!
 use_modular_headers!
 
 target 'ai-passport-app' do
-  # RealmSwift の安定バージョン指定
-  pod 'RealmSwift', '~> 10.47.0'
+  # RealmSwift の最新版（v10.54系）を使用
+  pod 'RealmSwift', '~> 10.54'
 
-  # iOS17以降でのビルド高速化・安定化オプション
+  # iOS17 / Xcode16 系での安定ビルド対応
   post_install do |installer|
     installer.pods_project.targets.each do |target|
       target.build_configurations.each do |config|
-        # Module stability 確保（Swift/Realm周りのビルドエラー対策）
+        # モジュール安定性（Realm含む Swift ライブラリ対策）
         config.build_settings['BUILD_LIBRARY_FOR_DISTRIBUTION'] = 'YES'
-        # 新しいアーキテクチャ対応（Apple Silicon対策）
+
+        # Apple Silicon (arm64) シミュレータ対応
         config.build_settings['EXCLUDED_ARCHS[sdk=iphonesimulator*]'] = 'arm64'
+
+        # Swift 6ビルド時の警告回避（安全設定）
+        config.build_settings['SWIFT_STRICT_CONCURRENCY'] = 'complete'
       end
     end
   end
