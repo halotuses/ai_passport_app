@@ -26,21 +26,18 @@ class ChapterListViewModel: ObservableObject {
         chapters = []
         progressViewModels.removeAll()
         progressLookup.removeAll()
-
-        
         
         let fullURL = Constants.url(filePath)
         NetworkManager.fetchChapterList(from: fullURL) { [weak self] result in
-            
             guard let self else { return }
-            
             let fetchedChapters = result?.chapters ?? []
-            DispatchQueue.main.async {
+            // Task を使って MainActor 上で UI 状態と子 ViewModel を更新
+            Task { @MainActor [weak self] in
+                guard let self else { return }
                 self.chapters = fetchedChapters
                 self.buildProgressViewModels()
                 self.calculateQuizCounts()
             }
-            
         }
     }
     
@@ -57,15 +54,15 @@ class ChapterListViewModel: ObservableObject {
         }
     }
     
+    @MainActor
     private func buildProgressViewModels() {
+        // MainActor 上で ChapterProgressViewModel を生成して UI バインディングの整合性を保つ
         let models = chapters.map { chapter in
             ChapterProgressViewModel(unitId: currentUnitId, chapter: chapter, repository: repository)
         }
         progressViewModels = models
         progressLookup = Dictionary(uniqueKeysWithValues: models.map { ($0.id, $0) })
     }
-    
-    
     
     private func extractUnitIdentifier(from path: String) -> String {
         let components = path.split(separator: "/")

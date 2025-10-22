@@ -16,9 +16,10 @@ final class HomeViewModel: ObservableObject {
 
     init(
         currentDate: Date = Date(),
-        progressViewModel: HomeProgressViewModel = HomeProgressViewModel()
+        progressViewModel: HomeProgressViewModel? = nil
     ) {
-        self.progressViewModel = progressViewModel
+
+        self.progressViewModel = progressViewModel ?? HomeProgressViewModel()
         if let storedDate = Self.storedExamDate() {
             examDate = storedDate
         } else if let defaultDate = Calendar.current.date(byAdding: .day, value: 90, to: currentDate) {
