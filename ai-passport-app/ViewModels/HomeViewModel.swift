@@ -14,6 +14,7 @@ final class HomeViewModel: ObservableObject {
 
     private let repository: RealmAnswerHistoryRepository
     private var hasLoadedMetadata = false
+    private var answerHistoryObserver: NSObjectProtocol?
 
     private static let examDateStorageKey = "home.examDate"
 
@@ -31,6 +32,14 @@ final class HomeViewModel: ObservableObject {
         }
 
         refreshCountdown(from: currentDate)
+        
+        answerHistoryObserver = NotificationCenter.default.addObserver(
+            forName: .answerHistoryDidChange,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            self?.reloadProgress()
+        }
     }
 
     func refresh(currentDate: Date = Date()) {
@@ -130,6 +139,12 @@ final class HomeViewModel: ObservableObject {
             } else {
                 return "一緒にスタート！小さな一歩から始めよう🌱"
             }
+        }
+    }
+    
+    deinit {
+        if let answerHistoryObserver {
+            NotificationCenter.default.removeObserver(answerHistoryObserver)
         }
     }
 }
