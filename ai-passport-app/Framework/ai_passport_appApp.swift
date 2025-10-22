@@ -10,7 +10,7 @@ struct ai_passport_appApp: SwiftUI.App {
         configuration.migrationBlock = { _, _ in }
         Realm.Configuration.defaultConfiguration = configuration
 
-        // Realmファイルのパスを出力（←ここ追加！）
+        // Realmファイルのパスを出力
         if let url = Realm.Configuration.defaultConfiguration.fileURL {
             print("✅ Realm file path:")
             print(url)
