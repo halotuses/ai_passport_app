@@ -75,6 +75,7 @@ final class RealmAnswerHistoryRepository {
     }
 
     private func persistStatus(quizId: String, chapterId: Int?, status: QuestionStatus, updatedAt: Date) {
+        var notifiedChapterId: Int?
         do {
             let realm = try realm()
             let resolvedChapterId = chapterId ?? IdentifierGenerator.chapterNumericId(fromQuizIdentifier: quizId)
@@ -94,9 +95,19 @@ final class RealmAnswerHistoryRepository {
                 object.status = status
                 object.updatedAt = updatedAt
                 realm.add(object, update: .modified)
+                notifiedChapterId = object.chapterId
             }
         } catch {
             print("❌ Realm save failed: \(error)")
+            return
+        }
+
+        if let notifiedChapterId {
+            NotificationCenter.default.post(
+                name: .answerHistoryDidChange,
+                object: nil,
+                userInfo: ["chapterId": notifiedChapterId]
+            )
         }
     }
 
@@ -139,4 +150,33 @@ final class RealmAnswerHistoryRepository {
     private func realm() throws -> Realm {
         try Realm(configuration: configuration)
     }
+    
+    func observeCorrectCount(for chapterId: Int, onUpdate: @escaping (Int) -> Void) -> NotificationToken? {
+        do {
+            let realm = try realm()
+            let results = realm.objects(QuestionProgressObject.self)
+                .filter("chapterId == %d", chapterId)
+
+            let token = results.observe { changes in
+                switch changes {
+                case .initial(let collection), .update(let collection, _, _, _):
+                    let count = collection.filter("statusRaw == %@", QuestionStatus.correct.rawValue).count
+                    DispatchQueue.main.async {
+                        onUpdate(count)
+                    }
+                case .error(let error):
+                    print("❌ Realm observe failed: \(error)")
+                }
+            }
+
+            return token
+        } catch {
+            print("❌ Realm observe failed: \(error)")
+            return nil
+        }
+    }
+}
+
+extension Notification.Name {
+    static let answerHistoryDidChange = Notification.Name("answerHistoryDidChange")
 }

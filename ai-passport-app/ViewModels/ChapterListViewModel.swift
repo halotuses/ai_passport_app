@@ -1,5 +1,6 @@
 // ViewModels/ChapterListViewModel.swift
 import Foundation
+import RealmSwift
 
 class ChapterListViewModel: ObservableObject {
     
@@ -10,6 +11,7 @@ class ChapterListViewModel: ObservableObject {
     private let repository: RealmAnswerHistoryRepository
     
     private var currentUnitId: String = ""
+    private var progressTokens: [String: NotificationToken] = [:]
     
     init(repository: RealmAnswerHistoryRepository = RealmAnswerHistoryRepository()) {
         self.repository = repository
@@ -25,6 +27,7 @@ class ChapterListViewModel: ObservableObject {
         chapters = []
         quizCounts.removeAll()
         correctCounts.removeAll()
+        invalidateProgressTokens()
         
         
         let fullURL = Constants.url(filePath)
@@ -56,21 +59,24 @@ class ChapterListViewModel: ObservableObject {
     }
     
     private func calculateCorrectCounts() {
-        DispatchQueue.global(qos: .userInitiated).async { [weak self] in
-            guard let self else { return }
-            var counts: [String: Int] = [:]
-            
-            for chapter in self.chapters {
-                let identifier = IdentifierGenerator.chapterNumericId(unitId: self.currentUnitId, chapterId: chapter.id)
-                let correctCount = self.repository.countCorrectAnswers(for: identifier)
-                counts[chapter.id] = correctCount
-            }
-            
-            DispatchQueue.main.async { [weak self] in
+        invalidateProgressTokens()
+        var updatedCounts: [String: Int] = [:]
+
+        for chapter in chapters {
+            let chapterKey = chapter.id
+            let identifier = IdentifierGenerator.chapterNumericId(unitId: currentUnitId, chapterId: chapter.id)
+            let initialCount = repository.countCorrectAnswers(for: identifier)
+            updatedCounts[chapterKey] = initialCount
+
+            if let token = repository.observeCorrectCount(for: identifier, onUpdate: { [weak self] correctCount in
                 guard let self else { return }
-                self.correctCounts = counts
+                self.correctCounts[chapterKey] = correctCount
+            }) {
+                progressTokens[chapterKey] = token
             }
         }
+        
+        correctCounts = updatedCounts
     }
     
     
@@ -83,4 +89,12 @@ class ChapterListViewModel: ObservableObject {
         return ""
     }
     
+    deinit {
+        invalidateProgressTokens()
+    }
+
+    private func invalidateProgressTokens() {
+        progressTokens.values.forEach { $0.invalidate() }
+        progressTokens.removeAll()
+    }
 }
