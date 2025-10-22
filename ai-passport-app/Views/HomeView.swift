@@ -45,6 +45,11 @@ struct HomeView: View {
 
         return "正解\(progressViewModel.totalCorrect)問 / 不正解\(progressViewModel.totalIncorrect)問 / 未回答\(unanswered)問"
     }
+    private var completionPercentageValue: Int? {
+        guard progressViewModel.totalQuestions > 0 else { return nil }
+
+        return Int((progressViewModel.completionRate * 100).rounded())
+    }
     
     private var completionPercentageDisplay: (value: String, label: String) {
         if let percentage = completionPercentageValue {
@@ -58,10 +63,12 @@ struct HomeView: View {
         return ("0%", "達成度")
     }
     
-    private var completionPercentageValue: Int? {
-        guard progressViewModel.totalQuestions > 0 else { return nil }
+    private var completionProgressValue: Double {
+        if completionPercentageValue == nil && progressViewModel.totalAnswered > 0 {
+            return -1
+        }
 
-        return Int((progressViewModel.completionRate * 100).rounded())
+        return progressViewModel.completionRate
     }
     
     private var accuracyText: String {
@@ -174,19 +181,18 @@ struct HomeView: View {
             }
             
             HStack(alignment: .center, spacing: 28) {
-                CircularProgressView(
-                    progress: progressViewModel.completionRate,
-                    lineWidth: 12,
-                    size: 140
-                ) {
-                    VStack(spacing: 4) {
-                        Text(completionPercentageDisplay.value)
-                            .font(.system(size: 36, weight: .black, design: .rounded))
-                            .foregroundColor(.themeTextPrimary)
-                        Text(completionPercentageDisplay.label)
-                            .font(.caption.weight(.semibold))
-                            .foregroundColor(.themeTextSecondary)
-                    }
+                VStack(spacing: 10) {
+                    CircularProgressView(
+                        progress: completionProgressValue,
+                        lineWidth: 12,
+                        size: 140
+                    )
+                    Text(completionPercentageDisplay.value)
+                        .font(.footnote.weight(.semibold))
+                        .foregroundColor(.themeTextPrimary)
+                    Text(completionPercentageDisplay.label)
+                        .font(.caption.weight(.semibold))
+                        .foregroundColor(.themeTextSecondary)
                 }
                 
                 VStack(alignment: .leading, spacing: 12) {

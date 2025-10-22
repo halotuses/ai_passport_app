@@ -51,6 +51,7 @@
 		0CF00B682EA91D5800B8A6D0 /* HomeProgressViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF00B672EA91D5700B8A6D0 /* HomeProgressViewModel.swift */; };
 		0CF00B6B2EA91FA900B8A6D0 /* CircularProgressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF00B6A2EA91F9B00B8A6D0 /* CircularProgressView.swift */; };
 		0CF00B6E2EA924FD00B8A6D0 /* CreatePageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF00B6D2EA924FB00B8A6D0 /* CreatePageView.swift */; };
+		0CF00B702EA92B1700B8A6D0 /* ProgressBadgeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF00B6F2EA92B1600B8A6D0 /* ProgressBadgeView.swift */; };
 		2B63F89F4CE1CD0E16123851 /* Pods_ai_passport_app.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B6D8C50DB3A51823B125E337 /* Pods_ai_passport_app.framework */; };
 		42A1F52C68FCFD4E23C1AD3B /* Pods_ai_passport_appTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CD4D1B17350B13D73E50E963 /* Pods_ai_passport_appTests.framework */; };
 		D4D414550206AE8AFFD822D8 /* Pods_ai_passport_app_ai_passport_appUITests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8B7A668C0E0F2C0A2AD7E56D /* Pods_ai_passport_app_ai_passport_appUITests.framework */; };
@@ -121,6 +122,7 @@
 		0CF00B672EA91D5700B8A6D0 /* HomeProgressViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeProgressViewModel.swift; sourceTree = "<group>"; };
 		0CF00B6A2EA91F9B00B8A6D0 /* CircularProgressView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CircularProgressView.swift; sourceTree = "<group>"; };
 		0CF00B6D2EA924FB00B8A6D0 /* CreatePageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreatePageView.swift; sourceTree = "<group>"; };
+		0CF00B6F2EA92B1600B8A6D0 /* ProgressBadgeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressBadgeView.swift; sourceTree = "<group>"; };
 		132FB8E45FA8448778A70AEB /* Pods-ai-passport-app.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ai-passport-app.release.xcconfig"; path = "Target Support Files/Pods-ai-passport-app/Pods-ai-passport-app.release.xcconfig"; sourceTree = "<group>"; };
 		1DF2ED86DEEC2D2F21257F72 /* Pods-ai-passport-app.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ai-passport-app.debug.xcconfig"; path = "Target Support Files/Pods-ai-passport-app/Pods-ai-passport-app.debug.xcconfig"; sourceTree = "<group>"; };
 		336BE6D1C0A308AF4E7A9E15 /* Pods-ai-passport-app-ai-passport-appUITests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ai-passport-app-ai-passport-appUITests.release.xcconfig"; path = "Target Support Files/Pods-ai-passport-app-ai-passport-appUITests/Pods-ai-passport-app-ai-passport-appUITests.release.xcconfig"; sourceTree = "<group>"; };
@@ -346,6 +348,7 @@
 		0CF00B692EA91F8900B8A6D0 /* Components */ = {
 			isa = PBXGroup;
 			children = (
+				0CF00B6F2EA92B1600B8A6D0 /* ProgressBadgeView.swift */,
 				0CF00B6A2EA91F9B00B8A6D0 /* CircularProgressView.swift */,
 			);
 			path = Components;
@@ -665,6 +668,7 @@
 				0C30DDF72DFF1CD800F25D02 /* Quiz.swift in Sources */,
 				0C30DDD92DFF185400F25D02 /* MainRouterView.swift in Sources */,
 				0C30DDE52DFF1AB400F25D02 /* HeaderView.swift in Sources */,
+				0CF00B702EA92B1700B8A6D0 /* ProgressBadgeView.swift in Sources */,
 				0C31AD812EA21897007500F7 /* HomeViewModel.swift in Sources */,
 				0C30DDFF2DFF1E9A00F25D02 /* PersistenceController.swift in Sources */,
 			);

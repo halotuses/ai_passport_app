@@ -1,46 +1,57 @@
 import SwiftUI
 
-/// 章ごとの進捗を表示するバッジ
-struct ProgressBadgeView: View {
-    let correctCount: Int
-    let totalCount: Int
+/// ホーム画面で全体の学習状況を示す円形プログレスビュー
+struct CircularProgressView: View {
     let progress: Double
+    var lineWidth: CGFloat = 12
+    var size: CGFloat = 140
+
+    private var shouldDisplayPlaceholder: Bool {
+        progress.isNaN || progress < 0
+    }
+    
 
     private var clampedProgress: Double {
-        min(max(progress, 0), 1)
+        guard !shouldDisplayPlaceholder else { return 0 }
+        return min(max(progress, 0), 1)
     }
 
-    private var percentageText: String {
-        guard totalCount > 0 else { return "--%" }
-        let percentage = Int((clampedProgress * 100).rounded())
-        return "\(percentage)%"
+    private var progressText: String {
+        guard !shouldDisplayPlaceholder else { return "--%" }
+        return "\(Int((clampedProgress * 100).rounded()))%"
+    }
+
+    private var gradient: AngularGradient {
+        AngularGradient(
+            gradient: Gradient(colors: [
+                Color.themeMain,
+                Color.themeSecondary,
+                Color.themeQuaternary
+            ]),
+            center: .center
+        )
     }
 
     var body: some View {
-        VStack(alignment: .center, spacing: 8) {
-            Text("\(correctCount)/\(totalCount)")
-                .font(.system(size: 14, weight: .bold))
+        ZStack {
+            Circle()
+                .stroke(Color.themeSurfaceElevated.opacity(0.4), lineWidth: lineWidth)
+
+            Circle()
+                .trim(from: 0, to: clampedProgress)
+                .stroke(gradient, style: StrokeStyle(lineWidth: lineWidth, lineCap: .round))
+                .rotationEffect(.degrees(-90))
+                .animation(.easeInOut(duration: 0.6), value: clampedProgress)
+                .opacity(shouldDisplayPlaceholder ? 0.35 : 1)
+
+            Text(progressText)
+                .font(.system(size: size * 0.2, weight: .bold))
                 .foregroundColor(.themeTextPrimary)
-
-            ProgressView(value: clampedProgress)
-                .progressViewStyle(.linear)
-                .tint(.themeMain)
-                .frame(maxWidth: .infinity)
-
-            Text(percentageText)
-                .font(.caption.weight(.semibold))
-                .foregroundColor(.themeSecondary)
-                .padding(.horizontal, 10)
-                .padding(.vertical, 4)
-                .background(
-                    Capsule()
-                        .fill(Color.themeSecondary.opacity(0.15))
-                )
         }
-        .padding(.vertical, 12)
-        .padding(.horizontal, 14)
+        .frame(width: size, height: size)
+        .padding(lineWidth / 2)
         .background(
-            RoundedRectangle(cornerRadius: 16)
+            Circle()
                 .fill(
                     LinearGradient(
                         colors: [Color.themeSurfaceElevated, Color.themeSurfaceAlt],
@@ -49,10 +60,17 @@ struct ProgressBadgeView: View {
                     )
                 )
         )
-        .overlay(
-            RoundedRectangle(cornerRadius: 16)
-                .stroke(Color.white.opacity(0.25), lineWidth: 0.8)
-        )
-        .shadow(color: Color.themeShadowSoft.opacity(0.45), radius: 10, x: 0, y: 4)
+        .shadow(color: Color.themeShadowSoft.opacity(0.6), radius: 12, x: 0, y: 8)
+    }
+}
+
+struct CircularProgressView_Previews: PreviewProvider {
+    static var previews: some View {
+        VStack(spacing: 24) {
+            CircularProgressView(progress: 0.68)
+            CircularProgressView(progress: -1)
+        }
+        .padding()
+        .previewLayout(.sizeThatFits)
     }
 }
