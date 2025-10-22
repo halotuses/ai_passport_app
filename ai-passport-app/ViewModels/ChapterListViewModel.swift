@@ -62,8 +62,7 @@ class ChapterListViewModel: ObservableObject {
             
             for chapter in self.chapters {
                 let identifier = IdentifierGenerator.chapterNumericId(unitId: self.currentUnitId, chapterId: chapter.id)
-                let statuses = self.repository.loadStatuses(chapterId: identifier)
-                let correctCount = statuses.values.filter { $0 == .correct }.count
+                let correctCount = self.repository.countCorrectAnswers(for: identifier)
                 counts[chapter.id] = correctCount
             }
             

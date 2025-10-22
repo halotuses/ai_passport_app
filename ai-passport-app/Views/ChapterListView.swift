@@ -49,9 +49,7 @@ struct ChapterListView: View {
                 Text(chapter.title)
                     .font(.system(size: 16, weight: .bold))
                     .foregroundColor(.themeTextPrimary)
-                Text("正解数 / 問題数")
-                    .font(.caption)
-                    .foregroundColor(.themeTextSecondary)
+
             }
             Spacer()
             CircularProgressView(
