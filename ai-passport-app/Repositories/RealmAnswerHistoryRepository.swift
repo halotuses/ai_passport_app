@@ -44,8 +44,40 @@ final class RealmAnswerHistoryRepository {
         persistStatus(
             quizId: progress.quizId,
             chapterId: progress.chapterId,
-            status: progress.status.questionStatus,
-            updatedAt: progress.updatedAt
+            status: progress.status,
+            updatedAt: progress.updatedAt,
+            selectedChoiceIndex: progress.selectedAnswerIndex,
+            correctChoiceIndex: progress.correctAnswerIndex,
+            questionText: progress.questionText,
+            choiceTexts: progress.choiceTexts,
+            unitId: progress.unitId,
+            chapterIdentifier: progress.chapterIdentifier
+        )
+    }
+
+    func saveOrUpdateAnswerSnapshot(
+        quizId: String,
+        chapterId: Int,
+        unitId: String,
+        chapterIdentifier: String,
+        status: QuestionStatus,
+        selectedChoiceIndex: Int?,
+        correctChoiceIndex: Int?,
+        questionText: String?,
+        choiceTexts: [String],
+        updatedAt: Date = Date()
+    ) {
+        persistStatus(
+            quizId: quizId,
+            chapterId: chapterId,
+            status: status,
+            updatedAt: updatedAt,
+            selectedChoiceIndex: selectedChoiceIndex,
+            correctChoiceIndex: correctChoiceIndex,
+            questionText: questionText,
+            choiceTexts: choiceTexts,
+            unitId: unitId,
+            chapterIdentifier: chapterIdentifier
         )
     }
     
@@ -53,12 +85,18 @@ final class RealmAnswerHistoryRepository {
         quizId: String,
         chapterId: Int,
         status: QuestionStatus,
+        selectedChoiceIndex: Int? = nil,
+        correctChoiceIndex: Int? = nil,
+        questionText: String? = nil,
+        choiceTexts: [String]? = nil,
+        unitId: String? = nil,
+        chapterIdentifier: String? = nil,
         updatedAt: Date = Date()
     ) {
         do {
             let realm = try realm()
             try realm.write {
-                let _ = realm.create(
+                let object = realm.create(
                     QuestionProgressObject.self,
                     value: [
                         "quizId": quizId,
@@ -68,6 +106,21 @@ final class RealmAnswerHistoryRepository {
                     ],
                     update: .modified
                 )
+                object.selectedChoiceIndex = selectedChoiceIndex
+                object.correctChoiceIndex = correctChoiceIndex
+                if let questionText {
+                    object.questionText = questionText
+                }
+                if let choiceTexts {
+                    object.choiceTexts.removeAll()
+                    object.choiceTexts.append(objectsIn: choiceTexts)
+                }
+                if let unitId {
+                    object.unitIdentifier = unitId
+                }
+                if let chapterIdentifier {
+                    object.chapterIdentifier = chapterIdentifier
+                }
             }
         } catch {
             print("❌ Realm immediate update failed: \(error)")
@@ -105,6 +158,55 @@ final class RealmAnswerHistoryRepository {
         }
     }
     
+    func fetchAnswerHistory(limit: Int? = nil) -> [QuestionProgress] {
+        do {
+            let realm = try realm()
+            let results = realm.objects(QuestionProgressObject.self)
+                .sorted(byKeyPath: "updatedAt", ascending: false)
+            if let limit {
+                return Array(results.prefix(limit).map(QuestionProgress.init(object:)))
+            } else {
+                return Array(results.map(QuestionProgress.init(object:)))
+            }
+        } catch {
+            print("❌ Realm load failed: \(error)")
+            return []
+        }
+    }
+
+    func observeAnswerHistory(
+        limit: Int? = nil,
+        onUpdate: @escaping ([QuestionProgress]) -> Void
+    ) -> NotificationToken? {
+        do {
+            let realm = try realm()
+            let results = realm.objects(QuestionProgressObject.self)
+                .sorted(byKeyPath: "updatedAt", ascending: false)
+
+            let token = results.observe { changes in
+                switch changes {
+                case .initial(let collection), .update(let collection, _, _, _):
+                    let mapped: [QuestionProgress]
+                    if let limit {
+                        mapped = Array(collection.prefix(limit).map(QuestionProgress.init(object:)))
+                    } else {
+                        mapped = Array(collection.map(QuestionProgress.init(object:)))
+                    }
+                    DispatchQueue.main.async {
+                        onUpdate(mapped)
+                    }
+                case .error(let error):
+                    print("❌ Realm observe failed: \(error)")
+                }
+            }
+
+            return token
+        } catch {
+            print("❌ Realm observe failed: \(error)")
+            return nil
+        }
+    }
+
     
     func totalCorrectAnswerCount() -> Int {
         count(for: .correct)
@@ -130,7 +232,18 @@ final class RealmAnswerHistoryRepository {
         countAnswered(chapterId: chapterId)
     }
     
-    private func persistStatus(quizId: String, chapterId: Int?, status: QuestionStatus, updatedAt: Date) {
+    private func persistStatus(
+        quizId: String,
+        chapterId: Int?,
+        status: QuestionStatus,
+        updatedAt: Date,
+        selectedChoiceIndex: Int? = nil,
+        correctChoiceIndex: Int? = nil,
+        questionText: String? = nil,
+        choiceTexts: [String]? = nil,
+        unitId: String? = nil,
+        chapterIdentifier: String? = nil
+    ) {
         var notifiedChapterId: Int?
         do {
             let realm = try realm()
@@ -150,6 +263,26 @@ final class RealmAnswerHistoryRepository {
                 }
                 object.status = status
                 object.updatedAt = updatedAt
+                object.selectedChoiceIndex = selectedChoiceIndex
+                object.correctChoiceIndex = correctChoiceIndex
+
+                if let questionText {
+                    object.questionText = questionText
+                }
+
+                if let choiceTexts {
+                    object.choiceTexts.removeAll()
+                    object.choiceTexts.append(objectsIn: choiceTexts)
+                }
+
+                if let unitId {
+                    object.unitIdentifier = unitId
+                }
+
+                if let chapterIdentifier {
+                    object.chapterIdentifier = chapterIdentifier
+                }
+
                 realm.add(object, update: .modified)
                 notifiedChapterId = object.chapterId
             }

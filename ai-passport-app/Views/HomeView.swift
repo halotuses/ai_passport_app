@@ -216,6 +216,47 @@ struct HomeView: View {
                 }
             }
             .frame(maxWidth: .infinity, alignment: .leading)
+            NavigationLink {
+                AnswerHistoryView()
+            } label: {
+                HStack(spacing: 16) {
+                    Image(systemName: "clock.arrow.circlepath")
+                        .font(.system(size: 20, weight: .semibold))
+                        .foregroundColor(.themeSecondary)
+                        .padding(12)
+                        .background(
+                            Circle()
+                                .fill(Color.themeSecondary.opacity(0.15))
+                        )
+
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("回答履歴を見る")
+                            .font(.subheadline.weight(.semibold))
+                            .foregroundColor(.themeTextPrimary)
+                        Text("選んだ選択肢と正誤を振り返りましょう")
+                            .font(.footnote)
+                            .foregroundColor(.themeTextSecondary)
+                    }
+
+                    Spacer()
+
+                    Image(systemName: "chevron.right")
+                        .font(.footnote.weight(.semibold))
+                        .foregroundColor(.themeTextSecondary)
+                }
+                .padding(.horizontal, 16)
+                .padding(.vertical, 14)
+                .background(
+                    RoundedRectangle(cornerRadius: 18, style: .continuous)
+                        .fill(Color.white.opacity(0.75))
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 18, style: .continuous)
+                                .stroke(Color.white.opacity(0.6), lineWidth: 0.6)
+                        )
+                        .shadow(color: Color.themeShadowSoft.opacity(0.35), radius: 10, x: 0, y: 6)
+                )
+            }
+            .buttonStyle(.plain)
         }
         .padding(24)
         .background(

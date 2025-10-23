@@ -28,6 +28,7 @@ class QuizViewModel: ObservableObject {
 
     init(repository: RealmAnswerHistoryRepository = RealmAnswerHistoryRepository()) {
         self.repository = repository
+        
     }
     
     // MARK: - Load
@@ -109,12 +110,25 @@ class QuizViewModel: ObservableObject {
         }
 
         let repository = repository
+        let currentUnitId = unitId
+        let currentChapterIdentifier = chapterId
+        let questionText = quiz.question
+        let choiceTexts = quiz.choices
+        let correctIndex = quiz.answerIndex
+        let persistedAt = Date()
         persistenceQueue.async {
             autoreleasepool {
-                repository.saveOrUpdateStatus(
+                repository.saveOrUpdateAnswerSnapshot(
                     quizId: stableQuizId,
                     chapterId: chapterIdInt,
-                    status: status
+                    unitId: currentUnitId,
+                    chapterIdentifier: currentChapterIdentifier,
+                    status: status,
+                    selectedChoiceIndex: selectedIndex,
+                    correctChoiceIndex: correctIndex,
+                    questionText: questionText,
+                    choiceTexts: choiceTexts,
+                    updatedAt: persistedAt
                 )
             }
         }
@@ -127,11 +141,25 @@ class QuizViewModel: ObservableObject {
 
         let chapterIdInt = IdentifierGenerator.chapterNumericId(unitId: unitId, chapterId: chapterId)
         for (index, status) in questionStatuses.enumerated() where status.isAnswered {
+            guard quizzes.indices.contains(index) else { continue }
+            let quiz = quizzes[index]
             let stableQuizId = "\(unitId)-\(chapterId)#\(index)"
+            let selectedAnswer: Int?
+            if selectedAnswers.indices.contains(index) {
+                selectedAnswer = selectedAnswers[index]
+            } else {
+                selectedAnswer = nil
+            }
             repository.updateAnswerStatusImmediately(
                 quizId: stableQuizId,
                 chapterId: chapterIdInt,
-                status: status
+                status: status,
+                selectedChoiceIndex: selectedAnswer,
+                correctChoiceIndex: quiz.answerIndex,
+                questionText: quiz.question,
+                choiceTexts: quiz.choices,
+                unitId: unitId,
+                chapterIdentifier: chapterId
             )
         }
     }
