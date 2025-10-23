@@ -11,9 +11,11 @@ final class ChapterProgressViewModel: ObservableObject, Identifiable {
     @Published private(set) var progressRate: Double = 0
 
     private let repository: RealmAnswerHistoryRepository
+    private let realmConfiguration: Realm.Configuration
     private let chapterNumericId: Int
     private var progressToken: NotificationToken?
     private var answerHistoryObserver: NSObjectProtocol?
+    private var progressResults: Results<QuestionProgressObject>?
 
     init(
         unitId: String,
@@ -24,18 +26,11 @@ final class ChapterProgressViewModel: ObservableObject, Identifiable {
         self.repository = repository
         self.id = chapter.id
         self.chapterNumericId = IdentifierGenerator.chapterNumericId(unitId: unitId, chapterId: chapter.id)
+        self.realmConfiguration = repository.realmConfiguration
 
         loadInitialProgress()
         observeProgressChanges()
         
-        answerHistoryObserver = NotificationCenter.default.addObserver(
-            forName: .answerHistoryDidChange,
-            object: nil,
-            queue: .main
-        ) { [weak self] _ in
-            // 即時反映対応: 通知受信時に強制再計算
-            self?.refresh()
-        }
     }
 
     func updateTotalQuestions(_ count: Int) {
@@ -54,15 +49,31 @@ final class ChapterProgressViewModel: ObservableObject, Identifiable {
     }
 
     private func observeProgressChanges() {
-        progressToken = repository.observeChapterProgress(for: chapterNumericId) { [weak self] progresses in
-            guard let self else { return }
-            let correct = progresses.filter(\.isCorrect).count
-            if correct != self.correctCount {
-                self.correctCount = correct
-                self.recalculateProgressRate()
-            } else if self.totalQuestions == 0 {
-                self.recalculateProgressRate()
+        do {
+            let realm = try Realm(configuration: realmConfiguration)
+            let results = realm.objects(QuestionProgressObject.self)
+                .filter("chapterId == %d", chapterNumericId)
+            progressResults = results
+
+            progressToken = results.observe { [weak self] changes in
+                guard let self else { return }
+                switch changes {
+                case .initial(let collection), .update(let collection, _, _, _):
+                    let correct = collection
+                        .filter("statusRaw == %@", QuestionStatus.correct.rawValue)
+                        .count
+                    if correct != self.correctCount {
+                        self.correctCount = correct
+                        self.recalculateProgressRate()
+                    } else if self.totalQuestions == 0 {
+                        self.recalculateProgressRate()
+                    }
+                case .error(let error):
+                    print("❌ Realm observe failed: \(error)")
+                }
             }
+        } catch {
+            print("❌ Realm observe failed: \(error)")
         }
     }
 
@@ -77,8 +88,5 @@ final class ChapterProgressViewModel: ObservableObject, Identifiable {
 
     deinit {
         progressToken?.invalidate()
-        if let answerHistoryObserver {
-            NotificationCenter.default.removeObserver(answerHistoryObserver)
-        }
     }
 }

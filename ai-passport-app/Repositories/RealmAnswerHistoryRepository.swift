@@ -30,6 +30,8 @@ final class RealmAnswerHistoryRepository {
         self.configuration = configuration
     }
     
+    var realmConfiguration: Realm.Configuration { configuration }
+    
     func saveOrUpdateStatus(quizId: String, status: QuestionStatus) {
         persistStatus(quizId: quizId, chapterId: nil, status: status, updatedAt: Date())
     }

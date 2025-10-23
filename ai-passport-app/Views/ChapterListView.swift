@@ -6,10 +6,23 @@ struct ChapterListView: View {
     let unitKey: String
     
     let unit: QuizMetadata
-    @ObservedObject var viewModel: ChapterListViewModel
+    @StateObject private var viewModel: ChapterListViewModel
     @Binding var selectedChapter: ChapterMetadata?
     @EnvironmentObject private var mainViewState: MainViewState
     
+    init(
+        unitKey: String,
+        unit: QuizMetadata,
+        viewModel: ChapterListViewModel,
+        selectedChapter: Binding<ChapterMetadata?>
+    ) {
+        self.unitKey = unitKey
+        self.unit = unit
+        _viewModel = StateObject(wrappedValue: viewModel)
+        _selectedChapter = selectedChapter
+    }
+
+
     
     var body: some View {
         ScrollView {

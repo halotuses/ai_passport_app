@@ -7,15 +7,15 @@ import AppKit
 #endif
 
 struct HomeView: View {
-    @ObservedObject var viewModel: HomeViewModel
-    @ObservedObject private var progressViewModel: HomeProgressViewModel
+    @StateObject private var viewModel: HomeViewModel
+    @StateObject private var progressViewModel: HomeProgressViewModel
     @EnvironmentObject private var mainViewState: MainViewState
     @Environment(\.scenePhase) private var scenePhase
     
     private let quickExamOffsets: [Int] = [0, 30, 60, 90]
     init(viewModel: HomeViewModel) {
-        self.viewModel = viewModel
-        self._progressViewModel = ObservedObject(wrappedValue: viewModel.progressViewModel)
+        _viewModel = StateObject(wrappedValue: viewModel)
+        _progressViewModel = StateObject(wrappedValue: viewModel.progressViewModel)
     }
     
     private var examDateBinding: Binding<Date> {
