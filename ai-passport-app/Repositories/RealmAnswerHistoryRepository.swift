@@ -26,8 +26,25 @@ enum IdentifierGenerator {
 final class RealmAnswerHistoryRepository {
     private let configuration: Realm.Configuration
     
-    init(configuration: Realm.Configuration = Realm.Configuration.defaultConfiguration) {
+    init(
+        configuration: Realm.Configuration = Realm.Configuration.defaultConfiguration,
+        fileManager: FileManager = .default
+    ) {
         self.configuration = configuration
+        Self.prepareRealmDirectoryIfNeeded(for: configuration, fileManager: fileManager)
+    }
+
+    private static func prepareRealmDirectoryIfNeeded(
+        for configuration: Realm.Configuration,
+        fileManager: FileManager
+    ) {
+        guard let realmFileURL = configuration.fileURL else { return }
+        let directoryURL = realmFileURL.deletingLastPathComponent()
+        do {
+            try fileManager.createDirectory(at: directoryURL, withIntermediateDirectories: true)
+        } catch {
+            print("❌ Failed to create Realm directory: \(error)")
+        }
     }
     
     var realmConfiguration: Realm.Configuration { configuration }
