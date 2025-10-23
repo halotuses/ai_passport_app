@@ -6,6 +6,7 @@ protocol QuizNavigationCleanupDelegate: AnyObject {
 }
 
 /// アプリ全体のメイン画面状態を管理
+@MainActor
 final class MainViewState: ObservableObject {
     struct HeaderBackButton: Equatable {
         enum Destination {
