@@ -37,15 +37,18 @@ struct MainRouterView: View {
                             chapter: chapter,
                             viewModel: quizViewModel,
                             onQuizEnd: {
+                                quizViewModel.persistAllStatusesImmediately()
                                 // クイズ終了時の戻し処理
                                 quizViewModel.reset()
                                 mainViewState.reset(router: router)
                             },
                             onBackToChapterSelection: {
+                                quizViewModel.persistAllStatusesImmediately()
                                 quizViewModel.reset()
                                 mainViewState.backToChapterSelection(router: router)
                             },
                             onBackToUnitSelection: {
+                                quizViewModel.persistAllStatusesImmediately()
                                 quizViewModel.reset()
                                 mainViewState.backToUnitSelection(router: router)
                             }

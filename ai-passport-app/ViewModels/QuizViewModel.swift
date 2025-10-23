@@ -54,6 +54,7 @@ class QuizViewModel: ObservableObject {
         
         NetworkManager.fetchQuizList(from: fullURL) { [weak self] result in
             guard let self else { return }
+            hydrateQuestionStatusesIfNeeded()
             
             if let qs = result?.questions, !qs.isEmpty {
                 self.quizzes = qs
@@ -150,6 +151,7 @@ class QuizViewModel: ObservableObject {
     
     func finishQuiz() {
         guard hasQuizzes else { return }
+        persistAllStatusesImmediately()
         currentQuestionIndex = quizzes.count
         selectedAnswerIndex = nil
         showResultView = true
@@ -200,5 +202,23 @@ class QuizViewModel: ObservableObject {
         unitId = ""
         showResultView = false
         questionStatuses = Array(repeating: .unanswered, count: quizzes.count)
+    }
+}
+private extension QuizViewModel {
+    func hydrateQuestionStatusesIfNeeded() {
+        guard !quizzes.isEmpty else { return }
+
+        if questionStatuses.count < quizzes.count {
+            questionStatuses.append(contentsOf: Array(repeating: .unanswered, count: quizzes.count - questionStatuses.count))
+        }
+
+        for index in quizzes.indices {
+            guard questionStatuses[index].isAnswered == false else { continue }
+            guard selectedAnswers.indices.contains(index), let selected = selectedAnswers[index] else { continue }
+
+            let quiz = quizzes[index]
+            let status: QuestionStatus = (selected == quiz.answerIndex) ? .correct : .incorrect
+            questionStatuses[index] = status
+        }
     }
 }
