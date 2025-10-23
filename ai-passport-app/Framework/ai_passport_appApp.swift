@@ -6,8 +6,8 @@ import RealmSwift
 struct ai_passport_appApp: SwiftUI.App {
     init() {
         // Realm設定
-        var configuration = Realm.Configuration(schemaVersion: 1)
-        configuration.migrationBlock = { _, _ in }
+        var configuration = Realm.Configuration(schemaVersion: 2)
+        configuration.deleteRealmIfMigrationNeeded = true
         Realm.Configuration.defaultConfiguration = configuration
 
         // Realmファイルのパスを出力
