@@ -42,12 +42,12 @@ struct HomeView: View {
     private var progressDetailsText: String? {
         let unanswered = max(progressViewModel.totalUnanswered, 0)
         guard progressViewModel.totalAnswered > 0 || unanswered > 0 else { return nil }
-
+        
         return "正解\(progressViewModel.totalCorrect)問 / 不正解\(progressViewModel.totalIncorrect)問 / 未回答\(unanswered)問"
     }
     private var completionPercentageValue: Int? {
         guard progressViewModel.totalQuestions > 0 else { return nil }
-
+        
         return Int((progressViewModel.completionRate * 100).rounded())
     }
     
@@ -67,7 +67,7 @@ struct HomeView: View {
         if completionPercentageValue == nil && progressViewModel.totalAnswered > 0 {
             return -1
         }
-
+        
         return progressViewModel.completionRate
     }
     
@@ -81,7 +81,7 @@ struct HomeView: View {
         return "正答率 \(percentage)%"
     }
     
-    private var progressLegendItems: [LegendItem] {
+    private var progressLegendItems: [ProgressLegendItem] {
         let unanswered = max(progressViewModel.totalUnanswered, 0)
         let denominator = progressPercentageDenominator
         
@@ -92,9 +92,9 @@ struct HomeView: View {
         }
         
         return [
-            LegendItem(kind: .correct, label: "正解", count: progressViewModel.totalCorrect, color: .themeCorrect, percentageText: percentageText(for: progressViewModel.totalCorrect)),
-            LegendItem(kind: .incorrect, label: "不正解", count: progressViewModel.totalIncorrect, color: .themeIncorrect, percentageText: percentageText(for: progressViewModel.totalIncorrect)),
-            LegendItem(kind: .unanswered, label: "未回答", count: unanswered, color: Color.themeButtonSecondary, percentageText: percentageText(for: unanswered))
+            ProgressLegendItem(kind: .correct, label: "正解", count: progressViewModel.totalCorrect, color: .themeCorrect, percentageText: percentageText(for: progressViewModel.totalCorrect)),
+            ProgressLegendItem(kind: .incorrect, label: "不正解", count: progressViewModel.totalIncorrect, color: .themeIncorrect, percentageText: percentageText(for: progressViewModel.totalIncorrect)),
+            ProgressLegendItem(kind: .unanswered, label: "未回答", count: unanswered, color: Color.themeButtonSecondary, percentageText: percentageText(for: unanswered))
         ]
     }
     
@@ -228,7 +228,7 @@ struct HomeView: View {
                             Circle()
                                 .fill(Color.themeSecondary.opacity(0.15))
                         )
-
+                    
                     VStack(alignment: .leading, spacing: 4) {
                         Text("回答履歴を見る")
                             .font(.subheadline.weight(.semibold))
@@ -237,9 +237,9 @@ struct HomeView: View {
                             .font(.footnote)
                             .foregroundColor(.themeTextSecondary)
                     }
-
+                    
                     Spacer()
-
+                    
                     Image(systemName: "chevron.right")
                         .font(.footnote.weight(.semibold))
                         .foregroundColor(.themeTextSecondary)
@@ -319,26 +319,26 @@ struct HomeView: View {
         return Int((Double(count) / Double(total) * 100).rounded())
     }
     
-    private func legendRow(for item: LegendItem) -> some View {
+    private func legendRow(for item: ProgressLegendItem) -> some View {
         HStack(spacing: 14) {
             Circle()
                 .fill(item.color)
                 .frame(width: 12, height: 12)
                 .opacity(item.count == 0 ? 0.4 : 1)
-
+            
             VStack(alignment: .leading, spacing: 4) {
                 
                 Text(item.label)
                     .font(.footnote.weight(.semibold))
                     .foregroundColor(.themeTextPrimary)
-
+                
                 Text("\(item.count)問")
                     .font(.footnote)
                     .foregroundColor(.themeTextSecondary)
             }
-
+            
             Spacer()
-
+            
             if let percentageText = item.percentageText {
                 Text(percentageText)
                     .font(.caption.weight(.semibold))
@@ -350,7 +350,7 @@ struct HomeView: View {
                             .fill(item.color.opacity(0.18))
                     )
             }
-
+            
         }
         .padding(.vertical, 14)
         .padding(.horizontal, 18)
@@ -405,22 +405,20 @@ struct HomeView: View {
     }
 }
 
-private extension HomeView {
-    enum LegendKind: Hashable {
-        case correct
-        case incorrect
-        case unanswered
-    }
-    
-    struct LegendItem: Identifiable {
-        let kind: LegendKind
-        let label: String
-        let count: Int
-        let color: Color
-        let percentageText: String?
+private enum ProgressLegendKind: Hashable {
+    case correct
+    case incorrect
+    case unanswered
+}
 
-        var id: LegendKind { kind }
-    }
+private struct ProgressLegendItem: Identifiable {
+    let kind: ProgressLegendKind
+    let label: String
+    let count: Int
+    let color: Color
+    let percentageText: String?
+    
+    var id: ProgressLegendKind { kind }
 }
 private struct PaperBackground: View {
     private let gradient = LinearGradient(
