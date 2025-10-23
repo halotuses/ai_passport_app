@@ -1,4 +1,5 @@
 import SwiftUI
+import Foundation
 import RealmSwift
 
 /// アプリ起動エントリーポイント
@@ -8,6 +9,14 @@ struct ai_passport_appApp: SwiftUI.App {
         // Realm設定
         var configuration = Realm.Configuration(schemaVersion: 2)
         configuration.deleteRealmIfMigrationNeeded = true
+        if let realmURL = configuration.fileURL {
+            let directoryURL = realmURL.deletingLastPathComponent()
+            do {
+                try FileManager.default.createDirectory(at: directoryURL, withIntermediateDirectories: true)
+            } catch {
+                print("❌ Failed to create Realm directory: \(error)")
+            }
+        }
         Realm.Configuration.defaultConfiguration = configuration
 
         // Realmファイルのパスを出力
