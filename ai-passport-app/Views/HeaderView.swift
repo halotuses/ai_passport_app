@@ -18,7 +18,7 @@ struct HeaderView: View {
 
             HStack {
                 if let backButton = mainViewState.headerBackButton {
-                    Button(action: { mainViewState.handleBackAction(backButton, router: router) }) {
+                    Button(action: mainViewState.makeBackButtonAction(for: backButton, router: router)) {
                         HStack(spacing: 4) {
                             Image(systemName: "chevron.left")
                                 .font(.body.weight(.semibold))

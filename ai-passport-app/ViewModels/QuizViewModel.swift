@@ -232,6 +232,14 @@ class QuizViewModel: ObservableObject {
         questionStatuses = Array(repeating: .unanswered, count: quizzes.count)
     }
 }
+
+extension QuizViewModel: QuizNavigationCleanupDelegate {
+    func prepareForQuizNavigationCleanup() {
+        persistAllStatusesImmediately()
+        reset()
+    }
+}
+
 private extension QuizViewModel {
     func hydrateQuestionStatusesIfNeeded() {
         guard !quizzes.isEmpty else { return }

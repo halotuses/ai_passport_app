@@ -109,6 +109,7 @@ struct ContentView: View {
             }
         }
         .onAppear {
+            mainViewState.quizCleanupDelegate = viewModel
             updateHeaderForCurrentState()
             guard !hasLoaded else { return }
             loadQuizzes()
@@ -132,6 +133,12 @@ struct ContentView: View {
         }
         .onChange(of: showExplanation) { _ in
             updateHeaderForCurrentState()
+        }
+        .onDisappear {
+            if let delegate = mainViewState.quizCleanupDelegate,
+               delegate === viewModel {
+                mainViewState.quizCleanupDelegate = nil
+            }
         }
     }
 }

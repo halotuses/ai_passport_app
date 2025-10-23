@@ -1,5 +1,10 @@
 import SwiftUI
 
+@MainActor
+protocol QuizNavigationCleanupDelegate: AnyObject {
+    func prepareForQuizNavigationCleanup()
+}
+
 /// アプリ全体のメイン画面状態を管理
 final class MainViewState: ObservableObject {
     struct HeaderBackButton: Equatable {
@@ -12,6 +17,9 @@ final class MainViewState: ObservableObject {
         let destination: Destination
     }
     
+    weak var quizCleanupDelegate: QuizNavigationCleanupDelegate?
+    var quizCleanupHandler: (() -> Void)?
+    
     @Published var selectedUnit: QuizMetadata? = nil
     @Published var selectedChapter: ChapterMetadata? = nil
     @Published var selectedUnitKey: String? = nil
@@ -23,6 +31,7 @@ final class MainViewState: ObservableObject {
     
     /// ホーム画面（単元選択）に戻す
     func reset(router: NavigationRouter) {
+        prepareForQuizNavigationCleanupIfNeeded()
         selectedChapter = nil
         selectedUnit = nil
         selectedUnitKey = nil
@@ -40,6 +49,7 @@ final class MainViewState: ObservableObject {
             return
         }
 
+        prepareForQuizNavigationCleanupIfNeeded()
         selectedChapter = nil
         showResultView = false
         router.reset()
@@ -51,6 +61,7 @@ final class MainViewState: ObservableObject {
 
     /// 単元選択画面へ戻す
     func backToUnitSelection(router: NavigationRouter) {
+        prepareForQuizNavigationCleanupIfNeeded()
         selectedChapter = nil
         selectedUnit = nil
         selectedUnitKey = nil
@@ -97,6 +108,28 @@ final class MainViewState: ObservableObject {
         }
     }
     
+    
+    func makeBackButtonAction(for backButton: HeaderBackButton, router: NavigationRouter) -> () -> Void {
+        { [weak self] in
+            self?.handleBackAction(backButton, router: router)
+        }
+    }
+
+    func makeHomeButtonAction(router: NavigationRouter) -> () -> Void {
+        { [weak self] in
+            self?.reset(router: router)
+        }
+    }
+
+
+    private func prepareForQuizNavigationCleanupIfNeeded() {
+        if let delegate = quizCleanupDelegate {
+            delegate.prepareForQuizNavigationCleanup()
+        } else {
+            quizCleanupHandler?()
+        }
+    }
+
 
 }
 
