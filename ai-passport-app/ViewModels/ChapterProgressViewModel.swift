@@ -7,8 +7,9 @@ final class ChapterProgressViewModel: ObservableObject, Identifiable {
     let chapter: ChapterMetadata
 
     @Published private(set) var correctCount: Int = 0
+    @Published private(set) var answeredCount: Int = 0
     @Published private(set) var totalQuestions: Int = 0
-    @Published private(set) var progressRate: Double = 0
+    @Published private(set) var accuracyRate: Double = 0
 
     private let repository: RealmAnswerHistoryRepository
     private let realmConfiguration: Realm.Configuration
@@ -36,7 +37,7 @@ final class ChapterProgressViewModel: ObservableObject, Identifiable {
     func updateTotalQuestions(_ count: Int) {
         guard count != totalQuestions else { return }
         totalQuestions = count
-        recalculateProgressRate()
+        recalculateAccuracyRate()
     }
 
     func refresh() {
@@ -45,7 +46,8 @@ final class ChapterProgressViewModel: ObservableObject, Identifiable {
 
     private func loadInitialProgress() {
         correctCount = repository.countCorrectAnswers(for: chapterNumericId)
-        recalculateProgressRate()
+        answeredCount = repository.answeredCount(for: chapterNumericId)
+        recalculateAccuracyRate()
     }
 
     private func observeProgressChanges() {
@@ -62,11 +64,23 @@ final class ChapterProgressViewModel: ObservableObject, Identifiable {
                     let correct = collection
                         .filter("statusRaw == %@", QuestionStatus.correct.rawValue)
                         .count
+                    let answered = collection
+                        .filter("statusRaw != %@", QuestionStatus.unanswered.rawValue)
+                        .count
+
+                    var needsRecalculate = false
                     if correct != self.correctCount {
                         self.correctCount = correct
-                        self.recalculateProgressRate()
-                    } else if self.totalQuestions == 0 {
-                        self.recalculateProgressRate()
+                        needsRecalculate = true
+                    }
+
+                    if answered != self.answeredCount {
+                        self.answeredCount = answered
+                        needsRecalculate = true
+                    }
+
+                    if needsRecalculate || self.totalQuestions == 0 {
+                        self.recalculateAccuracyRate()
                     }
                 case .error(let error):
                     print("❌ Realm observe failed: \(error)")
@@ -77,13 +91,13 @@ final class ChapterProgressViewModel: ObservableObject, Identifiable {
         }
     }
 
-    private func recalculateProgressRate() {
-        guard totalQuestions > 0 else {
-            progressRate = 0
+    private func recalculateAccuracyRate() {
+        guard answeredCount > 0 else {
+            accuracyRate = 0
             return
         }
 
-        progressRate = min(max(Double(correctCount) / Double(totalQuestions), 0), 1)
+        accuracyRate = min(max(Double(correctCount) / Double(answeredCount), 0), 1)
     }
 
     deinit {

@@ -66,8 +66,9 @@ private struct ChapterRowItem: View {
             Spacer()
             ProgressBadgeView(
                 correctCount: viewModel.correctCount,
+                answeredCount: viewModel.answeredCount,
                 totalCount: viewModel.totalQuestions,
-                progress: viewModel.progressRate
+                accuracy: viewModel.accuracyRate
             )
         }
         .padding(14)

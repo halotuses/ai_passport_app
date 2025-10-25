@@ -3,16 +3,27 @@ import SwiftUI
 /// 章選択画面での学習状況を示すバッジスタイルのプログレスビュー
 struct ProgressBadgeView: View {
     let correctCount: Int
+    let answeredCount: Int
     let totalCount: Int
-    let progress: Double
+    let accuracy: Double
 
-    private var clampedProgress: Double {
-        min(max(progress, 0), 1)
+    private var clampedAccuracy: Double {
+        min(max(accuracy, 0), 1)
     }
 
-    private var progressText: String {
-        guard totalCount > 0 else { return "--%" }
-        return "\(Int((clampedProgress * 100).rounded()))%"
+    private var accuracyText: String {
+        guard answeredCount > 0 else { return "--%" }
+        return "\(Int((clampedAccuracy * 100).rounded()))%"
+    }
+
+    private var answerSummaryText: String {
+        guard totalCount > 0 else { return "解答済み 0問" }
+        return "解答済み \(answeredCount)/\(totalCount)"
+    }
+
+    private var correctSummaryText: String {
+        guard answeredCount > 0 else { return "正答数 0/0" }
+        return "正答数 \(correctCount)/\(answeredCount)"
     }
 
     private var badgeGradient: LinearGradient {
@@ -34,11 +45,16 @@ struct ProgressBadgeView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack(alignment: .firstTextBaseline) {
-                Text("\(correctCount)/\(totalCount)")
-                    .font(.system(size: 16, weight: .semibold))
-                    .foregroundStyle(Color.themeTextPrimary)
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(correctSummaryText)
+                        .font(.system(size: 16, weight: .semibold))
+                        .foregroundStyle(Color.themeTextPrimary)
+                    Text(answerSummaryText)
+                        .font(.system(size: 12, weight: .medium))
+                        .foregroundStyle(Color.themeTextSecondary)
+                }
                 Spacer()
-                Text(progressText)
+                Text(accuracyText)
                     .font(.system(size: 14, weight: .semibold))
                     .foregroundStyle(Color.themeSecondary)
                     .padding(.horizontal, 10)
@@ -55,8 +71,8 @@ struct ProgressBadgeView: View {
                         .fill(Color.themeSurface.opacity(0.7))
                     Capsule()
                         .fill(progressGradient)
-                        .frame(width: geometry.size.width * clampedProgress)
-                        .animation(.easeInOut(duration: 0.45), value: clampedProgress)
+                        .frame(width: geometry.size.width * clampedAccuracy)
+                        .animation(.easeInOut(duration: 0.45), value: clampedAccuracy)
                 }
             }
             .frame(height: 8)
@@ -78,8 +94,8 @@ struct ProgressBadgeView: View {
 struct ProgressBadgeView_Previews: PreviewProvider {
     static var previews: some View {
         VStack(spacing: 20) {
-            ProgressBadgeView(correctCount: 3, totalCount: 5, progress: 0.6)
-            ProgressBadgeView(correctCount: 0, totalCount: 0, progress: 0)
+            ProgressBadgeView(correctCount: 3, answeredCount: 4, totalCount: 5, accuracy: 0.75)
+            ProgressBadgeView(correctCount: 0, answeredCount: 0, totalCount: 5, accuracy: 0)
         }
         .padding()
         .previewLayout(.sizeThatFits)
