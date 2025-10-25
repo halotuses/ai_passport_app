@@ -98,6 +98,33 @@ struct HomeView: View {
         ]
     }
     
+    private var progressSegments: [CircularProgressView.Segment] {
+        let denominator = max(progressPercentageDenominator ?? 0, 0)
+        let correct = min(progressViewModel.totalCorrect, denominator)
+        let incorrect: Int
+        if denominator > 0 {
+            let remainingAfterCorrect = max(denominator - correct, 0)
+            incorrect = min(progressViewModel.totalIncorrect, remainingAfterCorrect)
+        } else {
+            incorrect = progressViewModel.totalIncorrect
+        }
+        
+        let unansweredBase = max(progressViewModel.totalUnanswered, 0)
+        let unanswered: Int
+        if denominator > 0 {
+            let used = correct + incorrect
+            unanswered = max(min(unansweredBase, denominator - used), 0)
+        } else {
+            unanswered = unansweredBase
+        }
+        
+        return [
+            .init(kind: .correct, value: Double(correct), color: .themeCorrect),
+            .init(kind: .incorrect, value: Double(incorrect), color: .themeIncorrect),
+            .init(kind: .unanswered, value: Double(unanswered), color: .themeButtonSecondary)
+        ]
+    }
+    
     private var progressPercentageDenominator: Int? {
         if progressViewModel.totalQuestions > 0 {
             return progressViewModel.totalQuestions
@@ -183,6 +210,7 @@ struct HomeView: View {
             HStack(alignment: .center, spacing: 28) {
                 VStack(spacing: 10) {
                     CircularProgressView(
+                        segments: progressSegments,
                         progress: completionProgressValue,
                         lineWidth: 12,
                         size: 140
