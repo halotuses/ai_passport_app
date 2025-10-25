@@ -9,13 +9,19 @@ struct ai_passport_appApp: SwiftUI.App {
         // Realm設定
         var configuration = Realm.Configuration(schemaVersion: 2)
         configuration.deleteRealmIfMigrationNeeded = true
-        if let realmURL = configuration.fileURL {
-            let directoryURL = realmURL.deletingLastPathComponent()
-            do {
-                try FileManager.default.createDirectory(at: directoryURL, withIntermediateDirectories: true)
-            } catch {
-                print("❌ Failed to create Realm directory: \(error)")
-            }
+        let fileManager = FileManager.default
+        do {
+            let appSupportURL = try fileManager.url(
+                for: .applicationSupportDirectory,
+                in: .userDomainMask,
+                appropriateFor: nil,
+                create: true
+            )
+            let realmDirectory = appSupportURL.appendingPathComponent("Realm", isDirectory: true)
+            try fileManager.createDirectory(at: realmDirectory, withIntermediateDirectories: true)
+            configuration.fileURL = realmDirectory.appendingPathComponent("answer-history.realm")
+        } catch {
+            print("❌ Failed to prepare Realm directory: \(error)")
         }
         Realm.Configuration.defaultConfiguration = configuration
 
