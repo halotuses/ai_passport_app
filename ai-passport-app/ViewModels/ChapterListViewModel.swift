@@ -43,7 +43,8 @@ class ChapterListViewModel: ObservableObject {
     
     private func calculateQuizCounts() {
         for chapter in chapters {
-            let quizURL = Constants.url(chapter.file)
+            let quizPath = normalizedQuizPath(from: chapter.file)
+            let quizURL = Constants.url(quizPath)
             NetworkManager.fetchQuizList(from: quizURL) { [weak self] quizList in
                 guard let self else { return }
                 let count = quizList?.questions.count ?? 0
@@ -52,6 +53,17 @@ class ChapterListViewModel: ObservableObject {
                 }
             }
         }
+    }
+    
+    private func normalizedQuizPath(from path: String) -> String {
+        var normalizedPath = path
+        if normalizedPath.hasPrefix("/") {
+            normalizedPath.removeFirst()
+        }
+        if !normalizedPath.hasPrefix("quizzes/") {
+            normalizedPath = "quizzes/" + normalizedPath
+        }
+        return normalizedPath
     }
     
     @MainActor
