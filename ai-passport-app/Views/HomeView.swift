@@ -176,7 +176,8 @@ struct HomeView: View {
                     incorrectProgress: incorrectProgressValue,
                     titleText: completionPercentageDisplay.label,
                     valueText: completionPercentageDisplay.value,
-                    detailText: progressRingDetailText
+                    detailText: progressRingDetailText,
+                    highlightValue: completionPercentageValue == 100
                 )
                 HStack(spacing: 10) {
                     StatColumnView(color: .themeCorrect, label: "正解", value: progressViewModel.totalCorrect)
@@ -335,6 +336,7 @@ private struct ProgressRingView: View {
     let titleText: String
     let valueText: String
     let detailText: String?
+    let highlightValue: Bool
     
     @State private var animatedCorrect: Double = 0
     @State private var animatedIncorrect: Double = 0
@@ -422,9 +424,7 @@ private struct ProgressRingView: View {
                 Text(titleText)
                     .font(.caption.weight(.semibold))
                     .foregroundColor(.themeTextSecondary)
-                Text(valueText)
-                    .font(.title.weight(.bold))
-                    .foregroundColor(.themeTextPrimary)
+                valueTextView
                 if let detailText, !detailText.isEmpty {
                     Text(detailText)
                         .font(.footnote)
@@ -457,6 +457,26 @@ private struct ProgressRingView: View {
         }
     }
 }
+
+@ViewBuilder
+private var valueTextView: some View {
+    if highlightValue {
+        Text(valueText)
+            .font(.title.weight(.bold))
+            .foregroundStyle(
+                LinearGradient(
+                    colors: [Color.themeMain, Color.themeTertiary],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+            )
+    } else {
+        Text(valueText)
+            .font(.title.weight(.bold))
+            .foregroundColor(.themeTextPrimary)
+    }
+}
+
 
 // MARK: - 統計小コンポーネント
 private struct StatColumnView: View {
