@@ -118,7 +118,7 @@ struct HomeView: View {
                 progressCard
                 startLearningButton
             }
-            .padding(.horizontal, 20)
+            .padding(.horizontal, 14)
             .padding(.vertical, 32)
         }
         .background(
@@ -194,7 +194,7 @@ struct HomeView: View {
             }
             .buttonStyle(.plain)
         }
-        .padding()
+        .padding(24)
         .background(Color.white)
         .cornerRadius(20)
         .shadow(radius: 4)
@@ -288,6 +288,9 @@ private struct ProgressRingView: View {
 
     @State private var animatedCorrect: Double = 0
     @State private var animatedIncorrect: Double = 0
+    
+    private let ringLineWidth: CGFloat = 18
+    private let ringSize: CGFloat = 176
 
     private var clampedAnimatedCorrect: Double {
         max(0, min(animatedCorrect, 1))
@@ -314,14 +317,14 @@ private struct ProgressRingView: View {
     var body: some View {
         ZStack {
             Circle()
-                .stroke(Color.themeTextSecondary.opacity(0.12), lineWidth: 14)
+                .stroke(Color.themeTextSecondary.opacity(0.12), lineWidth: ringLineWidth)
 
             if isIndeterminate {
                 Circle()
                     .trim(from: 0, to: 0.85)
                     .stroke(
                         Color.themeTextSecondary.opacity(0.25),
-                        style: StrokeStyle(lineWidth: 14, lineCap: .round, dash: [1, 6])
+                        style: StrokeStyle(lineWidth: ringLineWidth, lineCap: .round, dash: [1, 6])
                     )
                     .rotationEffect(.degrees(-90))
             } else {
@@ -332,7 +335,7 @@ private struct ProgressRingView: View {
                             gradient: Gradient(colors: [Color.themeCorrect.opacity(0.9), Color.themeCorrect]),
                             center: .center
                         ),
-                        style: StrokeStyle(lineWidth: 14, lineCap: .round)
+                        style: StrokeStyle(lineWidth: ringLineWidth, lineCap: .round)
                     )
                     .rotationEffect(.degrees(-90))
 
@@ -343,7 +346,7 @@ private struct ProgressRingView: View {
                             gradient: Gradient(colors: [Color.themeIncorrect.opacity(0.85), Color.themeIncorrect]),
                             center: .center
                         ),
-                        style: StrokeStyle(lineWidth: 14, lineCap: .round)
+                        style: StrokeStyle(lineWidth: ringLineWidth, lineCap: .round)
                     )
                     .rotationEffect(.degrees(-90))
             }
@@ -364,7 +367,7 @@ private struct ProgressRingView: View {
                 }
             }
         }
-        .frame(width: 148, height: 148)
+        .frame(width: ringSize, height: ringSize)
         .onAppear {
             animateToCurrentProgress()
         }
