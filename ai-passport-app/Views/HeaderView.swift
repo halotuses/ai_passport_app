@@ -60,11 +60,12 @@ struct HeaderView: View {
             )
         )
         .foregroundColor(.white)
+        // 下方向に柔らかい影
         .shadow(
             color: Color.themeSecondary.opacity(0.25),
             radius: 12,
             x: 0,
             y: 6
-        ) // 下方向に柔らかい影
+        )
     }
 }
