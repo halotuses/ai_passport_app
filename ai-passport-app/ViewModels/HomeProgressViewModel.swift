@@ -40,19 +40,85 @@ final class HomeProgressViewModel: ObservableObject {
     }
 
     private func fetchMetadataIfNeeded() {
-        guard !hasLoadedMetadata else { return }
+        guard !hasLoadedMetadata, !isLoading else { return }
 
         isLoading = true
         NetworkManager.fetchMetadata { [weak self] metadata in
             guard let self else { return }
+            
+            guard let metadata else {
+                self.isLoading = false
+                return
+            }
 
-            self.isLoading = false
-            self.hasLoadedMetadata = (metadata != nil)
-            self.totalQuestions = metadata?.values.reduce(0) { $0 + $1.total } ?? 0
-            self.updateCompletionRate()
+            self.loadTotalQuestionCount(from: metadata)
         }
     }
 
+    private func loadTotalQuestionCount(from metadata: QuizMetadataMap) {
+        let fallbackTotal = metadata.values.reduce(0) { $0 + $1.total }
+        applyTotalQuestionCount(fallbackTotal)
+
+        guard !metadata.isEmpty else {
+            isLoading = false
+            hasLoadedMetadata = true
+            return
+        }
+
+        let unitGroup = DispatchGroup()
+        var aggregatedTotal = 0
+
+        for (_, unit) in metadata {
+            unitGroup.enter()
+            let chapterListURL = Constants.url(unit.file)
+
+            NetworkManager.fetchChapterList(from: chapterListURL) { chapterList in
+                guard let chapters = chapterList?.chapters, !chapters.isEmpty else {
+                    unitGroup.leave()
+                    return
+                }
+
+                var unitTotal = 0
+                let chapterGroup = DispatchGroup()
+
+                for chapter in chapters {
+                    chapterGroup.enter()
+                    let quizURL = Constants.url(chapter.file)
+
+                    NetworkManager.fetchQuizList(from: quizURL) { quizList in
+                        unitTotal += quizList?.questions.count ?? 0
+                        chapterGroup.leave()
+                    }
+                }
+
+                chapterGroup.notify(queue: .main) {
+                    aggregatedTotal += unitTotal
+                    unitGroup.leave()
+                }
+            }
+        }
+
+        unitGroup.notify(queue: .main) { [weak self] in
+            guard let self else { return }
+
+            if aggregatedTotal > 0 {
+                self.applyTotalQuestionCount(aggregatedTotal)
+                self.hasLoadedMetadata = true
+            } else if fallbackTotal == 0 {
+                self.hasLoadedMetadata = true
+            }
+
+            self.isLoading = false
+
+        }
+    }
+
+    private func applyTotalQuestionCount(_ candidate: Int) {
+        let resolvedTotal = max(candidate, totalAnswered)
+        totalQuestions = resolvedTotal
+        updateCompletionRate()
+    }
+    
     private func updateCompletionRate() {
         guard totalQuestions > 0 else {
             completionRate = 0
@@ -89,6 +155,9 @@ final class HomeProgressViewModel: ObservableObject {
         totalCorrect = correct
         totalIncorrect = incorrect
         totalAnswered = answered
+        if totalQuestions < answered {
+            totalQuestions = answered
+        }
         updateCompletionRate()
     }
 
