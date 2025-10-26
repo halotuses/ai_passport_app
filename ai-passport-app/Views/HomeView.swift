@@ -150,7 +150,7 @@ struct HomeView: View {
     
     // MARK: - 学習進捗カード
     private var progressCard: some View {
-        VStack(alignment: .leading, spacing: 28) {
+        VStack(alignment: .leading, spacing: 20) {
             // タイトル行
             HStack(alignment: .center, spacing: 12) {
                 Label("学習進捗", systemImage: "chart.pie.fill")
@@ -170,7 +170,7 @@ struct HomeView: View {
             }
             
             // 円グラフ＋統計3列
-            VStack(spacing: 28) {
+            VStack(spacing: 20) {
                 ProgressRingView(
                     correctProgress: correctProgressValue,
                     incorrectProgress: incorrectProgressValue,
@@ -178,7 +178,7 @@ struct HomeView: View {
                     valueText: completionPercentageDisplay.value,
                     detailText: progressRingDetailText
                 )
-                HStack(spacing: 16) {
+                HStack(spacing: 10) {
                     StatColumnView(color: .themeCorrect, label: "正解", value: progressViewModel.totalCorrect)
                     StatColumnView(color: .themeIncorrect, label: "不正解", value: progressViewModel.totalIncorrect)
                     StatColumnView(color: .gray, label: "未回答", value: unansweredCount)
@@ -201,8 +201,8 @@ struct HomeView: View {
                         .font(.footnote.weight(.semibold))
                         .foregroundColor(.themeSecondary)
                 }
-                .padding(.vertical, 14)
-                .padding(.horizontal, 18)
+                .padding(.vertical, 10)
+                .padding(.horizontal, 14)
                 .frame(maxWidth: .infinity)
                 .background(
                     RoundedRectangle(cornerRadius: 16, style: .continuous)
@@ -215,8 +215,8 @@ struct HomeView: View {
             }
             .buttonStyle(.plain)
         }
-        .padding(.horizontal, 28)
-        .padding(.vertical, 28)
+        .padding(.horizontal, 22)
+        .padding(.vertical, 20)
         .frame(maxWidth: .infinity)
         .background(
             RoundedRectangle(cornerRadius: 28, style: .continuous)
