@@ -6,18 +6,28 @@ import UIKit
 import AppKit
 #endif
 
+// MARK: - ホーム画面ビュー
 struct HomeView: View {
+    // ViewModel（進捗とホーム全体の状態管理）
     @StateObject private var viewModel: HomeViewModel
     @StateObject private var progressViewModel: HomeProgressViewModel
+    
+    // 画面遷移やタブ管理用のEnvironmentオブジェクト
     @EnvironmentObject private var mainViewState: MainViewState
+    
+    // アプリがアクティブ／バックグラウンドになるのを監視
     @Environment(\.scenePhase) private var scenePhase
     
+    // クイック試験用の日数プリセット
     private let quickExamOffsets: [Int] = [0, 30, 60, 90]
+    
+    // 初期化処理：HomeViewModelを受け取り、その中のprogressViewModelもセット
     init(viewModel: HomeViewModel) {
         _viewModel = StateObject(wrappedValue: viewModel)
         _progressViewModel = StateObject(wrappedValue: viewModel.progressViewModel)
     }
     
+    // MARK: - 試験日バインディング
     private var examDateBinding: Binding<Date> {
         Binding(
             get: { viewModel.examDate },
@@ -25,78 +35,74 @@ struct HomeView: View {
         )
     }
     
+    // MARK: - 学習進捗テキスト
     private var progressSummaryText: String {
         if progressViewModel.totalQuestions > 0 {
             return "全\(progressViewModel.totalQuestions)問中\(progressViewModel.totalCorrect)問に正解"
         }
-        
         if progressViewModel.totalAnswered > 0 {
             return "これまでに\(progressViewModel.totalAnswered)問に挑戦しました"
         }
-        
         return progressViewModel.isLoading
         ? "学習データを取得しています"
         : "学習を始めると進捗がここに表示されます"
     }
     
+    // 円グラフ下に表示する詳細テキスト
     private var progressRingDetailText: String? {
         guard progressViewModel.totalQuestions > 0 else { return nil }
         return progressSummaryText
     }
 
+    // タイトル下に表示する概要文（問題がない場合のみ）
     private var headerSummaryText: String? {
         progressRingDetailText == nil ? progressSummaryText : nil
     }
 
+    // 達成度（%）計算
     private var completionPercentageValue: Int? {
         guard progressViewModel.totalQuestions > 0 else { return nil }
-        
         return Int((progressViewModel.completionRate * 100).rounded())
     }
     
+    // 達成度表示用（数値＋ラベル）
     private var completionPercentageDisplay: (value: String, label: String) {
         if let percentage = completionPercentageValue {
             return ("\(percentage)%", "達成度")
         }
-        
         if progressViewModel.totalAnswered > 0 {
             return ("--%", "達成度")
         }
-        
         return ("0%", "達成度")
     }
     
+    // 正解割合（グラフ用）
     private var correctProgressValue: Double {
         if completionPercentageValue == nil && progressViewModel.totalAnswered > 0 {
             return -1
         }
-        
         return progressViewModel.completionRate
     }
     
-    
+    // 不正解割合（グラフ用）
     private var incorrectProgressValue: Double {
         if completionPercentageValue == nil && progressViewModel.totalAnswered > 0 {
             return -1
         }
-
         guard progressViewModel.totalQuestions > 0 else { return 0 }
-
-        return min(
-            max(Double(progressViewModel.totalIncorrect) / Double(progressViewModel.totalQuestions), 0),
-            1
-        )
+        return min(max(Double(progressViewModel.totalIncorrect) / Double(progressViewModel.totalQuestions), 0), 1)
     }
     
+    // 未回答数
     private var unansweredCount: Int {
         max(progressViewModel.totalUnanswered, 0)
     }
     
+    // 試験日までのカウントダウンテキスト
     private var countdownText: String {
         guard let days = viewModel.daysUntilExam else {
             return "試験日を設定してください"
         }
-        
         if days < 0 {
             return "試験日は \(abs(days)) 日前に終了しました"
         } else if days == 0 {
@@ -108,23 +114,23 @@ struct HomeView: View {
         }
     }
     
+    // メッセージタイトル
     private var encouragementTitle: String {
         viewModel.daysUntilExam == nil ? "今日のひとこと" : "いまのあなたへのメッセージ"
     }
     
+    // MARK: - メインビュー構築
     var body: some View {
         ScrollView(showsIndicators: false) {
             VStack(spacing: 18) {
-                progressCard
-                startLearningButton
+                progressCard         // 学習進捗カード
+                startLearningButton  // 学習開始ボタン
             }
             .padding(.horizontal, 10)
-            .padding(.top, 10)
-            .padding(.bottom, 10)
+            .padding(.vertical, 10)
         }
         .background(
-            PaperBackground()
-                .ignoresSafeArea()
+            PaperBackground().ignoresSafeArea()
         )
         .onAppear {
             mainViewState.enterHome()
@@ -137,13 +143,14 @@ struct HomeView: View {
         }
     }
     
+    // MARK: - 学習進捗カード
     private var progressCard: some View {
         VStack(alignment: .leading, spacing: 24) {
+            // タイトル行
             HStack(alignment: .center, spacing: 12) {
                 Label("学習進捗", systemImage: "chart.pie.fill")
                     .font(.headline)
                     .foregroundColor(.themeTextPrimary)
-                
                 Spacer()
                 if let headerSummaryText {
                     Text(headerSummaryText)
@@ -157,7 +164,7 @@ struct HomeView: View {
                 }
             }
             
-
+            // 円グラフ＋統計3列
             VStack(spacing: 24) {
                 ProgressRingView(
                     correctProgress: correctProgressValue,
@@ -166,7 +173,6 @@ struct HomeView: View {
                     valueText: completionPercentageDisplay.value,
                     detailText: progressRingDetailText
                 )
-
                 HStack(spacing: 16) {
                     StatColumnView(color: .themeCorrect, label: "正解", value: progressViewModel.totalCorrect)
                     StatColumnView(color: .themeIncorrect, label: "不正解", value: progressViewModel.totalIncorrect)
@@ -175,8 +181,9 @@ struct HomeView: View {
             }
             .frame(maxWidth: .infinity)
 
-            Divider()
-                .background(Color.gray.opacity(0.2))
+            Divider().background(Color.gray.opacity(0.2))
+            
+            // 回答履歴リンク
             NavigationLink {
                 AnswerHistoryView()
             } label: {
@@ -184,9 +191,7 @@ struct HomeView: View {
                     Text("回答履歴を見る")
                         .font(.subheadline.weight(.semibold))
                         .foregroundColor(.themeSecondary)
-                    
                     Spacer()
-                    
                     Image(systemName: "chevron.right")
                         .font(.footnote.weight(.semibold))
                         .foregroundColor(.themeSecondary)
@@ -195,12 +200,10 @@ struct HomeView: View {
                 .padding(.horizontal, 12)
                 .frame(maxWidth: .infinity)
                 .background(
-                    Capsule()
-                        .fill(Color.themeButtonSecondary.opacity(0.10))
+                    Capsule().fill(Color.themeButtonSecondary.opacity(0.10))
                 )
                 .overlay(
-                    Capsule()
-                        .stroke(Color.themeSecondary.opacity(0.10), lineWidth: 1)
+                    Capsule().stroke(Color.themeSecondary.opacity(0.10), lineWidth: 1)
                 )
             }
             .buttonStyle(.plain)
@@ -214,6 +217,7 @@ struct HomeView: View {
         .padding(.vertical, 8)
     }
     
+    // MARK: - 学習開始ボタン
     private var startLearningButton: some View {
         Button {
             withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
@@ -222,14 +226,10 @@ struct HomeView: View {
         } label: {
             ZStack {
                 HStack(spacing: 12) {
-                    Image(systemName: "play.fill")
-                        .font(.headline)
-                    Text("学習を始める")
-                        .font(.headline)
-                        .textCase(.none)
+                    Image(systemName: "play.fill").font(.headline)
+                    Text("学習を始める").font(.headline)
                 }
                 .frame(maxWidth: .infinity)
-
                 HStack {
                     Spacer()
                     Image(systemName: "arrow.right")
@@ -244,8 +244,7 @@ struct HomeView: View {
             .background(
                 LinearGradient(
                     colors: [Color.themeSecondary, Color.themeMain, Color.themeAccent],
-                    startPoint: .leading,
-                    endPoint: .trailing
+                    startPoint: .leading, endPoint: .trailing
                 )
             )
             .cornerRadius(20)
@@ -257,77 +256,34 @@ struct HomeView: View {
         }
         .buttonStyle(.plain)
     }
-    
-    private func quickExamButton(daysFromNow offset: Int) -> some View {
-        let targetDate = Calendar.current.date(byAdding: .day, value: offset, to: Date()) ?? Date()
-        let isSelected = Calendar.current.isDate(viewModel.examDate, inSameDayAs: targetDate)
-        
-        return Button {
-            withAnimation(.easeInOut(duration: 0.2)) {
-                viewModel.updateExamDate(targetDate)
-            }
-        } label: {
-            HStack(spacing: 6) {
-                Image(systemName: isSelected ? "checkmark.circle.fill" : "calendar")
-                    .font(.caption)
-                Text(offset == 0 ? "今日" : "あと\(offset)日")
-                    .font(.caption.weight(.semibold))
-            }
-            .foregroundColor(isSelected ? .white : .themeTextPrimary)
-            .padding(.vertical, 8)
-            .padding(.horizontal, 14)
-            .background(
-                Capsule()
-                    .fill(
-                        LinearGradient(
-                            colors: isSelected
-                            ? [Color.themeMain, Color.themeSecondary]
-                            : Array(repeating: Color.themeButtonSecondary.opacity(0.6), count: 2),
-                            startPoint: .leading,
-                            endPoint: .trailing
-                        )
-                    )
-            )
-            .overlay(
-                Capsule()
-                    .stroke(isSelected ? Color.white.opacity(0.6) : Color.themeButtonSecondary.opacity(0.6), lineWidth: 1)
-            )
-            .shadow(color: isSelected ? Color.themeMain.opacity(0.25) : Color.clear, radius: 8, x: 0, y: 4)
-        }
-        .buttonStyle(.plain)
-    }
 }
 
+// MARK: - 円グラフコンポーネント
 private struct ProgressRingView: View {
     let correctProgress: Double
     let incorrectProgress: Double
     let titleText: String
     let valueText: String
     let detailText: String?
-
+    
     @State private var animatedCorrect: Double = 0
     @State private var animatedIncorrect: Double = 0
     
     private let ringLineWidth: CGFloat = 18
     private let ringSize: CGFloat = 176
-
-    private var clampedAnimatedCorrect: Double {
-        max(0, min(animatedCorrect, 1))
-    }
-
-    private var clampedAnimatedIncorrect: Double {
-        max(0, min(animatedIncorrect, 1))
-    }
-
+    
+    private var clampedAnimatedCorrect: Double { max(0, min(animatedCorrect, 1)) }
+    private var clampedAnimatedIncorrect: Double { max(0, min(animatedIncorrect, 1)) }
+    
     private static func sanitize(_ value: Double) -> Double {
         guard value.isFinite else { return 0 }
         return max(0, min(value, 1))
     }
-
+    
     private var isIndeterminate: Bool {
         correctProgress < 0 || incorrectProgress < 0
     }
-
+    
     private var incorrectSegmentEnd: Double {
         let total = clampedAnimatedCorrect + clampedAnimatedIncorrect
         return min(total, 1)
@@ -335,10 +291,11 @@ private struct ProgressRingView: View {
     
     var body: some View {
         ZStack {
-            Circle()
-                .stroke(Color.themeTextSecondary.opacity(0.12), lineWidth: ringLineWidth)
-
+            // ベースリング（グレー背景）
+            Circle().stroke(Color.themeTextSecondary.opacity(0.12), lineWidth: ringLineWidth)
+            
             if isIndeterminate {
+                // データ未確定時（点線アニメーション）
                 Circle()
                     .trim(from: 0, to: 0.85)
                     .stroke(
@@ -347,6 +304,7 @@ private struct ProgressRingView: View {
                     )
                     .rotationEffect(.degrees(-90))
             } else {
+                // 正解部分
                 Circle()
                     .trim(from: 0, to: CGFloat(clampedAnimatedCorrect))
                     .stroke(
@@ -357,7 +315,7 @@ private struct ProgressRingView: View {
                         style: StrokeStyle(lineWidth: ringLineWidth, lineCap: .round)
                     )
                     .rotationEffect(.degrees(-90))
-
+                // 不正解部分
                 Circle()
                     .trim(from: CGFloat(clampedAnimatedCorrect), to: CGFloat(incorrectSegmentEnd))
                     .stroke(
@@ -369,7 +327,8 @@ private struct ProgressRingView: View {
                     )
                     .rotationEffect(.degrees(-90))
             }
-
+            
+            // 中央テキスト
             VStack(spacing: 6) {
                 Text(titleText)
                     .font(.caption.weight(.semibold))
@@ -387,17 +346,12 @@ private struct ProgressRingView: View {
             }
         }
         .frame(width: ringSize, height: ringSize)
-        .onAppear {
-            animateToCurrentProgress()
-        }
-        .onChange(of: correctProgress) { _ in
-            animateToCurrentProgress()
-        }
-        .onChange(of: incorrectProgress) { _ in
-            animateToCurrentProgress()
-        }
+        .onAppear { animateToCurrentProgress() }
+        .onChange(of: correctProgress) { _ in animateToCurrentProgress() }
+        .onChange(of: incorrectProgress) { _ in animateToCurrentProgress() }
     }
-
+    
+    // アニメーション更新
     private func animateToCurrentProgress() {
         if isIndeterminate {
             withAnimation(.easeOut(duration: 0.5)) {
@@ -415,21 +369,16 @@ private struct ProgressRingView: View {
     }
 }
 
+// MARK: - 統計小コンポーネント
 private struct StatColumnView: View {
     let color: Color
     let label: String
     let value: Int
-
+    
     var body: some View {
         VStack(spacing: 6) {
-            Circle()
-                .fill(color)
-                .frame(width: 10, height: 10)
-
-            Text(label)
-                .font(.caption)
-                .foregroundColor(.themeTextSecondary)
-
+            Circle().fill(color).frame(width: 10, height: 10)
+            Text(label).font(.caption).foregroundColor(.themeTextSecondary)
             Text("\(value)問")
                 .font(.subheadline.weight(.semibold))
                 .foregroundColor(.themeTextPrimary)
@@ -437,6 +386,8 @@ private struct StatColumnView: View {
         .frame(maxWidth: .infinity)
     }
 }
+
+// MARK: - 背景グラデーション＋ノイズ
 private struct PaperBackground: View {
     private let gradient = LinearGradient(
         colors: [
@@ -447,7 +398,6 @@ private struct PaperBackground: View {
         startPoint: .topLeading,
         endPoint: .bottomTrailing
     )
-    
     var body: some View {
         Rectangle()
             .fill(gradient)
@@ -459,19 +409,18 @@ private struct PaperBackground: View {
     }
 }
 
+// MARK: - ノイズテクスチャ（粒子風背景）
 private struct NoiseTextureView: View {
     private static let noiseImage: Image? = {
         let context = CIContext()
         let filter = CIFilter.randomGenerator()
         let size = CGSize(width: 512, height: 512)
-        
         guard
             let outputImage = filter.outputImage?.cropped(to: CGRect(origin: .zero, size: size)),
             let cgImage = context.createCGImage(outputImage, from: CGRect(origin: .zero, size: size))
         else {
             return nil
         }
-        
 #if canImport(UIKit)
         return Image(uiImage: UIImage(cgImage: cgImage))
 #elseif canImport(AppKit)
@@ -483,10 +432,7 @@ private struct NoiseTextureView: View {
     
     var body: some View {
         if let noiseImage = Self.noiseImage {
-            noiseImage
-                .resizable()
-                .scaledToFill()
-                .clipped()
+            noiseImage.resizable().scaledToFill().clipped()
         } else {
             Color.clear
         }
