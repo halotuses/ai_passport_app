@@ -47,6 +47,7 @@
 		0CCB45A22E8994E800C41D03 /* QuizList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CCB45A12E8994E800C41D03 /* QuizList.swift */; };
 		0CCB45A42E89951900C41D03 /* CapterList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CCB45A32E89951900C41D03 /* CapterList.swift */; };
 		0CE6D5992EAE0C1900D38241 /* ProgressManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CE6D5982EAE0C0F00D38241 /* ProgressManager.swift */; };
+		0CE6D59B2EAE867B00D38241 /* ContentStateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CE6D59A2EAE866D00D38241 /* ContentStateView.swift */; };
 		0CF00B642EA91BF300B8A6D0 /* QuestionProgress.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF00B632EA91BEC00B8A6D0 /* QuestionProgress.swift */; };
 		0CF00B662EA91D2700B8A6D0 /* ChapterProgressViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF00B652EA91D1400B8A6D0 /* ChapterProgressViewModel.swift */; };
 		0CF00B682EA91D5800B8A6D0 /* HomeProgressViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF00B672EA91D5700B8A6D0 /* HomeProgressViewModel.swift */; };
@@ -121,6 +122,7 @@
 		0CCB45A12E8994E800C41D03 /* QuizList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuizList.swift; sourceTree = "<group>"; };
 		0CCB45A32E89951900C41D03 /* CapterList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CapterList.swift; sourceTree = "<group>"; };
 		0CE6D5982EAE0C0F00D38241 /* ProgressManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressManager.swift; sourceTree = "<group>"; };
+		0CE6D59A2EAE866D00D38241 /* ContentStateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentStateView.swift; sourceTree = "<group>"; };
 		0CF00B632EA91BEC00B8A6D0 /* QuestionProgress.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuestionProgress.swift; sourceTree = "<group>"; };
 		0CF00B652EA91D1400B8A6D0 /* ChapterProgressViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChapterProgressViewModel.swift; sourceTree = "<group>"; };
 		0CF00B672EA91D5700B8A6D0 /* HomeProgressViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeProgressViewModel.swift; sourceTree = "<group>"; };
@@ -314,6 +316,7 @@
 		0C30DDCF2DFF141A00F25D02 /* Navigation */ = {
 			isa = PBXGroup;
 			children = (
+				0CE6D59A2EAE866D00D38241 /* ContentStateView.swift */,
 				0C31AD7A2EA2184A007500F7 /* MainViewState.swift */,
 				0C30DDD62DFF183F00F25D02 /* NavigationRouter.swift */,
 				0C30DDD82DFF185400F25D02 /* MainRouterView.swift */,
@@ -672,6 +675,7 @@
 				0C30DDFD2DFF1CFB00F25D02 /* SelectedAnswer.swift in Sources */,
 				0CF00B6E2EA924FD00B8A6D0 /* CreatePageView.swift in Sources */,
 				0C30DDEB2DFF1B7A00F25D02 /* UnitListViewModel.swift in Sources */,
+				0CE6D59B2EAE867B00D38241 /* ContentStateView.swift in Sources */,
 				0C30DD9A2DFF116F00F25D02 /* ai_passport_appApp.swift in Sources */,
 				0C30DDF52DFF1C7100F25D02 /* AnswerHistoryRepository.swift in Sources */,
 				0CF00B742EAA83B100B8A6D0 /* AnswerHistoryView.swift in Sources */,
