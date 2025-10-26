@@ -12,6 +12,7 @@ struct AppFrameView: View {
             HeaderView()
             Divider()
             MainRouterView()
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
             Divider()
             BottomTabBarView()
         }

@@ -124,7 +124,10 @@ struct HomeView: View {
         ScrollView(showsIndicators: false) {
             VStack(spacing: 28) {
                 progressCard         // 学習進捗カード
-                startLearningButton  // 学習開始ボタン
+                VStack(spacing: 16) {
+                    startLearningButton  // 学習開始ボタン
+                    startReviewButton   // 復習開始ボタン
+                }
             }
             .frame(maxWidth: 520)
             .padding(.horizontal, 24)
@@ -249,6 +252,47 @@ struct HomeView: View {
                 HStack(spacing: 12) {
                     Image(systemName: "play.fill").font(.headline)
                     Text("学習を始める").font(.headline)
+                }
+                .frame(maxWidth: .infinity)
+                HStack {
+                    Spacer()
+                    Image(systemName: "arrow.right")
+                        .font(.headline)
+                        .foregroundColor(.white)
+                }
+            }
+            .foregroundColor(.white)
+            .padding(.vertical, 20)
+            .padding(.horizontal, 28)
+            .frame(maxWidth: 360)
+            .background(
+                LinearGradient(
+                    colors: [
+                        Color.themeSecondary,
+                        Color.themeMain,
+                        Color.themeAccent.opacity(0.9)
+                    ],
+                    startPoint: .leading,
+                    endPoint: .trailing
+                )
+            )
+            .cornerRadius(24)
+            .shadow(color: Color.themeSecondary.opacity(0.35), radius: 18, x: 0, y: 12)
+            .overlay(
+                RoundedRectangle(cornerRadius: 24)
+                    .stroke(Color.white.opacity(0.35), lineWidth: 1)
+            )
+        }
+        .buttonStyle(.plain)
+    }
+    private var startReviewButton: some View {
+        Button {
+            // TODO: 復習機能の実装時に処理を追加
+        } label: {
+            ZStack {
+                HStack(spacing: 12) {
+                    Image(systemName: "arrow.triangle.2.circlepath").font(.headline)
+                    Text("復習を始める").font(.headline)
                 }
                 .frame(maxWidth: .infinity)
                 HStack {

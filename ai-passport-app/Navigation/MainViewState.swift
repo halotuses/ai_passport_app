@@ -12,6 +12,7 @@ final class MainViewState: ObservableObject {
         enum Destination {
             case unitList
             case chapterList
+            case home
         }
         
         let title: String
@@ -82,7 +83,19 @@ final class MainViewState: ObservableObject {
     /// 単元一覧（学習開始画面）に遷移
     func enterUnitSelection() {
         isOnHome = false
-        setHeader(title: "学習アプリ")
+        setHeader(title: "学習アプリ", backButton: .toHome)
+
+    }
+
+    func backToHome(router: NavigationRouter) {
+        prepareForQuizNavigationCleanupIfNeeded()
+        selectedChapter = nil
+        selectedUnit = nil
+        selectedUnitKey = nil
+        showResultView = false
+        router.reset()
+        navigationResetToken = UUID()
+        enterHome()
         
     }
     
@@ -106,6 +119,8 @@ final class MainViewState: ObservableObject {
             backToUnitSelection(router: router)
         case .chapterList:
             backToChapterSelection(router: router)
+        case .home:
+            backToHome(router: router)
         }
     }
     
@@ -141,4 +156,6 @@ extension MainViewState.HeaderBackButton {
     static let toChapterList = Self(title: "◀ 章", destination: .chapterList)
     /// 単元一覧に戻る際のラベル
     static let toUnitList = Self(title: "◀ 単元", destination: .unitList)
+    /// ホームに戻る際のラベル
+    static let toHome = Self(title: "◀ ホーム", destination: .home)
 }
