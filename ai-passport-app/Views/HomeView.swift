@@ -38,13 +38,7 @@ struct HomeView: View {
         ? "学習データを取得しています"
         : "学習を始めると進捗がここに表示されます"
     }
-    
-    private var progressDetailsText: String? {
-        let unanswered = max(progressViewModel.totalUnanswered, 0)
-        guard progressViewModel.totalAnswered > 0 || unanswered > 0 else { return nil }
-        
-        return "正解\(progressViewModel.totalCorrect)問 / 不正解\(progressViewModel.totalIncorrect)問 / 未回答\(unanswered)問"
-    }
+
     private var completionPercentageValue: Int? {
         guard progressViewModel.totalQuestions > 0 else { return nil }
         
@@ -71,67 +65,8 @@ struct HomeView: View {
         return progressViewModel.completionRate
     }
     
-    private var accuracyText: String {
-        guard progressViewModel.totalAnswered > 0 else {
-            return "正答率 --"
-        }
-        
-        let accuracy = Double(progressViewModel.totalCorrect) / Double(progressViewModel.totalAnswered)
-        let percentage = Int((accuracy * 100).rounded())
-        return "正答率 \(percentage)%"
-    }
-    
-    private var progressLegendItems: [ProgressLegendItem] {
-        let unanswered = max(progressViewModel.totalUnanswered, 0)
-        let denominator = progressPercentageDenominator
-        
-        func percentageText(for count: Int) -> String? {
-            guard let denominator, denominator > 0 else { return nil }
-            let value = percentage(for: count, total: denominator)
-            return "\(value)%"
-        }
-        
-        return [
-            ProgressLegendItem(kind: .correct, label: "正解", count: progressViewModel.totalCorrect, color: .themeCorrect, percentageText: percentageText(for: progressViewModel.totalCorrect)),
-            ProgressLegendItem(kind: .incorrect, label: "不正解", count: progressViewModel.totalIncorrect, color: .themeIncorrect, percentageText: percentageText(for: progressViewModel.totalIncorrect)),
-            ProgressLegendItem(kind: .unanswered, label: "未回答", count: unanswered, color: Color.themeButtonSecondary, percentageText: percentageText(for: unanswered))
-        ]
-    }
-    
-    private var progressSegments: [CircularProgressView.Segment] {
-        let denominator = max(progressPercentageDenominator ?? 0, 0)
-        let correct = min(progressViewModel.totalCorrect, denominator)
-        let incorrect: Int
-        if denominator > 0 {
-            let remainingAfterCorrect = max(denominator - correct, 0)
-            incorrect = min(progressViewModel.totalIncorrect, remainingAfterCorrect)
-        } else {
-            incorrect = progressViewModel.totalIncorrect
-        }
-        
-        let unansweredBase = max(progressViewModel.totalUnanswered, 0)
-        let unanswered: Int
-        if denominator > 0 {
-            let used = correct + incorrect
-            unanswered = max(min(unansweredBase, denominator - used), 0)
-        } else {
-            unanswered = unansweredBase
-        }
-        
-        return [
-            .init(kind: .correct, value: Double(correct), color: .themeCorrect),
-            .init(kind: .incorrect, value: Double(incorrect), color: .themeIncorrect),
-            .init(kind: .unanswered, value: Double(unanswered), color: .themeButtonSecondary)
-        ]
-    }
-    
-    private var progressPercentageDenominator: Int? {
-        if progressViewModel.totalQuestions > 0 {
-            return progressViewModel.totalQuestions
-        }
-        
-        let total = progressViewModel.totalAnswered + max(progressViewModel.totalUnanswered, 0)
-        return total > 0 ? total : nil
+    private var unansweredCount: Int {
+        max(progressViewModel.totalUnanswered, 0)
     }
     
     private var countdownText: String {
@@ -180,26 +115,15 @@ struct HomeView: View {
     
     private var progressCard: some View {
         VStack(alignment: .leading, spacing: 24) {
-            HStack(spacing: 12) {
-                Image(systemName: "chart.pie.fill")
-                    .font(.system(size: 20, weight: .semibold))
-                    .foregroundColor(.themeSecondary)
-                    .padding(10)
-                    .background(
-                        Circle()
-                            .fill(Color.themeSecondary.opacity(0.15))
-                    )
-                
-                VStack(alignment: .leading, spacing: 4) {
-                    Text("学習進捗")
-                        .font(.headline)
-                        .foregroundColor(.themeTextPrimary)
-                    Text(progressSummaryText)
-                        .font(.subheadline)
-                        .foregroundColor(.themeTextSecondary)
-                }
+            HStack(alignment: .center, spacing: 12) {
+                Label("学習進捗", systemImage: "chart.pie.fill")
+                    .font(.headline)
+                    .foregroundColor(.themeTextPrimary)
                 
                 Spacer()
+                Text(progressSummaryText)
+                    .font(.subheadline)
+                    .foregroundColor(.themeTextSecondary)
                 if progressViewModel.isLoading {
                     ProgressView()
                         .progressViewStyle(.circular)
@@ -207,101 +131,47 @@ struct HomeView: View {
                 }
             }
             
-            HStack(alignment: .center, spacing: 28) {
-                VStack(spacing: 10) {
-                    CircularProgressView(
-                        segments: progressSegments,
-                        progress: completionProgressValue,
-                        lineWidth: 12,
-                        size: 140
-                    )
-                    Text(completionPercentageDisplay.value)
-                        .font(.footnote.weight(.semibold))
-                        .foregroundColor(.themeTextPrimary)
-                    Text(completionPercentageDisplay.label)
-                        .font(.caption.weight(.semibold))
-                        .foregroundColor(.themeTextSecondary)
-                }
-                
-                VStack(alignment: .leading, spacing: 12) {
-                    Text(accuracyText)
-                        .font(.subheadline.weight(.semibold))
-                        .foregroundColor(.themeTextPrimary)
-                    
-                    if let details = progressDetailsText {
-                        Text(details)
-                            .font(.footnote)
-                            .foregroundColor(.themeTextSecondary)
-                    }
-                    
-                    Divider()
-                        .background(Color.themeButtonSecondary.opacity(0.4))
-                    VStack(spacing: 12) {
-                        ForEach(progressLegendItems) { item in
-                            legendRow(for: item)
-                        }
-                    }
+
+            VStack(spacing: 24) {
+                ProgressRingView(
+                    progress: completionProgressValue,
+                    displayText: completionPercentageDisplay.value,
+                    labelText: completionPercentageDisplay.label
+                )
+
+                HStack(spacing: 16) {
+                    StatColumnView(color: .themeCorrect, label: "正解", value: progressViewModel.totalCorrect)
+                    StatColumnView(color: .themeIncorrect, label: "不正解", value: progressViewModel.totalIncorrect)
+                    StatColumnView(color: .gray, label: "未回答", value: unansweredCount)
                 }
             }
-            .frame(maxWidth: .infinity, alignment: .leading)
+            .frame(maxWidth: .infinity)
+
+            Divider()
+                .background(Color.gray.opacity(0.2))
             NavigationLink {
                 AnswerHistoryView()
             } label: {
-                HStack(spacing: 16) {
-                    Image(systemName: "clock.arrow.circlepath")
-                        .font(.system(size: 20, weight: .semibold))
+                HStack(spacing: 8) {
+                    Text("回答履歴を見る")
+                        .font(.subheadline.weight(.semibold))
                         .foregroundColor(.themeSecondary)
-                        .padding(12)
-                        .background(
-                            Circle()
-                                .fill(Color.themeSecondary.opacity(0.15))
-                        )
-                    
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("回答履歴を見る")
-                            .font(.subheadline.weight(.semibold))
-                            .foregroundColor(.themeTextPrimary)
-                        Text("選んだ選択肢と正誤を振り返りましょう")
-                            .font(.footnote)
-                            .foregroundColor(.themeTextSecondary)
-                    }
                     
                     Spacer()
                     
                     Image(systemName: "chevron.right")
                         .font(.footnote.weight(.semibold))
-                        .foregroundColor(.themeTextSecondary)
+                        .foregroundColor(.themeSecondary)
                 }
-                .padding(.horizontal, 16)
-                .padding(.vertical, 14)
-                .background(
-                    RoundedRectangle(cornerRadius: 18, style: .continuous)
-                        .fill(Color.white.opacity(0.75))
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 18, style: .continuous)
-                                .stroke(Color.white.opacity(0.6), lineWidth: 0.6)
-                        )
-                        .shadow(color: Color.themeShadowSoft.opacity(0.35), radius: 10, x: 0, y: 6)
-                )
+                .padding(.vertical, 4)
             }
             .buttonStyle(.plain)
         }
-        .padding(24)
-        .background(
-            RoundedRectangle(cornerRadius: 26)
-                .fill(
-                    LinearGradient(
-                        colors: [Color.themeSurface, Color.white.opacity(0.75)],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    )
-                )
-                .overlay(
-                    RoundedRectangle(cornerRadius: 26)
-                        .stroke(Color.white.opacity(0.7), lineWidth: 0.6)
-                )
-                .shadow(color: Color.themeShadowSoft, radius: 18, x: 0, y: 12)
-        )
+        .padding()
+        .background(Color.white)
+        .cornerRadius(20)
+        .shadow(radius: 4)
+        .padding()
     }
     
     private var startLearningButton: some View {
@@ -340,57 +210,6 @@ struct HomeView: View {
             )
         }
         .buttonStyle(.plain)
-    }
-    
-    private func percentage(for count: Int, total: Int) -> Int {
-        guard total > 0 else { return 0 }
-        return Int((Double(count) / Double(total) * 100).rounded())
-    }
-    
-    private func legendRow(for item: ProgressLegendItem) -> some View {
-        HStack(spacing: 14) {
-            Circle()
-                .fill(item.color)
-                .frame(width: 12, height: 12)
-                .opacity(item.count == 0 ? 0.4 : 1)
-            
-            VStack(alignment: .leading, spacing: 4) {
-                
-                Text(item.label)
-                    .font(.footnote.weight(.semibold))
-                    .foregroundColor(.themeTextPrimary)
-                
-                Text("\(item.count)問")
-                    .font(.footnote)
-                    .foregroundColor(.themeTextSecondary)
-            }
-            
-            Spacer()
-            
-            if let percentageText = item.percentageText {
-                Text(percentageText)
-                    .font(.caption.weight(.semibold))
-                    .foregroundColor(item.count == 0 ? .themeTextSecondary : item.color)
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 6)
-                    .background(
-                        Capsule()
-                            .fill(item.color.opacity(0.18))
-                    )
-            }
-            
-        }
-        .padding(.vertical, 14)
-        .padding(.horizontal, 18)
-        .background(
-            RoundedRectangle(cornerRadius: 18, style: .continuous)
-                .fill(Color.white.opacity(0.72))
-                .overlay(
-                    RoundedRectangle(cornerRadius: 18, style: .continuous)
-                        .stroke(Color.white.opacity(0.65), lineWidth: 0.6)
-                )
-                .shadow(color: Color.themeShadowSoft.opacity(0.35), radius: 14, x: 0, y: 6)
-        )
     }
     
     private func quickExamButton(daysFromNow offset: Int) -> some View {
@@ -433,20 +252,82 @@ struct HomeView: View {
     }
 }
 
-private enum ProgressLegendKind: Hashable {
-    case correct
-    case incorrect
-    case unanswered
+private struct ProgressRingView: View {
+    let progress: Double
+    let displayText: String
+    let labelText: String
+
+    @State private var animatedProgress: Double = 0
+
+    private var clampedAnimatedProgress: Double {
+        max(0, min(animatedProgress, 1))
+    }
+
+    private static func sanitize(_ value: Double) -> Double {
+        guard value.isFinite else { return 0 }
+        return max(0, min(value, 1))
+    }
+
+    var body: some View {
+        ZStack {
+            Circle()
+                .stroke(Color.themeTextSecondary.opacity(0.12), lineWidth: 12)
+
+            Circle()
+                .trim(from: 0, to: CGFloat(clampedAnimatedProgress))
+                .stroke(
+                    AngularGradient(
+                        gradient: Gradient(colors: [Color.themeCorrect.opacity(0.9), Color.themeCorrect]),
+                        center: .center
+                    ),
+                    style: StrokeStyle(lineWidth: 12, lineCap: .round)
+                )
+                .rotationEffect(.degrees(-90))
+
+            VStack(spacing: 4) {
+                Text(displayText)
+                    .font(.title2.weight(.bold))
+                    .foregroundColor(.themeTextPrimary)
+                Text(labelText)
+                    .font(.caption)
+                    .foregroundColor(.themeTextSecondary)
+            }
+        }
+        .frame(width: 120, height: 120)
+        .onAppear {
+            withAnimation(.easeOut(duration: 0.8)) {
+                animatedProgress = Self.sanitize(progress)
+            }
+        }
+        .onChange(of: progress) { newValue in
+            withAnimation(.easeOut(duration: 0.8)) {
+                animatedProgress = Self.sanitize(newValue)
+            }
+        }
+    }
 }
 
-private struct ProgressLegendItem: Identifiable {
-    let kind: ProgressLegendKind
-    let label: String
-    let count: Int
+private struct StatColumnView: View {
     let color: Color
-    let percentageText: String?
-    
-    var id: ProgressLegendKind { kind }
+    let label: String
+    let value: Int
+
+    var body: some View {
+        VStack(spacing: 6) {
+            Circle()
+                .fill(color)
+                .frame(width: 10, height: 10)
+
+            Text(label)
+                .font(.caption)
+                .foregroundColor(.themeTextSecondary)
+
+            Text("\(value)問")
+                .font(.subheadline.weight(.semibold))
+                .foregroundColor(.themeTextPrimary)
+        }
+        .frame(maxWidth: .infinity)
+    }
 }
 private struct PaperBackground: View {
     private let gradient = LinearGradient(
