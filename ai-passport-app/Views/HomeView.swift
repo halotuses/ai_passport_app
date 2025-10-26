@@ -114,7 +114,7 @@ struct HomeView: View {
     
     var body: some View {
         ScrollView(showsIndicators: false) {
-            VStack(spacing: 28) {
+            VStack(spacing: 18) {
                 progressCard
                 startLearningButton
             }
@@ -191,8 +191,8 @@ struct HomeView: View {
                         .font(.footnote.weight(.semibold))
                         .foregroundColor(.themeSecondary)
                 }
-                .padding(.vertical, 4)
-                .padding(.horizontal, 10)
+                .padding(.vertical, 8)
+                .padding(.horizontal, 18)
                 .frame(maxWidth: .infinity)
                 .background(
                     Capsule()
@@ -205,11 +205,13 @@ struct HomeView: View {
             }
             .buttonStyle(.plain)
         }
-        .padding(24)
+        .padding(.horizontal, 24)
+        .padding(.vertical, 24)
         .background(Color.white)
         .cornerRadius(20)
         .shadow(radius: 4)
-        .padding()
+        .padding(.horizontal, 24)
+        .padding(.vertical, 8)
     }
     
     private var startLearningButton: some View {
@@ -218,17 +220,22 @@ struct HomeView: View {
                 mainViewState.enterUnitSelection()
             }
         } label: {
-            HStack(spacing: 12) {
-                Image(systemName: "play.fill")
-                    .font(.headline)
-                Text("学習を始める")
-                    .font(.headline)
-                    .textCase(.none)
-                Spacer()
-                Image(systemName: "arrow.right")
-                    .font(.headline)
-                    .foregroundColor(.white)
-                Spacer()
+            ZStack {
+                HStack(spacing: 12) {
+                    Image(systemName: "play.fill")
+                        .font(.headline)
+                    Text("学習を始める")
+                        .font(.headline)
+                        .textCase(.none)
+                }
+                .frame(maxWidth: .infinity)
+
+                HStack {
+                    Spacer()
+                    Image(systemName: "arrow.right")
+                        .font(.headline)
+                        .foregroundColor(.white)
+                }
             }
             .foregroundColor(.white)
             .padding(.vertical, 18)
