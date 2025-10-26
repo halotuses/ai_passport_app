@@ -57,12 +57,26 @@ struct HomeView: View {
         return ("0%", "達成度")
     }
     
-    private var completionProgressValue: Double {
+    private var correctProgressValue: Double {
         if completionPercentageValue == nil && progressViewModel.totalAnswered > 0 {
             return -1
         }
         
         return progressViewModel.completionRate
+    }
+    
+    
+    private var incorrectProgressValue: Double {
+        if completionPercentageValue == nil && progressViewModel.totalAnswered > 0 {
+            return -1
+        }
+
+        guard progressViewModel.totalQuestions > 0 else { return 0 }
+
+        return min(
+            max(Double(progressViewModel.totalIncorrect) / Double(progressViewModel.totalQuestions), 0),
+            1
+        )
     }
     
     private var unansweredCount: Int {
@@ -134,7 +148,8 @@ struct HomeView: View {
 
             VStack(spacing: 24) {
                 ProgressRingView(
-                    progress: completionProgressValue,
+                    correctProgress: correctProgressValue,
+                    incorrectProgress: incorrectProgressValue,
                     displayText: completionPercentageDisplay.value,
                     labelText: completionPercentageDisplay.label
                 )
@@ -253,14 +268,20 @@ struct HomeView: View {
 }
 
 private struct ProgressRingView: View {
-    let progress: Double
+    let correctProgress: Double
+    let incorrectProgress: Double
     let displayText: String
     let labelText: String
 
-    @State private var animatedProgress: Double = 0
+    @State private var animatedCorrect: Double = 0
+    @State private var animatedIncorrect: Double = 0
 
-    private var clampedAnimatedProgress: Double {
-        max(0, min(animatedProgress, 1))
+    private var clampedAnimatedCorrect: Double {
+        max(0, min(animatedCorrect, 1))
+    }
+
+    private var clampedAnimatedIncorrect: Double {
+        max(0, min(animatedIncorrect, 1))
     }
 
     private static func sanitize(_ value: Double) -> Double {
@@ -268,21 +289,51 @@ private struct ProgressRingView: View {
         return max(0, min(value, 1))
     }
 
+    private var isIndeterminate: Bool {
+        correctProgress < 0 || incorrectProgress < 0
+    }
+
+    private var incorrectSegmentEnd: Double {
+        let total = clampedAnimatedCorrect + clampedAnimatedIncorrect
+        return min(total, 1)
+    }
+    
     var body: some View {
         ZStack {
             Circle()
-                .stroke(Color.themeTextSecondary.opacity(0.12), lineWidth: 12)
+                .stroke(Color.themeTextSecondary.opacity(0.12), lineWidth: 14)
 
-            Circle()
-                .trim(from: 0, to: CGFloat(clampedAnimatedProgress))
-                .stroke(
-                    AngularGradient(
-                        gradient: Gradient(colors: [Color.themeCorrect.opacity(0.9), Color.themeCorrect]),
-                        center: .center
-                    ),
-                    style: StrokeStyle(lineWidth: 12, lineCap: .round)
-                )
-                .rotationEffect(.degrees(-90))
+            if isIndeterminate {
+                Circle()
+                    .trim(from: 0, to: 0.85)
+                    .stroke(
+                        Color.themeTextSecondary.opacity(0.25),
+                        style: StrokeStyle(lineWidth: 14, lineCap: .round, dash: [1, 6])
+                    )
+                    .rotationEffect(.degrees(-90))
+            } else {
+                Circle()
+                    .trim(from: 0, to: CGFloat(clampedAnimatedCorrect))
+                    .stroke(
+                        AngularGradient(
+                            gradient: Gradient(colors: [Color.themeCorrect.opacity(0.9), Color.themeCorrect]),
+                            center: .center
+                        ),
+                        style: StrokeStyle(lineWidth: 14, lineCap: .round)
+                    )
+                    .rotationEffect(.degrees(-90))
+
+                Circle()
+                    .trim(from: CGFloat(clampedAnimatedCorrect), to: CGFloat(incorrectSegmentEnd))
+                    .stroke(
+                        AngularGradient(
+                            gradient: Gradient(colors: [Color.themeIncorrect.opacity(0.85), Color.themeIncorrect]),
+                            center: .center
+                        ),
+                        style: StrokeStyle(lineWidth: 14, lineCap: .round)
+                    )
+                    .rotationEffect(.degrees(-90))
+            }
 
             VStack(spacing: 4) {
                 Text(displayText)
@@ -293,15 +344,30 @@ private struct ProgressRingView: View {
                     .foregroundColor(.themeTextSecondary)
             }
         }
-        .frame(width: 120, height: 120)
+        .frame(width: 148, height: 148)
         .onAppear {
-            withAnimation(.easeOut(duration: 0.8)) {
-                animatedProgress = Self.sanitize(progress)
-            }
+            animateToCurrentProgress()
         }
-        .onChange(of: progress) { newValue in
+        .onChange(of: correctProgress) { _ in
+            animateToCurrentProgress()
+        }
+        .onChange(of: incorrectProgress) { _ in
+            animateToCurrentProgress()
+        }
+    }
+
+    private func animateToCurrentProgress() {
+        if isIndeterminate {
+            withAnimation(.easeOut(duration: 0.5)) {
+                animatedCorrect = 0
+                animatedIncorrect = 0
+            }
+        } else {
+            let sanitizedCorrect = Self.sanitize(correctProgress)
+            let sanitizedIncorrect = Self.sanitize(incorrectProgress)
             withAnimation(.easeOut(duration: 0.8)) {
-                animatedProgress = Self.sanitize(newValue)
+                animatedCorrect = sanitizedCorrect
+                animatedIncorrect = sanitizedIncorrect
             }
         }
     }
@@ -332,9 +398,9 @@ private struct StatColumnView: View {
 private struct PaperBackground: View {
     private let gradient = LinearGradient(
         colors: [
-            Color(red: 0.99, green: 0.98, blue: 0.96),
-            Color(red: 0.97, green: 0.94, blue: 0.89),
-            Color(red: 1.0, green: 0.98, blue: 0.94)
+            Color.themeBase,
+            Color(red: 0.96, green: 0.99, blue: 0.98),
+            Color.themeSurfaceElevated
         ],
         startPoint: .topLeading,
         endPoint: .bottomTrailing
@@ -346,7 +412,7 @@ private struct PaperBackground: View {
             .overlay(
                 NoiseTextureView()
                     .blendMode(.softLight)
-                    .opacity(0.08)
+                    .opacity(0.04)
             )
     }
 }
