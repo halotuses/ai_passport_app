@@ -14,7 +14,8 @@ struct BottomTabBarView: View {
     @State private var isHovering = false
 #endif
     
-    private let tabBarContentHeight: CGFloat = 80
+    private let tabBarContentHeight: CGFloat = 60
+    private let tabItemTopPadding: CGFloat = 8
     
     var body: some View {
         ZStack(alignment: .top) {
@@ -37,6 +38,7 @@ struct BottomTabBarView: View {
                             .font(.caption)
                             .fontWeight(.semibold)
                     }
+                    .padding(.top, tabItemTopPadding)
                 }
                 .buttonStyle(.plain)
                 .allowsHitTesting(isHovering)
@@ -49,6 +51,7 @@ struct BottomTabBarView: View {
                         .font(.caption)
                         .fontWeight(.semibold)
                 }
+                .padding(.top, tabItemTopPadding)
                 .allowsHitTesting(isHovering)
                 .foregroundColor(.white.opacity(0.8))
                 Spacer()
@@ -58,6 +61,7 @@ struct BottomTabBarView: View {
                         .font(.caption)
                         .fontWeight(.semibold)
                 }
+                .padding(.top, tabItemTopPadding)
                 .allowsHitTesting(isHovering)
                 .foregroundColor(.white.opacity(0.8))
                 Spacer()
