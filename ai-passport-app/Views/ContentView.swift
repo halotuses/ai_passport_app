@@ -153,7 +153,13 @@ private extension ContentView {
     
     func extractUnitIdentifier(from path: String) -> String {
         let components = path.split(separator: "/")
-        if let unitComponent = components.first(where: { $0.hasPrefix("unit") }) {
+        if let unitComponent = components.first(where: { component in
+            let lowercased = component.lowercased()
+            guard lowercased.hasPrefix("unit") else { return false }
+            // "units" ディレクトリやその他 "unit" で始まる別要素を除外するため、
+            // prefix の後に数字を含むもののみをユニット識別子とみなす
+            return component.dropFirst(4).contains(where: { $0.isNumber })
+        }) {
             return String(unitComponent)
         }
         return ""

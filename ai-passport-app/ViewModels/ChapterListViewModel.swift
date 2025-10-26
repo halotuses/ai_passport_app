@@ -78,7 +78,11 @@ class ChapterListViewModel: ObservableObject {
     
     private func extractUnitIdentifier(from path: String) -> String {
         let components = path.split(separator: "/")
-        if let unitComponent = components.first(where: { $0.hasPrefix("unit") }) {
+        if let unitComponent = components.first(where: { component in
+            let lowercased = component.lowercased()
+            guard lowercased.hasPrefix("unit") else { return false }
+            return component.dropFirst(4).contains(where: { $0.isNumber })
+        }) {
             return String(unitComponent)
         }
         return ""
