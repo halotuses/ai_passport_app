@@ -5,10 +5,9 @@ import SwiftUI
 struct MainRouterView: View {
     @EnvironmentObject private var router: NavigationRouter
     @EnvironmentObject private var mainViewState: MainViewState
-    @StateObject private var homeViewModel = HomeViewModel()
+    @EnvironmentObject private var progressManager: ProgressManager
     @StateObject private var unitListVM = UnitListViewModel()
-    @StateObject private var chapterListVM = ChapterListViewModel()
-    @StateObject private var quizViewModel  = QuizViewModel()   // ← 参照型VMは StateObject
+
     
     var body: some View {
         NavigationStack(path: $router.path) {  // ← router.path をバインド（reset()が効く）
@@ -18,7 +17,8 @@ struct MainRouterView: View {
                 
                 Group {
                     if mainViewState.isOnHome {
-                        HomeView(viewModel: homeViewModel)
+
+                        HomeView(viewModel: progressManager.homeViewModel)
                     } else if mainViewState.selectedUnit == nil {
                         // 単元一覧
                         UnitListView(viewModel: unitListVM, selectedUnit: $mainViewState.selectedUnit)
@@ -28,14 +28,14 @@ struct MainRouterView: View {
                         ChapterListView(
                             unitKey: mainViewState.selectedUnitKey ?? "unknown",
                             unit: unit,
-                            viewModel: chapterListVM,
+                            viewModel: progressManager.chapterListViewModel,
                             selectedChapter: $mainViewState.selectedChapter
                         )
                     } else if let chapter = mainViewState.selectedChapter {
                         // 出題
                         ContentView(
                             chapter: chapter,
-                            viewModel: quizViewModel,
+                            viewModel: progressManager.quizViewModel,
                             onQuizEnd: {
                                 mainViewState.reset(router: router)
                             },

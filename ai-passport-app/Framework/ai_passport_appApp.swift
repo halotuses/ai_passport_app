@@ -5,6 +5,7 @@ import RealmSwift
 /// アプリ起動エントリーポイント
 @main
 struct ai_passport_appApp: SwiftUI.App {
+    @StateObject private var progressManager = ProgressManager()
     init() {
         // Realm設定
         var configuration = Realm.Configuration(schemaVersion: 2)
