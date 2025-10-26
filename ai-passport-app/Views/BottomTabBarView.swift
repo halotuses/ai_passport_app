@@ -1,9 +1,12 @@
 import SwiftUI
+#if os(iOS)
+import UIKit
+#endif
 
 struct BottomTabBarView: View {
     @EnvironmentObject private var router: NavigationRouter
     @EnvironmentObject private var mainViewState: MainViewState
-    @Environment(\.safeAreaInsets) private var safeAreaInsets
+
     
 #if os(iOS)
     @State private var isHovering = true
@@ -62,7 +65,7 @@ struct BottomTabBarView: View {
             }
             .frame(height: tabBarContentHeight)
             .frame(maxWidth: .infinity)
-            .padding(.bottom, safeAreaInsets.bottom)
+            .padding(.bottom, safeAreaInsetsBottom)
             .background(tabBarBackground)
             .opacity(isHovering ? 1 : 0)
             .animation(.easeInOut(duration: 0.2), value: isHovering)
@@ -81,7 +84,7 @@ struct BottomTabBarView: View {
 
 extension BottomTabBarView {
     private var totalHeight: CGFloat {
-        tabBarContentHeight + safeAreaInsets.bottom
+        tabBarContentHeight + safeAreaInsetsBottom
     }
 
     private var backgroundGradient: LinearGradient {
@@ -97,6 +100,27 @@ extension BottomTabBarView {
             .shadow(color: Color.themeSecondary.opacity(0.25), radius: 16, x: 0, y: 8)
     }
 }
+// MARK: - Safe Area Helpers
+
+private extension BottomTabBarView {
+    var safeAreaInsetsBottom: CGFloat {
+#if os(iOS)
+        guard
+            let windowScene = UIApplication.shared.connectedScenes
+                .compactMap({ $0 as? UIWindowScene })
+                .first,
+            let window = windowScene.windows.first(where: { $0.isKeyWindow })
+        else {
+            return 0
+        }
+
+        return window.safeAreaInsets.bottom
+#else
+        return 0
+#endif
+    }
+}
+
 
 private struct TopRoundedRectangle: Shape {
     var radius: CGFloat
