@@ -54,17 +54,10 @@ struct BottomTabBarView: View {
                 Spacer()
                 
             }
-            .padding()
 
             .background(
                 TopRoundedRectangle(radius: 10)
-                    .fill(
-                        LinearGradient(
-                            colors: [Color.themeSecondary, Color.themeMain],
-                            startPoint: .leading,
-                            endPoint: .trailing
-                        )
-                    )
+                    .fill(gradientBackground)
                     .shadow(color: Color.themeSecondary.opacity(0.25), radius: 16, x: 0, y: 8)
             )
             .opacity(isHovering ? 1 : 0)
@@ -73,11 +66,25 @@ struct BottomTabBarView: View {
         .frame(height: 80)
         .frame(maxWidth: .infinity)
         .contentShape(Rectangle())
+        .background(
+            gradientBackground
+                .ignoresSafeArea(edges: .bottom)
+        )
         .onHover { hovering in
             withAnimation(.easeInOut(duration: 0.2)) {
                 isHovering = hovering
             }
         }
+    }
+}
+
+extension BottomTabBarView {
+    private var gradientBackground: LinearGradient {
+        LinearGradient(
+            colors: [Color.themeSecondary, Color.themeMain],
+            startPoint: .leading,
+            endPoint: .trailing
+        )
     }
 }
 
