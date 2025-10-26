@@ -122,15 +122,17 @@ struct HomeView: View {
     // MARK: - メインビュー構築
     var body: some View {
         ScrollView(showsIndicators: false) {
-            VStack(spacing: 18) {
+            VStack(spacing: 28) {
                 progressCard         // 学習進捗カード
                 startLearningButton  // 学習開始ボタン
             }
-            .padding(.horizontal, 10)
-            .padding(.vertical, 10)
+            .frame(maxWidth: 520)
+            .padding(.horizontal, 24)
+            .padding(.vertical, 32)
         }
         .background(
-            PaperBackground().ignoresSafeArea()
+            PaperBackground()
+                .ignoresSafeArea()
         )
         .onAppear {
             mainViewState.enterHome()
@@ -145,16 +147,16 @@ struct HomeView: View {
     
     // MARK: - 学習進捗カード
     private var progressCard: some View {
-        VStack(alignment: .leading, spacing: 24) {
+        VStack(alignment: .leading, spacing: 28) {
             // タイトル行
             HStack(alignment: .center, spacing: 12) {
                 Label("学習進捗", systemImage: "chart.pie.fill")
-                    .font(.headline)
+                    .font(.title3.weight(.semibold))
                     .foregroundColor(.themeTextPrimary)
                 Spacer()
                 if let headerSummaryText {
                     Text(headerSummaryText)
-                        .font(.subheadline)
+                        .font(.footnote.weight(.medium))
                         .foregroundColor(.themeTextSecondary)
                 }
                 if progressViewModel.isLoading {
@@ -165,7 +167,7 @@ struct HomeView: View {
             }
             
             // 円グラフ＋統計3列
-            VStack(spacing: 24) {
+            VStack(spacing: 28) {
                 ProgressRingView(
                     correctProgress: correctProgressValue,
                     incorrectProgress: incorrectProgressValue,
@@ -187,34 +189,53 @@ struct HomeView: View {
             NavigationLink {
                 AnswerHistoryView()
             } label: {
-                HStack(spacing: 8) {
+                HStack(spacing: 12) {
                     Text("回答履歴を見る")
                         .font(.subheadline.weight(.semibold))
                         .foregroundColor(.themeSecondary)
-                    Spacer()
+                    Spacer(minLength: 0)
                     Image(systemName: "chevron.right")
                         .font(.footnote.weight(.semibold))
                         .foregroundColor(.themeSecondary)
                 }
-                .padding(.vertical, 12)
-                .padding(.horizontal, 12)
+                .padding(.vertical, 14)
+                .padding(.horizontal, 18)
                 .frame(maxWidth: .infinity)
                 .background(
-                    Capsule().fill(Color.themeButtonSecondary.opacity(0.10))
-                )
-                .overlay(
-                    Capsule().stroke(Color.themeSecondary.opacity(0.10), lineWidth: 1)
+                    RoundedRectangle(cornerRadius: 16, style: .continuous)
+                        .fill(Color.themeButtonSecondary.opacity(0.14))
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                                .stroke(Color.themeSecondary.opacity(0.12), lineWidth: 1)
+                        )
                 )
             }
             .buttonStyle(.plain)
         }
-        .padding(.horizontal, 24)
-        .padding(.vertical, 24)
-        .background(Color.white)
-        .cornerRadius(20)
-        .shadow(radius: 4)
-        .padding(.horizontal, 24)
-        .padding(.vertical, 8)
+        .padding(.horizontal, 28)
+        .padding(.vertical, 28)
+        .frame(maxWidth: .infinity)
+        .background(
+            RoundedRectangle(cornerRadius: 28, style: .continuous)
+                .fill(
+                    LinearGradient(
+                        colors: [
+                            Color.white.opacity(0.96),
+                            Color.white.opacity(0.86)
+                        ],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                )
+                .overlay(
+                    RoundedRectangle(cornerRadius: 28, style: .continuous)
+                        .stroke(Color.white.opacity(0.45), lineWidth: 1)
+                        .blendMode(.overlay)
+                )
+        )
+        .shadow(color: Color.themeSecondary.opacity(0.14), radius: 20, x: 0, y: 14)
+        .padding(.horizontal, 8)
+        .padding(.vertical, 4)
     }
     
     // MARK: - 学習開始ボタン
@@ -238,20 +259,25 @@ struct HomeView: View {
                 }
             }
             .foregroundColor(.white)
-            .padding(.vertical, 18)
-            .padding(.horizontal, 24)
+            .padding(.vertical, 20)
+            .padding(.horizontal, 28)
             .frame(maxWidth: 360)
             .background(
                 LinearGradient(
-                    colors: [Color.themeSecondary, Color.themeMain, Color.themeAccent],
-                    startPoint: .leading, endPoint: .trailing
+                    colors: [
+                        Color.themeSecondary,
+                        Color.themeMain,
+                        Color.themeAccent.opacity(0.9)
+                    ],
+                    startPoint: .leading,
+                    endPoint: .trailing
                 )
             )
-            .cornerRadius(20)
-            .shadow(color: Color.themeSecondary.opacity(0.35), radius: 16, x: 0, y: 10)
+            .cornerRadius(24)
+            .shadow(color: Color.themeSecondary.opacity(0.35), radius: 18, x: 0, y: 12)
             .overlay(
-                RoundedRectangle(cornerRadius: 20)
-                    .stroke(Color.white.opacity(0.3), lineWidth: 1)
+                RoundedRectangle(cornerRadius: 24)
+                    .stroke(Color.white.opacity(0.35), lineWidth: 1)
             )
         }
         .buttonStyle(.plain)
@@ -269,8 +295,8 @@ private struct ProgressRingView: View {
     @State private var animatedCorrect: Double = 0
     @State private var animatedIncorrect: Double = 0
     
-    private let ringLineWidth: CGFloat = 18
-    private let ringSize: CGFloat = 176
+    private let ringLineWidth: CGFloat = 20
+    private let ringSize: CGFloat = 188
     
     private var clampedAnimatedCorrect: Double { max(0, min(animatedCorrect, 1)) }
     private var clampedAnimatedIncorrect: Double { max(0, min(animatedIncorrect, 1)) }
@@ -334,11 +360,11 @@ private struct ProgressRingView: View {
                     .font(.caption.weight(.semibold))
                     .foregroundColor(.themeTextSecondary)
                 Text(valueText)
-                    .font(.title2.weight(.bold))
+                    .font(.title.weight(.bold))
                     .foregroundColor(.themeTextPrimary)
                 if let detailText, !detailText.isEmpty {
                     Text(detailText)
-                        .font(.caption)
+                        .font(.footnote)
                         .foregroundColor(.themeTextSecondary)
                         .lineLimit(2)
                         .multilineTextAlignment(.center)
@@ -376,14 +402,27 @@ private struct StatColumnView: View {
     let value: Int
     
     var body: some View {
-        VStack(spacing: 6) {
-            Circle().fill(color).frame(width: 10, height: 10)
-            Text(label).font(.caption).foregroundColor(.themeTextSecondary)
+        VStack(spacing: 8) {
+            Circle()
+                .fill(color)
+                .frame(width: 10, height: 10)
+            Text(label)
+                .font(.caption)
+                .foregroundColor(.themeTextSecondary)
             Text("\(value)問")
                 .font(.subheadline.weight(.semibold))
                 .foregroundColor(.themeTextPrimary)
         }
         .frame(maxWidth: .infinity)
+        .padding(.vertical, 12)
+        .background(
+            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                .fill(Color.white.opacity(0.75))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 16, style: .continuous)
+                        .stroke(Color.themeTextSecondary.opacity(0.08), lineWidth: 1)
+                )
+        )
     }
 }
 
