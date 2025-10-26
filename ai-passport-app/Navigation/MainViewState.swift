@@ -127,13 +127,15 @@ final class MainViewState: ObservableObject {
     
     func makeBackButtonAction(for backButton: HeaderBackButton, router: NavigationRouter) -> () -> Void {
         { [weak self] in
-            self?.handleBackAction(backButton, router: router)
+            guard let self else { return }
+            self.handleBackAction(backButton, router: router)
         }
     }
 
     func makeHomeButtonAction(router: NavigationRouter) -> () -> Void {
         { [weak self] in
-            self?.reset(router: router)
+            guard let self else { return }
+            self.reset(router: router)
         }
     }
 

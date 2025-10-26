@@ -24,7 +24,7 @@ struct BottomTabBarView: View {
                 Spacer()
                 Button(action: {
                     withAnimation {
-                        mainViewState.makeHomeButtonAction(router: router)()
+                        mainViewState.reset(router: router)
                     }
                 }) {
                     
