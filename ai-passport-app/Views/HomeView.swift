@@ -78,19 +78,27 @@ struct HomeView: View {
     
     // 正解割合（グラフ用）
     private var correctProgressValue: Double {
-        if completionPercentageValue == nil && progressViewModel.totalAnswered > 0 {
-            return -1
+        if progressViewModel.totalQuestions > 0 {
+            return progressViewModel.completionRate
         }
-        return progressViewModel.completionRate
+        let answered = progressViewModel.totalAnswered
+        guard answered > 0 else { return 0 }
+
+        return min(max(Double(progressViewModel.totalCorrect) / Double(answered), 0), 1)
     }
     
     // 不正解割合（グラフ用）
     private var incorrectProgressValue: Double {
-        if completionPercentageValue == nil && progressViewModel.totalAnswered > 0 {
-            return -1
+        if progressViewModel.totalQuestions > 0 {
+            return min(
+                max(Double(progressViewModel.totalIncorrect) / Double(progressViewModel.totalQuestions), 0),
+                1
+            )
         }
-        guard progressViewModel.totalQuestions > 0 else { return 0 }
-        return min(max(Double(progressViewModel.totalIncorrect) / Double(progressViewModel.totalQuestions), 0), 1)
+        let answered = progressViewModel.totalAnswered
+        guard answered > 0 else { return 0 }
+
+        return min(max(Double(progressViewModel.totalIncorrect) / Double(answered), 0), 1)
     }
     
     // 未回答数
