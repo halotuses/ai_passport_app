@@ -354,9 +354,17 @@ private struct ProgressRingView: View {
         correctProgress < 0 || incorrectProgress < 0
     }
     
-    private var incorrectSegmentEnd: Double {
-        let total = clampedAnimatedCorrect + clampedAnimatedIncorrect
-        return min(total, 1)
+    private var incorrectSegmentRange: ClosedRange<Double>? {
+        let end = min(clampedAnimatedIncorrect, 1)
+        guard end > 0 else { return nil }
+        return 0...end
+    }
+
+    private var correctSegmentRange: ClosedRange<Double>? {
+        let start = min(clampedAnimatedIncorrect, 1)
+        let end = min(start + clampedAnimatedCorrect, 1)
+        guard end > start else { return nil }
+        return start...end
     }
     
     var body: some View {
@@ -374,28 +382,39 @@ private struct ProgressRingView: View {
                     )
                     .rotationEffect(.degrees(-90))
             } else {
-                // 正解部分
-                Circle()
-                    .trim(from: 0, to: CGFloat(clampedAnimatedCorrect))
-                    .stroke(
-                        AngularGradient(
-                            gradient: Gradient(colors: [Color.themeCorrect.opacity(0.9), Color.themeCorrect]),
-                            center: .center
-                        ),
-                        style: StrokeStyle(lineWidth: ringLineWidth, lineCap: .round)
-                    )
-                    .rotationEffect(.degrees(-90))
-                // 不正解部分
-                Circle()
-                    .trim(from: CGFloat(clampedAnimatedCorrect), to: CGFloat(incorrectSegmentEnd))
-                    .stroke(
-                        AngularGradient(
-                            gradient: Gradient(colors: [Color.themeIncorrect.opacity(0.85), Color.themeIncorrect]),
-                            center: .center
-                        ),
-                        style: StrokeStyle(lineWidth: ringLineWidth, lineCap: .round)
-                    )
-                    .rotationEffect(.degrees(-90))
+                if let incorrectSegmentRange {
+                    // 不正解部分（先に描画して背面に配置）
+                    Circle()
+                        .trim(
+                            from: CGFloat(incorrectSegmentRange.lowerBound),
+                            to: CGFloat(incorrectSegmentRange.upperBound)
+                        )
+                        .stroke(
+                            AngularGradient(
+                                gradient: Gradient(colors: [Color.themeIncorrect.opacity(0.85), Color.themeIncorrect]),
+                                center: .center
+                            ),
+                            style: StrokeStyle(lineWidth: ringLineWidth, lineCap: .round)
+                        )
+                        .rotationEffect(.degrees(-90))
+                }
+
+                if let correctSegmentRange {
+                    // 正解部分（最後に描画して最前面に配置）
+                    Circle()
+                        .trim(
+                            from: CGFloat(correctSegmentRange.lowerBound),
+                            to: CGFloat(correctSegmentRange.upperBound)
+                        )
+                        .stroke(
+                            AngularGradient(
+                                gradient: Gradient(colors: [Color.themeCorrect.opacity(0.9), Color.themeCorrect]),
+                                center: .center
+                            ),
+                            style: StrokeStyle(lineWidth: ringLineWidth, lineCap: .round)
+                        )
+                        .rotationEffect(.degrees(-90))
+                }
             }
             
             // 中央テキスト
