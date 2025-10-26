@@ -38,6 +38,15 @@ struct HomeView: View {
         ? "学習データを取得しています"
         : "学習を始めると進捗がここに表示されます"
     }
+    
+    private var progressRingDetailText: String? {
+        guard progressViewModel.totalQuestions > 0 else { return nil }
+        return progressSummaryText
+    }
+
+    private var headerSummaryText: String? {
+        progressRingDetailText == nil ? progressSummaryText : nil
+    }
 
     private var completionPercentageValue: Int? {
         guard progressViewModel.totalQuestions > 0 else { return nil }
@@ -135,9 +144,11 @@ struct HomeView: View {
                     .foregroundColor(.themeTextPrimary)
                 
                 Spacer()
-                Text(progressSummaryText)
-                    .font(.subheadline)
-                    .foregroundColor(.themeTextSecondary)
+                if let headerSummaryText {
+                    Text(headerSummaryText)
+                        .font(.subheadline)
+                        .foregroundColor(.themeTextSecondary)
+                }
                 if progressViewModel.isLoading {
                     ProgressView()
                         .progressViewStyle(.circular)
@@ -150,8 +161,9 @@ struct HomeView: View {
                 ProgressRingView(
                     correctProgress: correctProgressValue,
                     incorrectProgress: incorrectProgressValue,
-                    displayText: completionPercentageDisplay.value,
-                    labelText: completionPercentageDisplay.label
+                    titleText: completionPercentageDisplay.label,
+                    valueText: completionPercentageDisplay.value,
+                    detailText: progressRingDetailText
                 )
 
                 HStack(spacing: 16) {
@@ -270,8 +282,9 @@ struct HomeView: View {
 private struct ProgressRingView: View {
     let correctProgress: Double
     let incorrectProgress: Double
-    let displayText: String
-    let labelText: String
+    let titleText: String
+    let valueText: String
+    let detailText: String?
 
     @State private var animatedCorrect: Double = 0
     @State private var animatedIncorrect: Double = 0
@@ -335,13 +348,20 @@ private struct ProgressRingView: View {
                     .rotationEffect(.degrees(-90))
             }
 
-            VStack(spacing: 4) {
-                Text(displayText)
+            VStack(spacing: 6) {
+                Text(titleText)
+                    .font(.caption.weight(.semibold))
+                    .foregroundColor(.themeTextSecondary)
+                Text(valueText)
                     .font(.title2.weight(.bold))
                     .foregroundColor(.themeTextPrimary)
-                Text(labelText)
-                    .font(.caption)
-                    .foregroundColor(.themeTextSecondary)
+                if let detailText, !detailText.isEmpty {
+                    Text(detailText)
+                        .font(.caption)
+                        .foregroundColor(.themeTextSecondary)
+                        .lineLimit(2)
+                        .multilineTextAlignment(.center)
+                }
             }
         }
         .frame(width: 148, height: 148)
