@@ -3,35 +3,46 @@ import SwiftUI
 import UIKit
 #endif
 
+/// 下部タブバーのビュー
+/// - ホーム / アカウント / 設定 の3つのタブを表示
+/// - グラデーション背景を下端まで塗りつぶし、SafeAreaに対応
 struct BottomTabBarView: View {
+    // ルーティング制御（Navigation管理）
     @EnvironmentObject private var router: NavigationRouter
+    // 画面状態管理（メインタブの切り替えなど）
     @EnvironmentObject private var mainViewState: MainViewState
 
-    
+    // iOSとmacOSでHover挙動を分ける
 #if os(iOS)
     @State private var isHovering = true
 #else
     @State private var isHovering = false
 #endif
     
-    private let tabBarContentHeight: CGFloat = 60
-    private let tabItemTopPadding: CGFloat = 8
+    // タブバー内部要素の高さ
+    private let tabBarContentHeight: CGFloat = 40
+    // 各アイコンの上余白
+    private let tabItemTopPadding: CGFloat = 16
     
     var body: some View {
         ZStack(alignment: .top) {
+            // 背景グラデーション（全幅・下端まで）
             backgroundGradient
                 .frame(maxWidth: .infinity)
                 .frame(height: totalHeight)
                 .ignoresSafeArea(edges: .bottom)
                 .zIndex(0)
+            
+            // --- タブアイコン群 ---
             HStack {
                 Spacer()
+                
+                // 🏠 ホームタブ
                 Button(action: {
                     withAnimation {
                         mainViewState.reset(router: router)
                     }
                 }) {
-                    
                     VStack {
                         Image(systemName: "house.fill")
                         Text("ホーム")
@@ -43,8 +54,10 @@ struct BottomTabBarView: View {
                 .buttonStyle(.plain)
                 .allowsHitTesting(isHovering)
                 .foregroundColor(.white)
+                
                 Spacer()
                 
+                // 👤 アカウントタブ
                 VStack {
                     Image(systemName: "person.fill")
                     Text("アカウント")
@@ -54,7 +67,10 @@ struct BottomTabBarView: View {
                 .padding(.top, tabItemTopPadding)
                 .allowsHitTesting(isHovering)
                 .foregroundColor(.white.opacity(0.8))
+                
                 Spacer()
+                
+                // ⚙️ 設定タブ
                 VStack {
                     Image(systemName: "gearshape.fill")
                     Text("設定")
@@ -64,9 +80,10 @@ struct BottomTabBarView: View {
                 .padding(.top, tabItemTopPadding)
                 .allowsHitTesting(isHovering)
                 .foregroundColor(.white.opacity(0.8))
-                Spacer()
                 
+                Spacer()
             }
+            // --- タブバー全体のレイアウト調整 ---
             .frame(height: tabBarContentHeight)
             .frame(maxWidth: .infinity)
             .padding(.bottom, safeAreaInsetsBottom)
@@ -77,7 +94,7 @@ struct BottomTabBarView: View {
         .frame(height: totalHeight, alignment: .top)
         .frame(maxWidth: .infinity)
         .contentShape(Rectangle())
-
+        // Hover（mac用）でフェード表示切り替え
         .onHover { hovering in
             withAnimation(.easeInOut(duration: 0.2)) {
                 isHovering = hovering
@@ -87,10 +104,12 @@ struct BottomTabBarView: View {
 }
 
 extension BottomTabBarView {
+    /// SafeArea込みの合計高さ
     private var totalHeight: CGFloat {
         tabBarContentHeight + safeAreaInsetsBottom
     }
 
+    /// グラデーションの定義（全体背景）
     private var backgroundGradient: LinearGradient {
         LinearGradient(
             colors: [Color.themeSecondary, Color.themeMain],
@@ -98,15 +117,19 @@ extension BottomTabBarView {
             endPoint: UnitPoint(x: 0.8, y: 1.0)
         )
     }
+
+    /// タブバー背景（角丸＋影付き）
     private var tabBarBackground: some View {
         TopRoundedRectangle(radius: 10)
             .fill(backgroundGradient)
             .shadow(color: Color.themeSecondary.opacity(0.25), radius: 16, x: 0, y: 8)
     }
 }
-// MARK: - Safe Area Helpers
 
+// MARK: - Safe Area Helpers
 private extension BottomTabBarView {
+    /// iPhoneのSafeAreaInsetを動的取得
+    /// - ホームインジケータ領域などを考慮
     var safeAreaInsetsBottom: CGFloat {
 #if os(iOS)
         guard
@@ -117,7 +140,6 @@ private extension BottomTabBarView {
         else {
             return 0
         }
-
         return window.safeAreaInsets.bottom
 #else
         return 0
@@ -125,7 +147,8 @@ private extension BottomTabBarView {
     }
 }
 
-
+/// 上部だけ角丸の矩形シェイプ
+/// - タブバーの背景用
 private struct TopRoundedRectangle: Shape {
     var radius: CGFloat
 
@@ -135,21 +158,23 @@ private struct TopRoundedRectangle: Shape {
         let height = rect.height
         let cornerRadius = min(min(radius, height / 2), width / 2)
 
+        // 左下から描画スタート
         path.move(to: CGPoint(x: rect.minX, y: rect.maxY))
+        // 左上の角丸
         path.addLine(to: CGPoint(x: rect.minX, y: rect.minY + cornerRadius))
         path.addQuadCurve(
             to: CGPoint(x: rect.minX + cornerRadius, y: rect.minY),
             control: CGPoint(x: rect.minX, y: rect.minY)
         )
+        // 右上の角丸
         path.addLine(to: CGPoint(x: rect.maxX - cornerRadius, y: rect.minY))
         path.addQuadCurve(
             to: CGPoint(x: rect.maxX, y: rect.minY + cornerRadius),
             control: CGPoint(x: rect.maxX, y: rect.minY)
         )
+        // 右下に戻る
         path.addLine(to: CGPoint(x: rect.maxX, y: rect.maxY))
         path.closeSubpath()
-
         return path
     }
 }
-
