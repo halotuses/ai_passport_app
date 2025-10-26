@@ -185,6 +185,16 @@ class QuizViewModel: ObservableObject {
         showResultView = true
     }
     
+    func restartQuiz() {
+        guard hasQuizzes else { return }
+
+        currentQuestionIndex = 0
+        selectedAnswerIndex = nil
+        selectedAnswers = Array(repeating: nil, count: quizzes.count)
+        questionStatuses = Array(repeating: .unanswered, count: quizzes.count)
+        showResultView = false
+    }
+    
     // MARK: - Computed
     private var hasQuizzes: Bool { !quizzes.isEmpty }
     

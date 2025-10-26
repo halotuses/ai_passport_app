@@ -51,7 +51,9 @@ struct ContentView: View {
                 ResultView(
                     correctCount: viewModel.correctCount,
                     totalCount: viewModel.totalCount,
-                    onRestart: onQuizEnd,
+                    onRestart: {
+                        viewModel.restartQuiz()
+                    },
                     onBackToChapterSelection: onBackToChapterSelection,
                     onBackToUnitSelection: onBackToUnitSelection,
                     onImmediatePersist: {
