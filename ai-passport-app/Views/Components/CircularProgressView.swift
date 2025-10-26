@@ -28,6 +28,9 @@ struct CircularProgressView: View {
     let progress: Double
     var lineWidth: CGFloat = 12
     var size: CGFloat = 140
+    
+    private let startAngleOrder: [Segment.Kind] = [.incorrect, .correct, .unanswered]
+    private let drawingOrder: [Segment.Kind] = [.unanswered, .incorrect, .correct]
 
     private var sanitizedSegments: [Segment] {
         segments.map { segment in
@@ -35,13 +38,24 @@ struct CircularProgressView: View {
         }
     }
 
+    private func orderIndex(for kind: Segment.Kind, in order: [Segment.Kind]) -> Int {
+        order.firstIndex(of: kind) ?? order.count
+    }
+
+    private var layoutSegments: [Segment] {
+        sanitizedSegments.sorted { lhs, rhs in
+            orderIndex(for: lhs.kind, in: startAngleOrder) < orderIndex(for: rhs.kind, in: startAngleOrder)
+        }
+    }
+
+    
     private var totalValue: Double {
         sanitizedSegments.reduce(0) { $0 + $1.value }
     }
     
 
     private var segmentSlices: [SegmentSlice] {
-        let segments = sanitizedSegments
+        let segments = layoutSegments
         guard totalValue > 0 else { return [] }
 
         var slices: [SegmentSlice] = []
@@ -88,7 +102,9 @@ struct CircularProgressView: View {
                 Circle()
                     .stroke(Color.themeSurfaceElevated.opacity(0.2), lineWidth: lineWidth)
             } else {
-                ForEach(segmentSlices) { slice in
+                ForEach(segmentSlices.sorted { lhs, rhs in
+                    orderIndex(for: lhs.segment.kind, in: drawingOrder) < orderIndex(for: rhs.segment.kind, in: drawingOrder)
+                }) { slice in
                     Circle()
                         .trim(from: slice.start, to: slice.end)
                         .stroke(
