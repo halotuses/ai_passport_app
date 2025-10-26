@@ -118,8 +118,9 @@ struct HomeView: View {
                 progressCard
                 startLearningButton
             }
-            .padding(.horizontal, 14)
-            .padding(.vertical, 32)
+            .padding(.horizontal, 10)
+            .padding(.top, 10)
+            .padding(.bottom, 10)
         }
         .background(
             PaperBackground()
@@ -191,6 +192,16 @@ struct HomeView: View {
                         .foregroundColor(.themeSecondary)
                 }
                 .padding(.vertical, 4)
+                .padding(.horizontal, 10)
+                .frame(maxWidth: .infinity)
+                .background(
+                    Capsule()
+                        .fill(Color.themeButtonSecondary.opacity(0.10))
+                )
+                .overlay(
+                    Capsule()
+                        .stroke(Color.themeSecondary.opacity(0.10), lineWidth: 1)
+                )
             }
             .buttonStyle(.plain)
         }
