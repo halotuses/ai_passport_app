@@ -90,24 +90,31 @@ struct ContentView: View {
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(Color.themeBase)
-        .sheet(isPresented: $showExplanation) {
-            if let quiz = explanationQuiz {
-                ExplanationView(
-                    quiz: quiz,
-                    selectedAnswerIndex: explanationSelectedAnswerIndex,
-                    hasNextQuestion: viewModel.hasNextQuestion,
-                    onNextQuestion: {
-                        proceedToNextQuestion()
-                    },
-                    onShowResult: {
-                        finishQuiz()
-                    },
-                    onDismiss: {
-                        closeExplanation()
-                    }
-                )
+        .overlay(
+            NavigationLink(isActive: $showExplanation) {
+                if let quiz = explanationQuiz {
+                    ExplanationView(
+                        quiz: quiz,
+                        selectedAnswerIndex: explanationSelectedAnswerIndex,
+                        hasNextQuestion: viewModel.hasNextQuestion,
+                        onNextQuestion: {
+                            proceedToNextQuestion()
+                        },
+                        onShowResult: {
+                            finishQuiz()
+                        },
+                        onDismiss: {
+                            closeExplanation()
+                        }
+                    )
+                } else {
+                    EmptyView()
+                }
+            } label: {
+                EmptyView()
             }
-        }
+                .hidden()
+        )
         .onAppear {
             mainViewState.quizCleanupDelegate = viewModel
             updateHeaderForCurrentState()
@@ -131,7 +138,10 @@ struct ContentView: View {
         .onChange(of: viewModel.hasError) { _ in
             updateHeaderForCurrentState()
         }
-        .onChange(of: showExplanation) { _ in
+        .onChange(of: showExplanation) { isPresented in
+            if !isPresented {
+                resetExplanationState()
+            }
             updateHeaderForCurrentState()
         }
         .onDisappear {
@@ -161,8 +171,6 @@ private extension ContentView {
     
     func closeExplanation() {
         showExplanation = false
-        explanationQuiz = nil
-        explanationSelectedAnswerIndex = 0
     }
     
     func proceedToNextQuestion() {
@@ -176,6 +184,10 @@ private extension ContentView {
         closeExplanation()
     }
     
+    func resetExplanationState() {
+        explanationQuiz = nil
+        explanationSelectedAnswerIndex = 0
+    }
     
     func updateHeaderForCurrentState() {
         if showExplanation {

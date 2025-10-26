@@ -100,6 +100,8 @@ struct ExplanationView: View {
                     .padding(.bottom, 8)
             }
         }
+        .navigationBarBackButtonHidden(true)
+        .toolbar(.hidden, for: .navigationBar)
     }
 }
 
