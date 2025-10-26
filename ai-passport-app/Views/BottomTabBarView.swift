@@ -1,9 +1,9 @@
 import SwiftUI
 
-/// 下部タブバー（ダミー）
 struct BottomTabBarView: View {
     @EnvironmentObject private var router: NavigationRouter
     @EnvironmentObject private var mainViewState: MainViewState
+    @Environment(\.safeAreaInsets) private var safeAreaInsets
     
 #if os(iOS)
     @State private var isHovering = true
@@ -11,9 +11,15 @@ struct BottomTabBarView: View {
     @State private var isHovering = false
 #endif
     
+    private let tabBarContentHeight: CGFloat = 80
     
     var body: some View {
-        ZStack {
+        ZStack(alignment: .top) {
+            backgroundGradient
+                .frame(maxWidth: .infinity)
+                .frame(height: totalHeight)
+                .ignoresSafeArea(edges: .bottom)
+                .zIndex(0)
             HStack {
                 Spacer()
                 Button(action: {
@@ -54,7 +60,9 @@ struct BottomTabBarView: View {
                 Spacer()
                 
             }
-
+            .frame(height: tabBarContentHeight)
+            .frame(maxWidth: .infinity)
+            .padding(.bottom, safeAreaInsets.bottom)
             .background(
                 TopRoundedRectangle(radius: 10)
                     .fill(gradientBackground)
@@ -63,13 +71,10 @@ struct BottomTabBarView: View {
             .opacity(isHovering ? 1 : 0)
             .animation(.easeInOut(duration: 0.2), value: isHovering)
         }
-        .frame(height: 80)
+        .frame(height: totalHeight, alignment: .top)
         .frame(maxWidth: .infinity)
         .contentShape(Rectangle())
-        .background(
-            gradientBackground
-                .ignoresSafeArea(edges: .bottom)
-        )
+
         .onHover { hovering in
             withAnimation(.easeInOut(duration: 0.2)) {
                 isHovering = hovering
@@ -79,12 +84,19 @@ struct BottomTabBarView: View {
 }
 
 extension BottomTabBarView {
-    private var gradientBackground: LinearGradient {
+    private var totalHeight: CGFloat {
+        tabBarContentHeight + safeAreaInsets.bottom
+    }
+
+    private var backgroundGradient: LinearGradient {
         LinearGradient(
             colors: [Color.themeSecondary, Color.themeMain],
-            startPoint: .leading,
-            endPoint: .trailing
+            startPoint: UnitPoint(x: 0.2, y: 0.0),
+            endPoint: UnitPoint(x: 0.8, y: 1.0)
         )
+    }
+    private var gradientBackground: LinearGradient {
+        backgroundGradient
     }
 }
 
