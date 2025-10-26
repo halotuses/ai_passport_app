@@ -191,8 +191,8 @@ struct HomeView: View {
                         .font(.footnote.weight(.semibold))
                         .foregroundColor(.themeSecondary)
                 }
-                .padding(.vertical, 8)
-                .padding(.horizontal, 18)
+                .padding(.vertical, 12)
+                .padding(.horizontal, 12)
                 .frame(maxWidth: .infinity)
                 .background(
                     Capsule()
@@ -240,6 +240,7 @@ struct HomeView: View {
             .foregroundColor(.white)
             .padding(.vertical, 18)
             .padding(.horizontal, 24)
+            .frame(maxWidth: 360)
             .background(
                 LinearGradient(
                     colors: [Color.themeSecondary, Color.themeMain, Color.themeAccent],
