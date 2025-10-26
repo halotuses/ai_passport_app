@@ -90,26 +90,6 @@ struct ResultView: View {
 
                     VStack(spacing: 16) {
                         VStack(spacing: 12) {
-                            Button(action: onBackToChapterSelection) {
-                                HStack {
-                                    Image(systemName: "arrow.uturn.backward")
-                                        .font(.headline)
-                                    Text("章選択に戻る")
-                                        .font(.headline)
-                                        .fontWeight(.semibold)
-
-                                }
-                                .padding(.vertical, 12)
-                                .padding(.horizontal, 16)
-                                .frame(maxWidth: .infinity)
-                                .background(
-                                    LinearGradient(colors: [Color.themeMain, Color.themeAccent], startPoint: .leading, endPoint: .trailing)
-                                )
-                                .foregroundColor(.white)
-                                .cornerRadius(16)
-                            }
-                            .shadow(color: Color.themeMainHover.opacity(0.3), radius: 16, x: 0, y: 10)
-
                             Button(action: onBackToUnitSelection) {
                                 HStack {
                                     Image(systemName: "arrow.uturn.backward")
@@ -129,13 +109,33 @@ struct ResultView: View {
                                 .cornerRadius(16)
                             }
                             .shadow(color: Color.themeMainHover.opacity(0.3), radius: 16, x: 0, y: 10)
+
+                            Button(action: onBackToChapterSelection) {
+                                HStack {
+                                    Image(systemName: "arrow.uturn.backward")
+                                        .font(.headline)
+                                    Text("章選択に戻る")
+                                        .font(.headline)
+                                        .fontWeight(.semibold)
+
+                                }
+                                .padding(.vertical, 12)
+                                .padding(.horizontal, 16)
+                                .frame(maxWidth: .infinity)
+                                .background(
+                                    LinearGradient(colors: [Color.themeMain, Color.themeAccent], startPoint: .leading, endPoint: .trailing)
+                                )
+                                .foregroundColor(.white)
+                                .cornerRadius(16)
+                            }
+                            .shadow(color: Color.themeMainHover.opacity(0.3), radius: 16, x: 0, y: 10)
                         }
 
                         Button(action: onRestart) {
                             HStack {
-                                Image(systemName: "arrow.uturn.backward")
+                                Image(systemName: "repeat")
                                     .font(.headline)
-                                Text("トップに戻る")
+                                Text("もう一回")
                                     .font(.headline)
                                     .fontWeight(.semibold)
                             }

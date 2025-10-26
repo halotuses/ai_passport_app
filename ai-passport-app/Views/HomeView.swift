@@ -177,7 +177,7 @@ struct HomeView: View {
                     titleText: completionPercentageDisplay.label,
                     valueText: completionPercentageDisplay.value,
                     detailText: progressRingDetailText,
-                    highlightValue: (completionPercentageValue ?? 0) >= 10
+                    highlightValue: (completionPercentageValue ?? 0) == 100
                 )
                 HStack(spacing: 10) {
                     StatColumnView(color: .themeCorrect, label: "正解", value: progressViewModel.totalCorrect)
