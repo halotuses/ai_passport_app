@@ -22,9 +22,20 @@ extension Color {
     static let themeCorrect = Color(red: 119/255, green: 221/255, blue: 119/255)
     static let themeIncorrect = Color(red: 246/255, green: 114/255, blue: 128/255)
     
-//   static let themeAnswerGradientStart = Color(red: 255/255, green: 224/255, blue: 102/255)
-//   static let themeAnswerGradientEnd = Color(red: 255/255, green: 195/255, blue: 0/255)
+    static let crownGoldLight = Color(red: 0.93, green: 0.80, blue: 0.40)
+    static let crownGoldDeep = Color(red: 0.80, green: 0.65, blue: 0.20)
+    static let crownGoldHighlight = Color(red: 1.00, green: 0.90, blue: 0.60)
     
     static let themeAnswerGradientStart = Color(red: 255/255, green: 220/255, blue: 80/255)
     static let themeAnswerGradientEnd = Color(red: 255/255, green: 150/255, blue: 80/255)
+
 }
+
+extension Gradient {
+    static let crownGold = Gradient(colors: [.crownGoldLight, .crownGoldDeep, .crownGoldHighlight])
+}
+
+extension LinearGradient {
+    static let crownGold = LinearGradient(gradient: .crownGold, startPoint: .topLeading, endPoint: .bottomTrailing)
+}
+

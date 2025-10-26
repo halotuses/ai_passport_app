@@ -353,15 +353,7 @@ struct ResultView: View {
 
     private var resultIconGradient: LinearGradient? {
         guard resultIconName == "crown.fill" else { return nil }
-        return LinearGradient(
-            colors: [
-                Color(red: 0.93, green: 0.80, blue: 0.40),
-                Color(red: 0.80, green: 0.65, blue: 0.20),
-                Color(red: 1.00, green: 0.90, blue: 0.60)
-            ],
-            startPoint: .topLeading,
-            endPoint: .bottomTrailing
-        )
+        return .crownGold
     }
 
     private var progressBarFillStyle: AnyShapeStyle {

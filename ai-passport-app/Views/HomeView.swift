@@ -374,17 +374,27 @@ private struct ProgressRingView: View {
         if highlightValue {
             Text(valueText)
                 .font(.title.weight(.bold))
-                .foregroundStyle(
-                    LinearGradient(
-                        colors: [Color.themeMain, Color.themeTertiary],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    )
-                )
+                .foregroundStyle(LinearGradient.crownGold)
         } else {
             Text(valueText)
                 .font(.title.weight(.bold))
                 .foregroundColor(.themeTextPrimary)
+        }
+    }
+    
+    private var shouldUseCrownGradientForCorrectSegment: Bool {
+        guard !isIndeterminate else { return false }
+        return Self.sanitize(correctProgress) >= 1 && Self.sanitize(incorrectProgress) <= 0
+    }
+
+    private var correctSegmentGradient: AngularGradient {
+        if shouldUseCrownGradientForCorrectSegment {
+            return AngularGradient(gradient: .crownGold, center: .center)
+        } else {
+            return AngularGradient(
+                gradient: Gradient(colors: [Color.themeCorrect.opacity(0.9), Color.themeCorrect]),
+                center: .center
+            )
         }
     }
     
@@ -428,10 +438,7 @@ private struct ProgressRingView: View {
                             to: CGFloat(correctSegmentRange.upperBound)
                         )
                         .stroke(
-                            AngularGradient(
-                                gradient: Gradient(colors: [Color.themeCorrect.opacity(0.9), Color.themeCorrect]),
-                                center: .center
-                            ),
+                            correctSegmentGradient,
                             style: StrokeStyle(lineWidth: ringLineWidth, lineCap: .round)
                         )
                         .rotationEffect(.degrees(-90))
