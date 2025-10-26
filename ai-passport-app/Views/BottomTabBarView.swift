@@ -57,7 +57,7 @@ struct BottomTabBarView: View {
             .padding()
 
             .background(
-                RoundedRectangle(cornerRadius: 10)
+                TopRoundedRectangle(radius: 10)
                     .fill(
                         LinearGradient(
                             colors: [Color.themeSecondary, Color.themeMain],
@@ -80,3 +80,31 @@ struct BottomTabBarView: View {
         }
     }
 }
+
+private struct TopRoundedRectangle: Shape {
+    var radius: CGFloat
+
+    func path(in rect: CGRect) -> Path {
+        var path = Path()
+        let width = rect.width
+        let height = rect.height
+        let cornerRadius = min(min(radius, height / 2), width / 2)
+
+        path.move(to: CGPoint(x: rect.minX, y: rect.maxY))
+        path.addLine(to: CGPoint(x: rect.minX, y: rect.minY + cornerRadius))
+        path.addQuadCurve(
+            to: CGPoint(x: rect.minX + cornerRadius, y: rect.minY),
+            control: CGPoint(x: rect.minX, y: rect.minY)
+        )
+        path.addLine(to: CGPoint(x: rect.maxX - cornerRadius, y: rect.minY))
+        path.addQuadCurve(
+            to: CGPoint(x: rect.maxX, y: rect.minY + cornerRadius),
+            control: CGPoint(x: rect.maxX, y: rect.minY)
+        )
+        path.addLine(to: CGPoint(x: rect.maxX, y: rect.maxY))
+        path.closeSubpath()
+
+        return path
+    }
+}
+

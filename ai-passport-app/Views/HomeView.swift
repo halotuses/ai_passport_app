@@ -177,7 +177,7 @@ struct HomeView: View {
                     titleText: completionPercentageDisplay.label,
                     valueText: completionPercentageDisplay.value,
                     detailText: progressRingDetailText,
-                    highlightValue: completionPercentageValue == 100
+                    highlightValue: (completionPercentageValue ?? 0) >= 10
                 )
                 HStack(spacing: 10) {
                     StatColumnView(color: .themeCorrect, label: "正解", value: progressViewModel.totalCorrect)
@@ -369,6 +369,25 @@ private struct ProgressRingView: View {
         return start...end
     }
     
+    @ViewBuilder
+    private var valueTextView: some View {
+        if highlightValue {
+            Text(valueText)
+                .font(.title.weight(.bold))
+                .foregroundStyle(
+                    LinearGradient(
+                        colors: [Color.themeMain, Color.themeTertiary],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                )
+        } else {
+            Text(valueText)
+                .font(.title.weight(.bold))
+                .foregroundColor(.themeTextPrimary)
+        }
+    }
+    
     var body: some View {
         ZStack {
             // ベースリング（グレー背景）
@@ -455,25 +474,6 @@ private struct ProgressRingView: View {
                 animatedIncorrect = sanitizedIncorrect
             }
         }
-    }
-}
-
-@ViewBuilder
-private var valueTextView: some View {
-    if highlightValue {
-        Text(valueText)
-            .font(.title.weight(.bold))
-            .foregroundStyle(
-                LinearGradient(
-                    colors: [Color.themeMain, Color.themeTertiary],
-                    startPoint: .topLeading,
-                    endPoint: .bottomTrailing
-                )
-            )
-    } else {
-        Text(valueText)
-            .font(.title.weight(.bold))
-            .foregroundColor(.themeTextPrimary)
     }
 }
 
