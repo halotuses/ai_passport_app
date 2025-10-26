@@ -63,11 +63,7 @@ struct BottomTabBarView: View {
             .frame(height: tabBarContentHeight)
             .frame(maxWidth: .infinity)
             .padding(.bottom, safeAreaInsets.bottom)
-            .background(
-                TopRoundedRectangle(radius: 10)
-                    .fill(gradientBackground)
-                    .shadow(color: Color.themeSecondary.opacity(0.25), radius: 16, x: 0, y: 8)
-            )
+            .background(tabBarBackground)
             .opacity(isHovering ? 1 : 0)
             .animation(.easeInOut(duration: 0.2), value: isHovering)
         }
@@ -95,8 +91,10 @@ extension BottomTabBarView {
             endPoint: UnitPoint(x: 0.8, y: 1.0)
         )
     }
-    private var gradientBackground: LinearGradient {
-        backgroundGradient
+    private var tabBarBackground: some View {
+        TopRoundedRectangle(radius: 10)
+            .fill(backgroundGradient)
+            .shadow(color: Color.themeSecondary.opacity(0.25), radius: 16, x: 0, y: 8)
     }
 }
 
