@@ -237,6 +237,10 @@ final class RealmAnswerHistoryRepository {
         count(for: .correct, chapterId: chapterId)
     }
     
+    func countCorrectAnswers(unitId: String, chapterIdentifier: String) -> Int {
+        count(for: .correct, unitId: unitId, chapterIdentifier: chapterIdentifier)
+    }
+    
     func countIncorrectAnswers(for chapterId: Int) -> Int {
         count(for: .incorrect, chapterId: chapterId)
     }
@@ -247,6 +251,10 @@ final class RealmAnswerHistoryRepository {
     
     func answeredCount(for chapterId: Int) -> Int {
         countAnswered(chapterId: chapterId)
+    }
+    
+    func answeredCount(unitId: String, chapterIdentifier: String) -> Int {
+        countAnswered(unitId: unitId, chapterIdentifier: chapterIdentifier)
     }
     
     private func persistStatus(
@@ -317,36 +325,53 @@ final class RealmAnswerHistoryRepository {
         }
     }
     
-    private func count(for status: QuestionStatus, chapterId: Int? = nil) -> Int {
+    private func count(
+        for status: QuestionStatus,
+        chapterId: Int? = nil,
+        unitId: String? = nil,
+        chapterIdentifier: String? = nil
+    ) -> Int {
         do {
             let realm = try realm()
+            var results = realm.objects(QuestionProgressObject.self)
             if let chapterId {
-                return realm.objects(QuestionProgressObject.self)
-                    .filter("chapterId == %d AND statusRaw == %@", chapterId, status.rawValue)
-                    .count
-            } else {
-                return realm.objects(QuestionProgressObject.self)
-                    .filter("statusRaw == %@", status.rawValue)
-                    .count
+                results = results.filter("chapterId == %d", chapterId)
             }
+            if let unitId {
+                results = results.filter("unitIdentifier == %@", unitId)
+            }
+            if let chapterIdentifier {
+                results = results.filter("chapterIdentifier == %@", chapterIdentifier)
+            }
+            return results
+                .filter("statusRaw == %@", status.rawValue)
+                .count
         } catch {
             print("❌ Realm count failed: \(error)")
             return 0
         }
     }
     
-    private func countAnswered(chapterId: Int? = nil) -> Int {
+    private func countAnswered(
+        chapterId: Int? = nil,
+        unitId: String? = nil,
+        chapterIdentifier: String? = nil
+    ) -> Int {
         do {
             let realm = try realm()
+            var results = realm.objects(QuestionProgressObject.self)
             if let chapterId {
-                return realm.objects(QuestionProgressObject.self)
-                    .filter("chapterId == %d AND statusRaw != %@", chapterId, QuestionStatus.unanswered.rawValue)
-                    .count
-            } else {
-                return realm.objects(QuestionProgressObject.self)
-                    .filter("statusRaw != %@", QuestionStatus.unanswered.rawValue)
-                    .count
+                results = results.filter("chapterId == %d", chapterId)
             }
+            if let unitId {
+                results = results.filter("unitIdentifier == %@", unitId)
+            }
+            if let chapterIdentifier {
+                results = results.filter("chapterIdentifier == %@", chapterIdentifier)
+            }
+            return results
+                .filter("statusRaw != %@", QuestionStatus.unanswered.rawValue)
+                .count
         } catch {
             print("❌ Realm count failed: \(error)")
             return 0

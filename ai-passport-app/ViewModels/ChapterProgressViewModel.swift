@@ -13,9 +13,10 @@ final class ChapterProgressViewModel: ObservableObject, Identifiable {
 
     private let repository: RealmAnswerHistoryRepository
     private let realmConfiguration: Realm.Configuration
+    private let unitIdentifier: String
+    private let chapterIdentifier: String
     private let chapterNumericId: Int
     private var progressToken: NotificationToken?
-    private var answerHistoryObserver: NSObjectProtocol?
     private var progressResults: Results<QuestionProgressObject>?
 
     init(
@@ -26,6 +27,8 @@ final class ChapterProgressViewModel: ObservableObject, Identifiable {
         self.chapter = chapter
         self.repository = repository
         self.id = chapter.id
+        self.unitIdentifier = unitId
+        self.chapterIdentifier = chapter.id
         self.chapterNumericId = IdentifierGenerator.chapterNumericId(unitId: unitId, chapterId: chapter.id)
         self.realmConfiguration = repository.realmConfiguration
 
@@ -45,8 +48,16 @@ final class ChapterProgressViewModel: ObservableObject, Identifiable {
     }
 
     private func loadInitialProgress() {
-        correctCount = repository.countCorrectAnswers(for: chapterNumericId)
-        answeredCount = repository.answeredCount(for: chapterNumericId)
+        let stringBasedCorrect = repository.countCorrectAnswers(unitId: unitIdentifier, chapterIdentifier: chapterIdentifier)
+        let stringBasedAnswered = repository.answeredCount(unitId: unitIdentifier, chapterIdentifier: chapterIdentifier)
+
+        if stringBasedCorrect == 0 && stringBasedAnswered == 0 {
+            correctCount = repository.countCorrectAnswers(for: chapterNumericId)
+            answeredCount = repository.answeredCount(for: chapterNumericId)
+        } else {
+            correctCount = stringBasedCorrect
+            answeredCount = stringBasedAnswered
+        }
         recalculateAccuracyRate()
     }
 
@@ -54,7 +65,12 @@ final class ChapterProgressViewModel: ObservableObject, Identifiable {
         do {
             let realm = try Realm(configuration: realmConfiguration)
             let results = realm.objects(QuestionProgressObject.self)
-                .filter("chapterId == %d", chapterNumericId)
+                .filter(
+                    "(unitIdentifier == %@ AND chapterIdentifier == %@) OR chapterId == %d",
+                    unitIdentifier,
+                    chapterIdentifier,
+                    chapterNumericId
+                )
             progressResults = results
 
             progressToken = results.observe { [weak self] changes in
