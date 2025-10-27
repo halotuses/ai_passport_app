@@ -78,13 +78,7 @@ struct ContentView: View {
                             guard !isShowingExplanation,
                                   let quiz = viewModel.currentQuiz else { return }
                             viewModel.recordAnswer(selectedIndex: selectedIndex)
-                            let destination = ExplanationRoute(
-                                quiz: quiz,
-                                selectedAnswerIndex: selectedIndex
-                            )
-
-                            router.path.append(destination)
-                            isShowingExplanation = true
+                            showExplanation(for: quiz, selectedAnswerIndex: selectedIndex)
                         }
                     )
                     .padding(.top, 12)
@@ -124,7 +118,7 @@ struct ContentView: View {
             updateHeaderForCurrentState()
         }
         .onChange(of: mainViewState.explanationDismissToken) { _ in
-            if showExplanation {
+            if isShowingExplanation {
                 closeExplanation()
             }
         }
@@ -138,6 +132,26 @@ struct ContentView: View {
 }
 
 private extension ContentView {
+    func showExplanation(for quiz: Quiz, selectedAnswerIndex: Int) {
+        let destination = ExplanationRoute(
+            quiz: quiz,
+            selectedAnswerIndex: selectedAnswerIndex
+        )
+
+        router.path.append(destination)
+        isShowingExplanation = true
+        updateHeaderForCurrentState()
+    }
+
+    func closeExplanation() {
+        guard isShowingExplanation else { return }
+        if !router.path.isEmpty {
+            router.path.removeLast()
+        }
+        isShowingExplanation = false
+        updateHeaderForCurrentState()
+    }
+    
     func loadQuizzes() {
         let chapterFilePath = chapter.file
         viewModel.unitId = extractUnitIdentifier(from: chapterFilePath)
