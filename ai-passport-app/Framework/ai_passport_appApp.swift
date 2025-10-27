@@ -38,7 +38,7 @@ struct ai_passport_appApp: SwiftUI.App {
 
     var body: some Scene {
         WindowGroup {
-            AppFrameView()
+            RootContainerView()
                 .environmentObject(progressManager)
         }
     }

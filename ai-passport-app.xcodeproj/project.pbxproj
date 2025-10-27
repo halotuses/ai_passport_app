@@ -54,6 +54,8 @@
 		0CE6D5A32EAF67D100D38241 /* AccountView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CE6D5A22EAF67CF00D38241 /* AccountView.swift */; };
 		0CE6D5A52EAF682B00D38241 /* SettingsViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CE6D5A42EAF682100D38241 /* SettingsViews.swift */; };
 		0CE6D5A72EAF709F00D38241 /* TermsPrivacyViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CE6D5A62EAF709D00D38241 /* TermsPrivacyViews.swift */; };
+		0CE6D5A92EAFC11100D38241 /* RootContainerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CE6D5A82EAFC10F00D38241 /* RootContainerView.swift */; };
+		0CE6D5AB2EAFC11C00D38241 /* SplashView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CE6D5AA2EAFC11B00D38241 /* SplashView.swift */; };
 		0CF00B642EA91BF300B8A6D0 /* QuestionProgress.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF00B632EA91BEC00B8A6D0 /* QuestionProgress.swift */; };
 		0CF00B662EA91D2700B8A6D0 /* ChapterProgressViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF00B652EA91D1400B8A6D0 /* ChapterProgressViewModel.swift */; };
 		0CF00B682EA91D5800B8A6D0 /* HomeProgressViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF00B672EA91D5700B8A6D0 /* HomeProgressViewModel.swift */; };
@@ -135,6 +137,8 @@
 		0CE6D5A22EAF67CF00D38241 /* AccountView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountView.swift; sourceTree = "<group>"; };
 		0CE6D5A42EAF682100D38241 /* SettingsViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViews.swift; sourceTree = "<group>"; };
 		0CE6D5A62EAF709D00D38241 /* TermsPrivacyViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TermsPrivacyViews.swift; sourceTree = "<group>"; };
+		0CE6D5A82EAFC10F00D38241 /* RootContainerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootContainerView.swift; sourceTree = "<group>"; };
+		0CE6D5AA2EAFC11B00D38241 /* SplashView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplashView.swift; sourceTree = "<group>"; };
 		0CF00B632EA91BEC00B8A6D0 /* QuestionProgress.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuestionProgress.swift; sourceTree = "<group>"; };
 		0CF00B652EA91D1400B8A6D0 /* ChapterProgressViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChapterProgressViewModel.swift; sourceTree = "<group>"; };
 		0CF00B672EA91D5700B8A6D0 /* HomeProgressViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeProgressViewModel.swift; sourceTree = "<group>"; };
@@ -344,6 +348,8 @@
 		0C30DDD22DFF144500F25D02 /* Framework */ = {
 			isa = PBXGroup;
 			children = (
+				0CE6D5AA2EAFC11B00D38241 /* SplashView.swift */,
+				0CE6D5A82EAFC10F00D38241 /* RootContainerView.swift */,
 				0C30DD992DFF116F00F25D02 /* ai_passport_appApp.swift */,
 				0C30DDD42DFF16FE00F25D02 /* AppFrameView.swift */,
 			);
@@ -682,6 +688,7 @@
 				0CF00B662EA91D2700B8A6D0 /* ChapterProgressViewModel.swift in Sources */,
 				0C30DDA62DFF117200F25D02 /* ai_passport_app.xcdatamodeld in Sources */,
 				0CF00B722EAA830A00B8A6D0 /* AnswerHistoryViewModel.swift in Sources */,
+				0CE6D5AB2EAFC11C00D38241 /* SplashView.swift in Sources */,
 				0C30DDD72DFF183F00F25D02 /* NavigationRouter.swift in Sources */,
 				0C30DDE32DFF1AAA00F25D02 /* ResultView.swift in Sources */,
 				0CF00B642EA91BF300B8A6D0 /* QuestionProgress.swift in Sources */,
@@ -703,6 +710,7 @@
 				0CE6D59F2EAF618E00D38241 /* QuizQuestionCatalog.swift in Sources */,
 				0CF00B742EAA83B100B8A6D0 /* AnswerHistoryView.swift in Sources */,
 				0C30DDE12DFF1AA000F25D02 /* ExplanationView.swift in Sources */,
+				0CE6D5A92EAFC11100D38241 /* RootContainerView.swift in Sources */,
 				0C30DDE92DFF1AC900F25D02 /* BottomTabBarView.swift in Sources */,
 				0C30DDF72DFF1CD800F25D02 /* Quiz.swift in Sources */,
 				0C30DDD92DFF185400F25D02 /* MainRouterView.swift in Sources */,
