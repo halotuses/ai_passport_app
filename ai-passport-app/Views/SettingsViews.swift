@@ -97,7 +97,7 @@ private extension SettingsView {
                             )
                             .tint(.themeMain)
 
-                            Text("現在：\(currentFontOption.label)")
+                            Text("\(currentFontOption.label)")
                                 .font(.subheadline)
                                 .fontWeight(.bold)
                                 .foregroundColor(.themeTextPrimary)
