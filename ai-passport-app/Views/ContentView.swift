@@ -81,7 +81,7 @@ struct ContentView: View {
                 onBackToUnitSelection: onBackToUnitSelection,
                 onImmediatePersist: viewModel.persistAllStatusesImmediately
             )
-        case .question:#imageLiteral(resourceName: "スクリーンショット 2025-10-27 15.19.34.png")
+        case .question:
             QuizContentView(
                 viewModel: viewModel,
                 isExplanationPresented: !explanationPath.isEmpty,
@@ -108,13 +108,22 @@ private extension ContentView {
     
     func handleRouterPathChange(_ count: Int) {
         if count == 0 {
-            activeExplanationRoute = nil
+            closeExplanation()
         }
         refreshHeader()
     }
+    func handleExplanationPathChange(_ path: [ExplanationRoute]) {
+        if let route = path.last {
+            if activeExplanationRoute != route {
+                activeExplanationRoute = route
+            }
+        } else if activeExplanationRoute != nil {
+            activeExplanationRoute = nil
+        }
+    }
     
     func handleExplanationDismiss(_: UUID) {
-        guard activeExplanationRoute != nil else { return }
+        guard !explanationPath.isEmpty else { return }
         closeExplanation()
     }
     
@@ -135,16 +144,18 @@ private extension ContentView {
         updateHeaderForCurrentState()
     }
     func showExplanation(for quiz: Quiz, selectedAnswerIndex: Int) {
-        activeExplanationRoute = ExplanationRoute(
+        let route = ExplanationRoute(
             quiz: quiz,
             selectedAnswerIndex: selectedAnswerIndex
         )
-        
+        activeExplanationRoute = route
+        explanationPath = [route]
         updateHeaderForCurrentState()
     }
     
     func closeExplanation() {
-        guard activeExplanationRoute != nil else { return }
+        guard !explanationPath.isEmpty else { return }
+        explanationPath = []
         activeExplanationRoute = nil
         updateHeaderForCurrentState()
     }
