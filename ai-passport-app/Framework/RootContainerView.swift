@@ -8,7 +8,7 @@ struct RootContainerView: View {
     var body: some View {
         ZStack {
             if isShowingSplash {
-                SplashView()
+                SplashSumusView()
                     .transition(.opacity)
             } else {
                 AppFrameView()
@@ -18,7 +18,7 @@ struct RootContainerView: View {
         .animation(.easeOut(duration: 0.3), value: isShowingSplash)
         .task {
             guard isShowingSplash else { return }
-            try? await Task.sleep(nanoseconds: 1_800_000_000)
+            try? await Task.sleep(nanoseconds: 2_000_000_000)
             await MainActor.run {
                 withAnimation(.easeOut(duration: 0.3)) {
                     isShowingSplash = false

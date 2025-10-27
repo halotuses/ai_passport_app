@@ -56,6 +56,7 @@
 		0CE6D5A72EAF709F00D38241 /* TermsPrivacyViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CE6D5A62EAF709D00D38241 /* TermsPrivacyViews.swift */; };
 		0CE6D5A92EAFC11100D38241 /* RootContainerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CE6D5A82EAFC10F00D38241 /* RootContainerView.swift */; };
 		0CE6D5AB2EAFC11C00D38241 /* SplashView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CE6D5AA2EAFC11B00D38241 /* SplashView.swift */; };
+		0CE6D5AD2EAFC3E500D38241 /* SplashSumusView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CE6D5AC2EAFC3E400D38241 /* SplashSumusView.swift */; };
 		0CF00B642EA91BF300B8A6D0 /* QuestionProgress.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF00B632EA91BEC00B8A6D0 /* QuestionProgress.swift */; };
 		0CF00B662EA91D2700B8A6D0 /* ChapterProgressViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF00B652EA91D1400B8A6D0 /* ChapterProgressViewModel.swift */; };
 		0CF00B682EA91D5800B8A6D0 /* HomeProgressViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF00B672EA91D5700B8A6D0 /* HomeProgressViewModel.swift */; };
@@ -139,6 +140,7 @@
 		0CE6D5A62EAF709D00D38241 /* TermsPrivacyViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TermsPrivacyViews.swift; sourceTree = "<group>"; };
 		0CE6D5A82EAFC10F00D38241 /* RootContainerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootContainerView.swift; sourceTree = "<group>"; };
 		0CE6D5AA2EAFC11B00D38241 /* SplashView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplashView.swift; sourceTree = "<group>"; };
+		0CE6D5AC2EAFC3E400D38241 /* SplashSumusView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplashSumusView.swift; sourceTree = "<group>"; };
 		0CF00B632EA91BEC00B8A6D0 /* QuestionProgress.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuestionProgress.swift; sourceTree = "<group>"; };
 		0CF00B652EA91D1400B8A6D0 /* ChapterProgressViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChapterProgressViewModel.swift; sourceTree = "<group>"; };
 		0CF00B672EA91D5700B8A6D0 /* HomeProgressViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeProgressViewModel.swift; sourceTree = "<group>"; };
@@ -348,6 +350,7 @@
 		0C30DDD22DFF144500F25D02 /* Framework */ = {
 			isa = PBXGroup;
 			children = (
+				0CE6D5AC2EAFC3E400D38241 /* SplashSumusView.swift */,
 				0CE6D5AA2EAFC11B00D38241 /* SplashView.swift */,
 				0CE6D5A82EAFC10F00D38241 /* RootContainerView.swift */,
 				0C30DD992DFF116F00F25D02 /* ai_passport_appApp.swift */,
@@ -690,6 +693,7 @@
 				0CF00B722EAA830A00B8A6D0 /* AnswerHistoryViewModel.swift in Sources */,
 				0CE6D5AB2EAFC11C00D38241 /* SplashView.swift in Sources */,
 				0C30DDD72DFF183F00F25D02 /* NavigationRouter.swift in Sources */,
+				0CE6D5AD2EAFC3E500D38241 /* SplashSumusView.swift in Sources */,
 				0C30DDE32DFF1AAA00F25D02 /* ResultView.swift in Sources */,
 				0CF00B642EA91BF300B8A6D0 /* QuestionProgress.swift in Sources */,
 				0C8786A12EA672D90052D2A8 /* RealmAnswerHistoryRepository.swift in Sources */,
