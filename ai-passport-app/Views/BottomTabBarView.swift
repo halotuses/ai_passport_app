@@ -11,6 +11,7 @@ struct BottomTabBarView: View {
     @EnvironmentObject private var router: NavigationRouter
     // 画面状態管理（メインタブの切り替えなど）
     @EnvironmentObject private var mainViewState: MainViewState
+    var onTapSettings: () -> Void = {}
 
     // iOSとmacOSでHover挙動を分ける
 #if os(iOS)
@@ -71,13 +72,18 @@ struct BottomTabBarView: View {
                 Spacer()
                 
                 // ⚙️ 設定タブ
-                VStack {
-                    Image(systemName: "gearshape.fill")
-                    Text("設定")
-                        .font(.caption)
-                        .fontWeight(.semibold)
+                Button(action: {
+                    onTapSettings()
+                }) {
+                    VStack {
+                        Image(systemName: "gearshape.fill")
+                        Text("設定")
+                            .font(.caption)
+                            .fontWeight(.semibold)
+                    }
+                    .padding(.top, tabItemTopPadding)
                 }
-                .padding(.top, tabItemTopPadding)
+                .buttonStyle(.plain)
                 .allowsHitTesting(isHovering)
                 .foregroundColor(.white.opacity(0.8))
                 

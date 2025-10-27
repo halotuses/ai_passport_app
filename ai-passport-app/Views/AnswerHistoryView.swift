@@ -3,37 +3,48 @@ import SwiftUI
 @MainActor
 struct AnswerHistoryView: View {
     @StateObject private var viewModel: AnswerHistoryViewModel
+    @EnvironmentObject private var mainViewState: MainViewState
 
     init(viewModel: AnswerHistoryViewModel? = nil) {
         _viewModel = StateObject(wrappedValue: viewModel ?? AnswerHistoryViewModel())
     }
 
     var body: some View {
-        Group {
-            if viewModel.isLoading {
-                ProgressView("読み込み中...")
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-            } else if viewModel.histories.isEmpty {
-                emptyState
-            } else {
-                historyList
-            }
+        ZStack {
+            Color.themeBase
+                .ignoresSafeArea()
+
+            content
         }
-        .navigationTitle("回答履歴")
-        .background(Color.themeBase.ignoresSafeArea())
         .onAppear {
+            mainViewState.setHeader(title: "回答履歴", backButton: .toHome)
             viewModel.refresh()
         }
     }
-
-    private var historyList: some View {
-        List {
-            ForEach(viewModel.histories) { history in
-                AnswerHistoryRow(history: history)
-                    .listRowBackground(Color.clear)
-            }
+    @ViewBuilder
+    private var content: some View {
+        if viewModel.isLoading {
+            ProgressView("読み込み中...")
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+        } else if viewModel.histories.isEmpty {
+            emptyState
+        } else {
+            historyList
         }
-        .listStyle(.insetGrouped)
+    }
+
+    
+    private var historyList: some View {
+        ScrollView {
+            LazyVStack(spacing: 16) {
+                ForEach(viewModel.histories) { history in
+                    AnswerHistoryRow(history: history)
+                }
+            }
+            .padding(.vertical, 24)
+            .padding(.horizontal, 20)
+        }
+        .scrollIndicators(.hidden)
         .refreshable {
             await MainActor.run {
                 viewModel.refresh()
@@ -54,6 +65,7 @@ struct AnswerHistoryView: View {
                 .foregroundColor(.themeTextSecondary)
                 .multilineTextAlignment(.center)
         }
+        .padding(24)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 }
@@ -70,12 +82,22 @@ private struct AnswerHistoryRow: View {
     }()
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
+        VStack(alignment: .leading, spacing: 16) {
             header
             questionSection
             answerSection
         }
-        .padding(.vertical, 8)
+        .padding(20)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(
+            RoundedRectangle(cornerRadius: 20, style: .continuous)
+                .fill(Color.themeSurface)
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 20, style: .continuous)
+                .stroke(Color.black.opacity(0.04), lineWidth: 0.5)
+        )
+        .shadow(color: Color.themeShadowSoft, radius: 12, x: 0, y: 8)
     }
 
     private var header: some View {

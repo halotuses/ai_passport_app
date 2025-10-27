@@ -448,6 +448,21 @@ final class RealmAnswerHistoryRepository {
         target.unitIdentifier = unitId
         target.chapterIdentifier = chapterIdentifier
     }
+    func deleteAllProgress() throws {
+        let realm = try realm()
+        let objects = realm.objects(QuestionProgressObject.self)
+        guard !objects.isEmpty else { return }
+        try realm.write {
+            realm.delete(objects)
+        }
+    }
+
+    func deleteAllData() throws {
+        let realm = try realm()
+        try realm.write {
+            realm.deleteAll()
+        }
+    }
     
     func observeCorrectCount(for chapterId: Int, onUpdate: @escaping (Int) -> Void) -> NotificationToken? {
         do {
