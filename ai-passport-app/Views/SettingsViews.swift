@@ -60,14 +60,27 @@ struct SettingsView: View {
 
 private extension SettingsView {
     var titleSection: some View {
-        Text("設定")
-            .font(.title2.bold())
-            .foregroundColor(.themeTextPrimary)
-            .frame(maxWidth: .infinity)
-            .padding(.horizontal, 20)
-            .padding(.top, 28)
-            .padding(.bottom, 12)
-            .background(Color.themeBase)
+        ZStack {
+            Text("設定")
+                .font(.title2.bold())
+                .foregroundColor(.themeTextPrimary)
+                .frame(maxWidth: .infinity, alignment: .center)
+
+            HStack {
+                Spacer()
+
+                Button("閉じる") {
+                    dismiss()
+                }
+                .font(.body)
+                .foregroundColor(.themeTextPrimary)
+            }
+            .frame(maxWidth: .infinity, alignment: .trailing)
+        }
+        .padding(.horizontal, 20)
+        .padding(.top, 28)
+        .padding(.bottom, 12)
+        .background(Color.themeBase)
     }
     var accountSection: some View {
         SettingsSection(title: "アカウント設定") {
