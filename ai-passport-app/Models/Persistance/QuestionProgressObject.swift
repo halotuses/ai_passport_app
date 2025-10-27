@@ -9,7 +9,7 @@ enum QuestionStatus: String, CaseIterable, Sendable {
     var isAnswered: Bool { self != .unanswered }
 }
 
-final class QuestionProgressObject: Object {
+final class QuestionProgressObject: Object, Identifiable {
     @Persisted(primaryKey: true) var quizId: String
     @Persisted var chapterId: Int
     @Persisted var statusRaw: String = QuestionStatus.unanswered.rawValue
@@ -26,4 +26,6 @@ final class QuestionProgressObject: Object {
         get { QuestionStatus(rawValue: statusRaw) ?? .unanswered }
         set { statusRaw = newValue.rawValue }
     }
+
+    var id: String { quizId }
 }
