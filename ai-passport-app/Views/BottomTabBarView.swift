@@ -4,7 +4,7 @@ import UIKit
 #endif
 
 /// 下部タブバーのビュー
-/// - ホーム / アカウント / 設定 の3つのタブを表示
+/// - ホーム / ブックマーク / 設定 の3つのタブを表示
 /// - グラデーション背景を下端まで塗りつぶし、SafeAreaに対応
 struct BottomTabBarView: View {
     // ルーティング制御（Navigation管理）
@@ -57,10 +57,10 @@ struct BottomTabBarView: View {
                 
                 Spacer()
                 
-                // 👤 アカウントタブ
+                // 🔖 ブックマークタブ
                 VStack {
-                    Image(systemName: "person.fill")
-                    Text("アカウント")
+                    Image(systemName: "bookmark.fill")
+                    Text("ブックマーク")
                         .font(.caption)
                         .fontWeight(.semibold)
                 }
