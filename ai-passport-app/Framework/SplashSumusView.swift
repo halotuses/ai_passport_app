@@ -4,7 +4,7 @@ import SwiftUI
 struct SplashSumusView: View {
     @State private var isVisible = false
 
-    private let backgroundColor = Color(red: 0xF2 / 255, green: 0xF8 / 255, blue: 0xED / 255)
+    private let backgroundColor = Color(red: 255/255, green: 255/255, blue: 255/255)
     private let animationDuration: TimeInterval = 0.8
     private let autoDismissDelay: TimeInterval = 1.5
 
