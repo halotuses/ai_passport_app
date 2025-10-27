@@ -16,7 +16,7 @@ struct ContentView: View {
     @EnvironmentObject private var router: NavigationRouter
     @State private var hasLoaded = false
     @State private var activeExplanationRoute: ExplanationRoute?
-    @State private var explanationPath: [ExplanationRoute] = []
+
     private enum QuizViewState {
         case loading
         case empty
@@ -26,31 +26,30 @@ struct ContentView: View {
     
     
     var body: some View {
-        NavigationStack(path: $explanationPath) {
-            VStack(spacing: 0) {
+        VStack(spacing: 0) {
+            if let route = activeExplanationRoute {
+                ExplanationView(
+                    viewModel: viewModel,
+                    quiz: route.quiz,
+                    selectedAnswerIndex: route.selectedAnswerIndex
+                )
+            } else {
                 contentBody
             }
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .background(Color.themeBase)
-            .onAppear(perform: handleOnAppear)
-            .onChange(of: chapter.id, perform: handleChapterChange)
-            .onChange(of: viewModel.currentQuestionIndex, perform: { _ in refreshHeader() })
-            .onChange(of: viewModel.quizzes.count, perform: { _ in refreshHeader() })
-            .onChange(of: viewModel.isLoaded, perform: { _ in refreshHeader() })
-            .onChange(of: viewModel.hasError, perform: { _ in refreshHeader() })
-            .onChange(of: router.path.count, perform: handleRouterPathChange)
-            .onChange(of: activeExplanationRoute, perform: { _ in refreshHeader() })
-            .onChange(of: explanationPath, perform: handleExplanationPathChange)
-            .onChange(of: mainViewState.explanationDismissToken, perform: handleExplanationDismiss)
-            .onDisappear(perform: handleOnDisappear)
         }
-        .navigationDestination(for: ExplanationRoute.self) { destination in
-            ExplanationView(
-                viewModel: viewModel,
-                quiz: destination.quiz,
-                selectedAnswerIndex: destination.selectedAnswerIndex
-            )
-        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(Color.themeBase)
+        .animation(.none, value: activeExplanationRoute)
+        .onAppear(perform: handleOnAppear)
+        .onChange(of: chapter.id, perform: handleChapterChange)
+        .onChange(of: viewModel.currentQuestionIndex, perform: { _ in refreshHeader() })
+        .onChange(of: viewModel.quizzes.count, perform: { _ in refreshHeader() })
+        .onChange(of: viewModel.isLoaded, perform: { _ in refreshHeader() })
+        .onChange(of: viewModel.hasError, perform: { _ in refreshHeader() })
+        .onChange(of: router.path.count, perform: handleRouterPathChange)
+        .onChange(of: activeExplanationRoute, perform: { _ in refreshHeader() })
+        .onChange(of: mainViewState.explanationDismissToken, perform: handleExplanationDismiss)
+        .onDisappear(perform: handleOnDisappear)
     }
     
     private var viewState: QuizViewState {
@@ -85,7 +84,7 @@ struct ContentView: View {
         case .question:
             QuizContentView(
                 viewModel: viewModel,
-                isExplanationPresented: !explanationPath.isEmpty,
+                isExplanationPresented: activeExplanationRoute != nil,
                 onSelectAnswer: handleAnswerSelection
             )
         }
@@ -113,18 +112,9 @@ private extension ContentView {
         }
         refreshHeader()
     }
-    func handleExplanationPathChange(_ path: [ExplanationRoute]) {
-        if let route = path.last {
-            if activeExplanationRoute != route {
-                activeExplanationRoute = route
-            }
-        } else if activeExplanationRoute != nil {
-            activeExplanationRoute = nil
-        }
-    }
     
     func handleExplanationDismiss(_: UUID) {
-        guard !explanationPath.isEmpty else { return }
+        guard activeExplanationRoute != nil else { return }
         closeExplanation()
     }
     
@@ -150,13 +140,10 @@ private extension ContentView {
             selectedAnswerIndex: selectedAnswerIndex
         )
         activeExplanationRoute = route
-        explanationPath = [route]
         updateHeaderForCurrentState()
     }
     
     func closeExplanation() {
-        guard !explanationPath.isEmpty else { return }
-        explanationPath = []
         activeExplanationRoute = nil
         updateHeaderForCurrentState()
     }
