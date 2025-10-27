@@ -4,7 +4,15 @@ import SwiftUI
 struct SplashSumusView: View {
     @State private var isVisible = false
 
-    private let backgroundColor = Color(red: 242 / 255, green: 248 / 255, blue: 237 / 255)
+    private let backgroundColor = Color(red: 0xF2 / 255, green: 0xF8 / 255, blue: 0xED / 255)
+    private let animationDuration: TimeInterval = 0.8
+    private let autoDismissDelay: TimeInterval = 1.5
+
+    var onFinished: (() -> Void)?
+
+    init(onFinished: (() -> Void)? = nil) {
+        self.onFinished = onFinished
+    }
 
     var body: some View {
         GeometryReader { proxy in
@@ -28,23 +36,31 @@ struct SplashSumusView: View {
                     }
 
                     Text("SUMUS")
-                        .font(.system(size: wordmarkSize, weight: .heavy, design: .rounded))
-                        .kerning(2)
+                        .font(.system(size: wordmarkSize, weight: .black, design: .default))
+                        .kerning(-1)
                         .foregroundStyle(.black)
-                        .shadow(color: .black.opacity(0.35), radius: 10, x: 0, y: 8)
+                        .shadow(color: .black.opacity(0.25), radius: 4, x: 1, y: 3)
                         .overlay(alignment: .topTrailing) {
                             Text("™")
                                 .font(.system(size: wordmarkSize * 0.32, weight: .bold))
                                 .foregroundColor(.black.opacity(0.8))
-                                .offset(x: wordmarkSize * 0.12, y: -wordmarkSize * 0.28)
+                                .offset(
+                                    x: max(wordmarkSize * 0.06, 4),
+                                    y: -max(wordmarkSize * 0.2, 10)
+                                )
                         }
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
             .opacity(isVisible ? 1 : 0)
-            .animation(.easeIn(duration: 1.0), value: isVisible)
+            .scaleEffect(isVisible ? 1 : 0.9)
+            .animation(.easeOut(duration: animationDuration), value: isVisible)
             .onAppear {
+                guard !isVisible else { return }
                 isVisible = true
+                DispatchQueue.main.asyncAfter(deadline: .now() + autoDismissDelay) {
+                    onFinished?()
+                }
             }
         }
     }
@@ -52,27 +68,27 @@ struct SplashSumusView: View {
 
 private struct SumusLogoMark: View {
     private let quadrantColors: [Color] = [
-        Color(red: 0 / 255, green: 152 / 255, blue: 69 / 255),    // green
-        Color(red: 0 / 255, green: 114 / 255, blue: 206 / 255),   // blue
-        Color(red: 255 / 255, green: 163 / 255, blue: 0 / 255),   // orange
-        Color(red: 229 / 255, green: 28 / 255, blue: 35 / 255)    // red
+        Color(red: 0x31 / 255, green: 0xC0 / 255, blue: 0x4D / 255),   // green
+        Color(red: 0x00 / 255, green: 0xAE / 255, blue: 0xEF / 255),   // blue
+        Color(red: 0xFF / 255, green: 0xB0 / 255, blue: 0x00 / 255),   // orange
+        Color(red: 0xE9 / 255, green: 0x4A / 255, blue: 0x2F / 255)    // red
     ]
 
     var body: some View {
         GeometryReader { proxy in
             let size = min(proxy.size.width, proxy.size.height)
-            let cornerRadius = size * 0.16
-            let crossThickness = size * 0.28
-            let centerSquareSize = size * 0.28
-            let centerInnerSize = size * 0.14
-            let crossBorderWidth = size * 0.024
+            let cornerRadius = size * 0.10
+            let crossThickness = size * 0.18
+            let centerSquareSize = size * 0.23
+            let centerInnerSize = size * 0.12
+            let strokeWidth = size * 0.015
 
             ZStack {
                 RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
                     .fill(Color.white)
                     .overlay(
                         RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
-                            .stroke(Color.black, lineWidth: size * 0.024)
+                            .stroke(Color.black, lineWidth: strokeWidth)
                     )
 
                 VStack(spacing: 0) {
@@ -92,18 +108,14 @@ private struct SumusLogoMark: View {
                 .clipShape(RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
 
                 SumusCrossShape(thickness: crossThickness)
-                    .fill(Color.white)
-                    .overlay(
-                        SumusCrossShape(thickness: crossThickness)
-                            .stroke(Color.black, lineWidth: crossBorderWidth)
-                    )
+                    .fill(Color.black)
 
                 Rectangle()
                     .fill(Color.white)
                     .frame(width: centerSquareSize, height: centerSquareSize)
                     .overlay(
                         Rectangle()
-                            .stroke(Color.black, lineWidth: crossBorderWidth)
+                            .stroke(Color.black, lineWidth: strokeWidth)
                     )
 
                 Rectangle()
