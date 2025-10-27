@@ -77,7 +77,7 @@ struct ContentView: View {
             ResultView(
                 correctCount: viewModel.correctCount,
                 totalCount: viewModel.totalCount,
-                onRestart: onQuizEnd,
+                onRestart: handleRestart,
                 onBackToChapterSelection: onBackToChapterSelection,
                 onBackToUnitSelection: onBackToUnitSelection,
                 onImmediatePersist: viewModel.persistAllStatusesImmediately
@@ -151,6 +151,12 @@ private extension ContentView {
     func closeExplanation() {
         activeExplanationRoute = nil
         updateHeaderForCurrentState()
+    }
+    
+    func handleRestart() {
+        closeExplanation()
+        viewModel.restartQuiz()
+        refreshHeader()
     }
     
     func loadQuizzes() {
