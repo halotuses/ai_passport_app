@@ -45,6 +45,7 @@ final class MainViewState: ObservableObject {
     @Published var headerBackButton: HeaderBackButton? = nil
     @Published var isOnHome: Bool = true
     @Published var isShowingAnswerHistory: Bool = false
+    @Published var isShowingBookmarks: Bool = false
     
     /// ホーム画面（単元選択）に戻す
     func reset(router: NavigationRouter) {
@@ -72,6 +73,7 @@ final class MainViewState: ObservableObject {
         router.reset()
         navigationResetToken = UUID()
         isShowingAnswerHistory = false
+        isShowingBookmarks = false
 
         let unitTitle = selectedUnit?.title ?? "章選択"
         setHeader(title: unitTitle, backButton: .toUnitList)
@@ -87,6 +89,7 @@ final class MainViewState: ObservableObject {
         router.reset()
         navigationResetToken = UUID()
         isShowingAnswerHistory = false
+        isShowingBookmarks = false
 
         enterUnitSelection()
     }
@@ -96,12 +99,14 @@ final class MainViewState: ObservableObject {
         isOnHome = true
         isShowingAnswerHistory = false
         setHeader(title: "ホーム")
+        isShowingBookmarks = false
     }
     
     /// 単元一覧（学習開始画面）に遷移
     func enterUnitSelection() {
         isOnHome = false
         isShowingAnswerHistory = false
+        isShowingBookmarks = false
         setHeader(title: "学習アプリ", backButton: .toHome)
 
     }
@@ -115,6 +120,7 @@ final class MainViewState: ObservableObject {
         router.reset()
         navigationResetToken = UUID()
         isShowingAnswerHistory = false
+        isShowingBookmarks = false
         enterHome()
         
     }
@@ -131,6 +137,20 @@ final class MainViewState: ObservableObject {
     func setHeader(title: String, backButton: HeaderBackButton? = nil) {
         headerTitle = title
         headerBackButton = backButton
+    }
+    
+    func enterBookmarks(router: NavigationRouter) {
+        prepareForQuizNavigationCleanupIfNeeded()
+        selectedChapter = nil
+        selectedUnit = nil
+        selectedUnitKey = nil
+        showResultView = false
+        router.reset()
+        navigationResetToken = UUID()
+        isOnHome = false
+        isShowingAnswerHistory = false
+        isShowingBookmarks = true
+        setHeader(title: "ブックマーク", backButton: .toHome)
     }
     
     func handleBackAction(_ backButton: HeaderBackButton, router: NavigationRouter) {

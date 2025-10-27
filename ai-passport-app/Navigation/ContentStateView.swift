@@ -15,7 +15,9 @@ struct ContentStateView: View {
 
     var body: some View {
         Group {
-            if mainViewState.isOnHome {
+            if mainViewState.isShowingBookmarks {
+                BookmarkListView()
+            } else if mainViewState.isOnHome {
                 HomeView(viewModel: progressManager.homeViewModel)
             } else if selectedUnit == nil {
                 UnitListView(

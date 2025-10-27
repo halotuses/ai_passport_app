@@ -54,20 +54,27 @@ struct BottomTabBarView: View {
                 }
                 .buttonStyle(.plain)
                 .allowsHitTesting(isHovering)
-                .foregroundColor(.white)
+                .foregroundColor(mainViewState.isOnHome && !mainViewState.isShowingBookmarks ? .white : .white.opacity(0.8))
                 
                 Spacer()
                 
                 // 🔖 ブックマークタブ
-                VStack {
-                    Image(systemName: "bookmark.fill")
-                    Text("ブックマーク")
-                        .font(.caption)
-                        .fontWeight(.semibold)
+                Button(action: {
+                    withAnimation {
+                        mainViewState.enterBookmarks(router: router)
+                    }
+                }) {
+                    VStack {
+                        Image(systemName: "bookmark.fill")
+                        Text("ブックマーク")
+                            .font(.caption)
+                            .fontWeight(.semibold)
+                    }
+                    .padding(.top, tabItemTopPadding)
                 }
-                .padding(.top, tabItemTopPadding)
+                .buttonStyle(.plain)
                 .allowsHitTesting(isHovering)
-                .foregroundColor(.white.opacity(0.8))
+                .foregroundColor(mainViewState.isShowingBookmarks ? .white : .white.opacity(0.8))
                 
                 Spacer()
                 

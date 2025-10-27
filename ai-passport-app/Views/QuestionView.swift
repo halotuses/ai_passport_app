@@ -10,6 +10,17 @@ struct QuestionView: View {
 
             if let quiz = viewModel.currentQuiz {
                 VStack(alignment: .leading, spacing: 16) {
+                    let isBookmarked = viewModel.isBookmarked(quiz: quiz)
+                    HStack {
+                        Spacer()
+                        Button {
+                            viewModel.toggleBookmark(for: quiz)
+                        } label: {
+                            Image(systemName: isBookmarked ? "bookmark.fill" : "bookmark")
+                                .foregroundColor(isBookmarked ? .yellow : .gray)
+                        }
+                        .accessibilityLabel("ブックマーク")
+                    }
                     Text(quiz.question)
                         .font(.title3)
                         .fontWeight(.semibold)

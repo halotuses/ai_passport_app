@@ -20,6 +20,17 @@ struct ExplanationView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 16) {
+                let isBookmarked = viewModel.isBookmarked(quiz: quiz)
+                HStack {
+                    Spacer()
+                    Button {
+                        viewModel.toggleBookmark(for: quiz)
+                    } label: {
+                        Image(systemName: isBookmarked ? "bookmark.fill" : "bookmark")
+                            .foregroundColor(isBookmarked ? .yellow : .gray)
+                    }
+                    .accessibilityLabel("ブックマーク")
+                }
                 
                 // MARK: - 正誤表示
                 HStack {

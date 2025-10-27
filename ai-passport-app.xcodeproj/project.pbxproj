@@ -61,6 +61,7 @@
 		0CE6D5B22EAFD25B00D38241 /* tap.wav in Resources */ = {isa = PBXBuildFile; fileRef = 0CE6D5AF2EAFD25A00D38241 /* tap.wav */; };
 		0CE6D5B32EAFD25B00D38241 /* wrong.wav in Resources */ = {isa = PBXBuildFile; fileRef = 0CE6D5B02EAFD25A00D38241 /* wrong.wav */; };
 		0CE6D5B52EAFD48C00D38241 /* SoundManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CE6D5B42EAFD48A00D38241 /* SoundManager.swift */; };
+		0CE6D5B72EAFE7E200D38241 /* BookmarkListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CE6D5B62EAFE7E000D38241 /* BookmarkListView.swift */; };
 		0CF00B642EA91BF300B8A6D0 /* QuestionProgress.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF00B632EA91BEC00B8A6D0 /* QuestionProgress.swift */; };
 		0CF00B662EA91D2700B8A6D0 /* ChapterProgressViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF00B652EA91D1400B8A6D0 /* ChapterProgressViewModel.swift */; };
 		0CF00B682EA91D5800B8A6D0 /* HomeProgressViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF00B672EA91D5700B8A6D0 /* HomeProgressViewModel.swift */; };
@@ -149,6 +150,7 @@
 		0CE6D5AF2EAFD25A00D38241 /* tap.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = tap.wav; sourceTree = "<group>"; };
 		0CE6D5B02EAFD25A00D38241 /* wrong.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = wrong.wav; sourceTree = "<group>"; };
 		0CE6D5B42EAFD48A00D38241 /* SoundManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoundManager.swift; sourceTree = "<group>"; };
+		0CE6D5B62EAFE7E000D38241 /* BookmarkListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarkListView.swift; sourceTree = "<group>"; };
 		0CF00B632EA91BEC00B8A6D0 /* QuestionProgress.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuestionProgress.swift; sourceTree = "<group>"; };
 		0CF00B652EA91D1400B8A6D0 /* ChapterProgressViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChapterProgressViewModel.swift; sourceTree = "<group>"; };
 		0CF00B672EA91D5700B8A6D0 /* HomeProgressViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeProgressViewModel.swift; sourceTree = "<group>"; };
@@ -322,6 +324,7 @@
 		0C30DDCE2DFF140C00F25D02 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				0CE6D5B62EAFE7E000D38241 /* BookmarkListView.swift */,
 				0CE6D5A62EAF709D00D38241 /* TermsPrivacyViews.swift */,
 				0CE6D5A42EAF682100D38241 /* SettingsViews.swift */,
 				0CE6D5A22EAF67CF00D38241 /* AccountView.swift */,
@@ -731,6 +734,7 @@
 				0CF00B742EAA83B100B8A6D0 /* AnswerHistoryView.swift in Sources */,
 				0C30DDE12DFF1AA000F25D02 /* ExplanationView.swift in Sources */,
 				0CE6D5A92EAFC11100D38241 /* RootContainerView.swift in Sources */,
+				0CE6D5B72EAFE7E200D38241 /* BookmarkListView.swift in Sources */,
 				0C30DDE92DFF1AC900F25D02 /* BottomTabBarView.swift in Sources */,
 				0C30DDF72DFF1CD800F25D02 /* Quiz.swift in Sources */,
 				0C30DDD92DFF185400F25D02 /* MainRouterView.swift in Sources */,

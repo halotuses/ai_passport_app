@@ -4,6 +4,7 @@
 //
 
 import Foundation
+import RealmSwift
 
 @MainActor
 class QuizViewModel: ObservableObject {
@@ -15,8 +16,9 @@ class QuizViewModel: ObservableObject {
     @Published var selectedAnswers: [Int?] = []
     @Published var isLoaded: Bool = false
     @Published var hasError: Bool = false
-    @Published var showResultView: Bool = false   // ✅ 結果画面表示フラグを追加
+    @Published var showResultView: Bool = false
     @Published var questionStatuses: [QuestionStatus] = []
+    @Published private(set) var bookmarkedQuizIds: Set<String> = []
     
     
     // MARK: - Identifiers
@@ -66,6 +68,7 @@ class QuizViewModel: ObservableObject {
                 self.hasError = false
                 let chapterNumericId = IdentifierGenerator.chapterNumericId(unitId: self.unitId, chapterId: self.chapterId)
                 let storedStatuses = self.repository.loadStatuses(chapterId: chapterNumericId)
+                self.bookmarkedQuizIds = self.loadBookmarkedQuizIds(chapterId: chapterNumericId)
                 self.questionStatuses = qs.enumerated().map { index, _ in
                     let quizId = "\(self.unitId)-\(self.chapterId)#\(index)"
                     return storedStatuses[quizId] ?? .unanswered
@@ -79,6 +82,7 @@ class QuizViewModel: ObservableObject {
                 self.isLoaded = true
                 self.hasError = true
                 self.questionStatuses = []
+                self.bookmarkedQuizIds = []
                 
             }
         }
@@ -163,6 +167,51 @@ class QuizViewModel: ObservableObject {
             )
         }
     }
+    // MARK: - Bookmark
+    func toggleBookmark(for quiz: Quiz) {
+        guard let stableQuizId = bookmarkIdentifier(for: quiz) else { return }
+        let chapterNumericId = IdentifierGenerator.chapterNumericId(unitId: unitId, chapterId: chapterId)
+
+        do {
+            let realm = try Realm()
+            var newState = false
+            try realm.write {
+                let object: QuestionProgressObject
+                if let existing = realm.object(ofType: QuestionProgressObject.self, forPrimaryKey: stableQuizId) {
+                    object = existing
+                } else {
+                    let newObject = QuestionProgressObject()
+                    newObject.quizId = stableQuizId
+                    newObject.chapterId = chapterNumericId
+                    realm.add(newObject)
+                    object = newObject
+                }
+
+                object.unitIdentifier = unitId
+                object.chapterIdentifier = chapterId
+                object.questionText = quiz.question
+                object.choiceTexts.removeAll()
+                object.choiceTexts.append(objectsIn: quiz.choices)
+                object.correctChoiceIndex = quiz.answerIndex
+                object.updatedAt = Date()
+                object.isBookmarked.toggle()
+                newState = object.isBookmarked
+            }
+
+            if newState {
+                bookmarkedQuizIds.insert(stableQuizId)
+            } else {
+                bookmarkedQuizIds.remove(stableQuizId)
+            }
+        } catch {
+            print("❌ Failed to toggle bookmark: \(error)")
+        }
+    }
+
+    func isBookmarked(quiz: Quiz) -> Bool {
+        guard let stableQuizId = bookmarkIdentifier(for: quiz) else { return false }
+        return bookmarkedQuizIds.contains(stableQuizId)
+    }
     
     // MARK: - Navigation
     func moveNext() {
@@ -240,6 +289,7 @@ class QuizViewModel: ObservableObject {
         unitId = ""
         showResultView = false
         questionStatuses = Array(repeating: .unanswered, count: quizzes.count)
+        bookmarkedQuizIds = []
     }
 }
 
@@ -266,5 +316,26 @@ private extension QuizViewModel {
             let status: QuestionStatus = (selected == quiz.answerIndex) ? .correct : .incorrect
             questionStatuses[index] = status
         }
+    }
+    func loadBookmarkedQuizIds(chapterId: Int) -> Set<String> {
+        do {
+            let realm = try Realm()
+            let results = realm.objects(QuestionProgressObject.self)
+                .filter("chapterId == %d AND isBookmarked == true", chapterId)
+            return Set(results.map { $0.quizId })
+        } catch {
+            print("❌ Failed to load bookmarks: \(error)")
+            return []
+        }
+    }
+
+    func bookmarkIdentifier(for quiz: Quiz) -> String? {
+        guard let index = quizzes.firstIndex(where: { $0.id == quiz.id }) else { return nil }
+        return progressIdentifier(for: index)
+    }
+
+    func progressIdentifier(for index: Int) -> String? {
+        guard quizzes.indices.contains(index) else { return nil }
+        return "\(unitId)-\(chapterId)#\(index)"
     }
 }
