@@ -24,6 +24,7 @@ struct ContentView: View {
         case question
     }
     
+    
     var body: some View {
         NavigationStack(path: $explanationPath) {
             VStack(spacing: 0) {
