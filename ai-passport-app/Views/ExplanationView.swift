@@ -54,10 +54,24 @@ struct ExplanationView: View {
                 Divider()
                 
                 // MARK: - 解説文
-                Text(quiz.explanation ?? "解説はありません。")
-                    .font(.body)
-                    .multilineTextAlignment(.leading)
-                    .foregroundColor(.themeTextPrimary)
+                if let explanationText {
+                    Text(explanationText)
+                        .font(.body)
+                        .multilineTextAlignment(.leading)
+                        .foregroundColor(.themeTextPrimary)
+                } else {
+                    VStack(spacing: 12) {
+                        Image(systemName: "exclamationmark.triangle.fill")
+                            .foregroundColor(.yellow)
+                            .imageScale(.large)
+
+                        Text("解説データが見つかりません。")
+                            .font(.body)
+                            .foregroundColor(.themeTextSecondary)
+                    }
+                    .frame(maxWidth: .infinity, alignment: .center)
+                    .padding(.vertical, 24)
+                }
                 
                 Spacer(minLength: 80) // 下のボタン分の余白
             }
@@ -74,7 +88,7 @@ struct ExplanationView: View {
         // ✅ 常に画面下部にボタンを固定
         .safeAreaInset(edge: .bottom) {
             VStack(spacing: 12) {
-                VoiceExplanation(text: quiz.explanation ?? "")
+                VoiceExplanation(text: explanationText ?? "")
 
                 Button(action: handleNextAction) {
                     Text(hasNextQuestion ? "次の問題へ" : "結果表示")
@@ -102,6 +116,13 @@ struct ExplanationView: View {
 
 
 private extension ExplanationView {
+    var explanationText: String? {
+        guard let text = quiz.explanation?.trimmingCharacters(in: .whitespacesAndNewlines),
+              !text.isEmpty else {
+            return nil
+        }
+        return text
+    }
     enum ChoiceTagType: String {
         case correct = "正解"
         case selected = "回答"
