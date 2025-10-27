@@ -33,15 +33,32 @@ struct ProgressBadgeView: View {
             endPoint: .bottomTrailing
         )
     }
+    
+    private var isPerfectScore: Bool {
+        totalCount > 0 && correctCount == totalCount
+    }
 
+    
     private var progressGradient: LinearGradient {
-        LinearGradient(
+        if isPerfectScore {
+            return .crownGold
+        }
+
+        return LinearGradient(
             colors: [Color.themeMain, Color.themeSecondary.opacity(0.85)],
             startPoint: .leading,
             endPoint: .trailing
         )
     }
 
+    private var accuracyForegroundStyle: AnyShapeStyle {
+        if isPerfectScore {
+            return AnyShapeStyle(LinearGradient.crownGold)
+        }
+
+        return AnyShapeStyle(Color.themeSecondary)
+    }
+    
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack(alignment: .firstTextBaseline) {
@@ -56,7 +73,7 @@ struct ProgressBadgeView: View {
                 Spacer()
                 Text(accuracyText)
                     .font(.system(size: 14, weight: .semibold))
-                    .foregroundStyle(Color.themeSecondary)
+                    .foregroundStyle(accuracyForegroundStyle)
                     .padding(.horizontal, 10)
                     .padding(.vertical, 4)
                     .background(
