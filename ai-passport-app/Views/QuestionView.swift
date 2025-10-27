@@ -10,16 +10,9 @@ struct QuestionView: View {
 
             if let quiz = viewModel.currentQuiz {
                 VStack(alignment: .leading, spacing: 16) {
-                    let isBookmarked = viewModel.isBookmarked(quiz: quiz)
                     HStack {
                         Spacer()
-                        Button {
-                            viewModel.toggleBookmark(for: quiz)
-                        } label: {
-                            Image(systemName: isBookmarked ? "bookmark.fill" : "bookmark")
-                                .foregroundColor(isBookmarked ? .yellow : .gray)
-                        }
-                        .accessibilityLabel("ブックマーク")
+                        BookmarkToggleButton(viewModel: viewModel, quiz: quiz)
                     }
                     Text(quiz.question)
                         .font(.title3)
@@ -86,5 +79,22 @@ struct QuestionView: View {
     private func choiceLabel(for index: Int) -> String {
         let labels = ["ア", "イ", "ウ", "エ"]
         return index < labels.count ? labels[index] : "?"
+    }
+}
+
+struct BookmarkToggleButton: View {
+    @ObservedObject var viewModel: QuizViewModel
+    let quiz: Quiz
+
+    var body: some View {
+        let isBookmarked = viewModel.isBookmarked(quiz: quiz)
+        Button {
+            viewModel.toggleBookmark(for: quiz)
+        } label: {
+            Image(systemName: isBookmarked ? "bookmark.fill" : "bookmark")
+                .foregroundColor(isBookmarked ? .yellow : .gray)
+        }
+        .accessibilityLabel("ブックマーク")
+        .accessibilityAddTraits(isBookmarked ? .isSelected : [])
     }
 }
