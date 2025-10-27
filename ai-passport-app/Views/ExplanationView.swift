@@ -6,7 +6,7 @@ struct ExplanationView: View {
     @ObservedObject var viewModel: QuizViewModel
     let quiz: Quiz
     let selectedAnswerIndex: Int
-    @EnvironmentObject private var router: NavigationRouter
+    @Environment(\.dismiss) private var dismiss
     
     private var isAnswerCorrect: Bool {
         selectedAnswerIndex == quiz.answerIndex
@@ -217,9 +217,7 @@ private extension ExplanationView {
             viewModel.finishQuiz()
         }
 
-        if !router.path.isEmpty {
-            router.path.removeLast()
-        }
+        dismiss()
     }
 }
 private struct VoiceExplanation: View {

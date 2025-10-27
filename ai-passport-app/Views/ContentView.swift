@@ -16,7 +16,7 @@ struct ContentView: View {
     
     @EnvironmentObject private var router: NavigationRouter
     @State private var hasLoaded = false
-    @State private var isShowingExplanation = false
+    @State private var activeExplanationRoute: ExplanationRoute?
     
     var body: some View {
         VStack(spacing: 0) {
@@ -75,7 +75,7 @@ struct ContentView: View {
                     AnswerAreaView(
                         choices: viewModel.currentQuiz?.choices ?? [],
                         selectAction: { selectedIndex in
-                            guard !isShowingExplanation,
+                            guard activeExplanationRoute == nil,
                                   let quiz = viewModel.currentQuiz else { return }
                             viewModel.recordAnswer(selectedIndex: selectedIndex)
                             showExplanation(for: quiz, selectedAnswerIndex: selectedIndex)
@@ -89,6 +89,17 @@ struct ContentView: View {
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(Color.themeBase)
+        .background(
+            NavigationLink(item: $activeExplanationRoute) { destination in
+                ExplanationView(
+                    viewModel: viewModel,
+                    quiz: destination.quiz,
+                    selectedAnswerIndex: destination.selectedAnswerIndex
+                )
+            } label: {
+                EmptyView()
+            }
+        )
 
         .onAppear {
             mainViewState.quizCleanupDelegate = viewModel
@@ -114,11 +125,16 @@ struct ContentView: View {
             updateHeaderForCurrentState()
         }
         .onChange(of: router.path.count) { count in
-            isShowingExplanation = count > 0
+            if count == 0 {
+                activeExplanationRoute = nil
+            }
+            updateHeaderForCurrentState()
+        }
+        .onChange(of: activeExplanationRoute) { _ in
             updateHeaderForCurrentState()
         }
         .onChange(of: mainViewState.explanationDismissToken) { _ in
-            if isShowingExplanation {
+            if activeExplanationRoute != nil {
                 closeExplanation()
             }
         }
@@ -133,22 +149,17 @@ struct ContentView: View {
 
 private extension ContentView {
     func showExplanation(for quiz: Quiz, selectedAnswerIndex: Int) {
-        let destination = ExplanationRoute(
+        activeExplanationRoute = ExplanationRoute(
             quiz: quiz,
             selectedAnswerIndex: selectedAnswerIndex
         )
 
-        router.path.append(destination)
-        isShowingExplanation = true
         updateHeaderForCurrentState()
     }
 
     func closeExplanation() {
-        guard isShowingExplanation else { return }
-        if !router.path.isEmpty {
-            router.path.removeLast()
-        }
-        isShowingExplanation = false
+        guard activeExplanationRoute != nil else { return }
+        activeExplanationRoute = nil
         updateHeaderForCurrentState()
     }
     
@@ -169,7 +180,7 @@ private extension ContentView {
     
     
     func updateHeaderForCurrentState() {
-        if isShowingExplanation {
+        if activeExplanationRoute != nil {
             let questionNumber = min(viewModel.currentQuestionIndex + 1, viewModel.totalCount)
             mainViewState.setHeader(title: "第\(questionNumber)問 解説", backButton: .toQuizQuestion)
         } else if viewModel.totalCount > 0 && viewModel.currentQuestionIndex >= viewModel.totalCount {

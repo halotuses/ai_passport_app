@@ -25,13 +25,6 @@ struct MainRouterView: View {
                 )
             }
         }
-        .navigationDestination(for: ExplanationRoute.self) { destination in
-            ExplanationView(
-                viewModel: progressManager.quizViewModel,
-                quiz: destination.quiz,
-                selectedAnswerIndex: destination.selectedAnswerIndex
-            )
-        }
     }
 }
 
