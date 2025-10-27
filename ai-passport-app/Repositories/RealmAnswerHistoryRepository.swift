@@ -32,6 +32,7 @@ final class RealmAnswerHistoryRepository {
     ) {
         self.configuration = configuration
         Self.prepareRealmDirectoryIfNeeded(for: configuration, fileManager: fileManager)
+        repairInvalidProgressIfNeeded()
     }
 
     private static func prepareRealmDirectoryIfNeeded(
@@ -380,6 +381,72 @@ final class RealmAnswerHistoryRepository {
     
     private func realm() throws -> Realm {
         try Realm(configuration: configuration)
+    }
+    private func repairInvalidProgressIfNeeded() {
+        do {
+            let realm = try realm()
+            let invalidObjects = realm.objects(QuestionProgressObject.self)
+                .filter("unitIdentifier == %@ OR chapterId < %d", "units", 1000)
+
+            guard !invalidObjects.isEmpty else { return }
+
+            let lookup = QuizQuestionCatalog.buildLookup()
+            guard !lookup.isEmpty else { return }
+
+            try realm.write {
+                for object in invalidObjects {
+                    guard let key = QuestionLookupKey(question: object.questionText, choices: Array(object.choiceTexts)) else {
+                        continue
+                    }
+                    guard let entry = lookup[key] else {
+                        continue
+                    }
+                    applyRepairEntry(entry, to: object, in: realm)
+                }
+            }
+        } catch {
+            print("❌ Realm repair failed: \(error)")
+        }
+    }
+
+    private func applyRepairEntry(
+        _ entry: QuizQuestionCatalog.Entry,
+        to object: QuestionProgressObject,
+        in realm: Realm
+    ) {
+        let newQuizId = "\(entry.unitId)-\(entry.chapterIdentifier)#\(entry.questionIndex)"
+        let newChapterId = IdentifierGenerator.chapterNumericId(unitId: entry.unitId, chapterId: entry.chapterIdentifier)
+
+        if let existing = realm.object(ofType: QuestionProgressObject.self, forPrimaryKey: newQuizId), existing !== object {
+            merge(object, into: existing, chapterId: newChapterId, unitId: entry.unitId, chapterIdentifier: entry.chapterIdentifier)
+            realm.delete(object)
+        } else {
+            object.quizId = newQuizId
+            object.chapterId = newChapterId
+            object.unitIdentifier = entry.unitId
+            object.chapterIdentifier = entry.chapterIdentifier
+        }
+    }
+
+    private func merge(
+        _ source: QuestionProgressObject,
+        into target: QuestionProgressObject,
+        chapterId: Int,
+        unitId: String,
+        chapterIdentifier: String
+    ) {
+        if source.updatedAt > target.updatedAt {
+            target.statusRaw = source.statusRaw
+            target.updatedAt = source.updatedAt
+            target.selectedChoiceIndex = source.selectedChoiceIndex
+            target.correctChoiceIndex = source.correctChoiceIndex
+            target.questionText = source.questionText
+            target.choiceTexts.removeAll()
+            target.choiceTexts.append(objectsIn: Array(source.choiceTexts))
+        }
+        target.chapterId = chapterId
+        target.unitIdentifier = unitId
+        target.chapterIdentifier = chapterIdentifier
     }
     
     func observeCorrectCount(for chapterId: Int, onUpdate: @escaping (Int) -> Void) -> NotificationToken? {

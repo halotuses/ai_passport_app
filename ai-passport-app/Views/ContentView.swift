@@ -168,8 +168,11 @@ private extension ContentView {
     
     func extractUnitIdentifier(from path: String) -> String {
         let components = path.split(separator: "/")
-        if let unitComponent = components.first(where: { $0.hasPrefix("unit") }) {
-            return String(unitComponent)
+        for component in components where component.hasPrefix("unit") {
+            let suffix = component.dropFirst("unit".count)
+            if !suffix.isEmpty && suffix.allSatisfy({ $0.isNumber }) {
+                return String(component)
+            }
         }
         return ""
     }
