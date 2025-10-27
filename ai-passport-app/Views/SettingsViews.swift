@@ -4,7 +4,7 @@ struct SettingsView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.openURL) private var openURL
     @EnvironmentObject private var progressManager: ProgressManager
-    @EnvironmentObject private var mainViewState: MainViewState
+
     @AppStorage(AppSettingsKeys.soundEnabled) private var soundEnabled = true
     @AppStorage(AppSettingsKeys.fontSizeIndex) private var fontSizeIndex = AppFontSettings.defaultIndex
 
@@ -12,22 +12,30 @@ struct SettingsView: View {
     @State private var showInitializationConfirmation = false
     @State private var errorMessage: String?
     @State private var showErrorAlert = false
-    @State private var previousHeaderState: (title: String, backButton: MainViewState.HeaderBackButton?)?
 
     private let fontSliderRange = 0.0...Double(AppFontSettings.options.count - 1)
 
     var body: some View {
-        ScrollView {
-            VStack(spacing: 28) {
-                accountSection
-                dataSection
-                supportSection
+        ZStack {
+            Color.themeBase
+                .ignoresSafeArea()
+
+            VStack(spacing: 0) {
+                titleSection
+
+                ScrollView {
+                    VStack(spacing: 28) {
+                        accountSection
+                        dataSection
+                        supportSection
+                    }
+                }
             }
             .padding(.horizontal, 20)
             .padding(.vertical, 32)
         }
-        .background(Color.themeBase.ignoresSafeArea())
-        .navigationBarBackButtonHidden(true)
+        .navigationTitle("")
+        .navigationBarTitleDisplayMode(.inline)
         .toolbar(.hidden, for: .navigationBar)
         
         .alert("データリセット", isPresented: $showResetConfirmation) {
@@ -47,19 +55,20 @@ struct SettingsView: View {
         } message: { message in
             Text(message)
         }
-        .onAppear {
-            previousHeaderState = (mainViewState.headerTitle, mainViewState.headerBackButton)
-            mainViewState.setHeader(title: "設定", backButton: .close(action: { dismiss() }))
-        }
-        .onDisappear {
-            if let previousHeaderState {
-                mainViewState.setHeader(title: previousHeaderState.title, backButton: previousHeaderState.backButton)
-            }
-        }
     }
 }
 
 private extension SettingsView {
+    var titleSection: some View {
+        Text("設定")
+            .font(.title2.bold())
+            .foregroundColor(.themeTextPrimary)
+            .frame(maxWidth: .infinity)
+            .padding(.horizontal, 20)
+            .padding(.top, 28)
+            .padding(.bottom, 12)
+            .background(Color.themeBase)
+    }
     var accountSection: some View {
         SettingsSection(title: "アカウント設定") {
             NavigationLink {
