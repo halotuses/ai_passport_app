@@ -13,6 +13,7 @@ struct SplashSumusView: View {
     init(onFinished: (() -> Void)? = nil) {
         self.onFinished = onFinished
     }
+    
 
     var body: some View {
         GeometryReader { proxy in
