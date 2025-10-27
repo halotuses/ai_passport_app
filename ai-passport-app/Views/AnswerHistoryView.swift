@@ -10,16 +10,16 @@ struct AnswerHistoryView: View {
     }
 
     var body: some View {
-        ZStack {
-            Color.themeBase
-                .ignoresSafeArea()
-
-            content
-        }
-        .onAppear {
-            mainViewState.setHeader(title: "回答履歴", backButton: .toHome)
-            viewModel.refresh()
-        }
+        content
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .background(
+                Color.themeBase
+                    .ignoresSafeArea()
+            )
+            .onAppear {
+                mainViewState.setHeader(title: "回答履歴", backButton: .toHome)
+                viewModel.refresh()
+            }
     }
     @ViewBuilder
     private var content: some View {
