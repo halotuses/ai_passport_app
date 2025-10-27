@@ -42,7 +42,7 @@ struct CircularProgressView: View {
                 radius: radius,
                 startAngle: adjustedStart,
                 endAngle: adjustedEnd,
-                clockwise: !clockwise
+                clockwise: clockwise
             )
             return path
         }
@@ -85,17 +85,29 @@ struct CircularProgressView: View {
         var slices: [SegmentSlice] = []
         var currentAngle: Double = 0
         
-        for (index, segment) in segments.enumerated(){
+        let orderedSegments = layoutSegments
+        let nonZeroIndices = orderedSegments.enumerated().compactMap { index, segment in
+            segment.value > 0 ? index : nil
+        }
+        let firstNonZeroIndex = nonZeroIndices.first
+        let lastNonZeroIndex = nonZeroIndices.last
+
+        for (index, segment) in orderedSegments.enumerated() {
 
             let fraction = segment.value / totalValue
-                let sweep = fraction * 360
-                let baseStartAngle = currentAngle
-                let baseEndAngle = currentAngle + sweep
-                let isFirst = index == 0
-                let isLast = index == segments.count - 1
+            let sweep = fraction * 360
+            let baseStartAngle = currentAngle
+            let baseEndAngle = currentAngle + sweep
+            let isFirstNonZero = index == firstNonZeroIndex
+            let isLastNonZero = index == lastNonZeroIndex
 
-                let adjustedStart = isFirst ? baseStartAngle : baseStartAngle - epsilon
-                let adjustedEnd = isLast ? baseEndAngle + epsilon : baseEndAngle
+            guard sweep > 0 else {
+                currentAngle = baseEndAngle
+                continue
+            }
+
+            let adjustedStart = isFirstNonZero ? baseStartAngle : baseStartAngle - epsilon
+            let adjustedEnd = isLastNonZero ? baseEndAngle + epsilon : baseEndAngle
             slices.append(
                 SegmentSlice(
                     segment: segment,
