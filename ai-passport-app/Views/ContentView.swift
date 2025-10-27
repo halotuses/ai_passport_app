@@ -18,145 +18,135 @@ struct ContentView: View {
     @State private var hasLoaded = false
     @State private var activeExplanationRoute: ExplanationRoute?
     
+    private enum QuizViewState {
+        case loading
+        case empty
+        case finished
+        case question
+    }
+    
     var body: some View {
         VStack(spacing: 0) {
             
-            // MARK: - ロード状態
-            if !viewModel.isLoaded {
-                ProgressView("読み込み中...")
-                    .padding()
-            }
-            
-            // MARK: - エラーまたはデータ無し
-            else if viewModel.hasError || viewModel.quizzes.isEmpty {
-                VStack(spacing: 12) {
-                    Text("問題データが見つかりませんでした。")
-                        .foregroundColor(.secondary)
-                    
-                    Button("前に戻る") {
-                        onQuizEnd()
-                    }
-                    .padding(.horizontal, 16)
-                    .padding(.vertical, 10)
-                    .background(Color.themeButtonSecondary)
-                    .foregroundColor(.themeTextPrimary)
-                    .cornerRadius(10)
-                }
-                .padding()
-            }
-            
-            // MARK: - クイズ完了
-            else if viewModel.isFinished {
-                ResultView(
-                    correctCount: viewModel.correctCount,
-                    totalCount: viewModel.totalCount,
-                    onRestart: onQuizEnd,
-                    onBackToChapterSelection: onBackToChapterSelection,
-                    onBackToUnitSelection: onBackToUnitSelection,
-                    onImmediatePersist: {
-                        // 即時反映対応: 結果表示前に保存内容を同期
-                        viewModel.persistAllStatusesImmediately()
-                    }
-                )
-            }
-            
-            // MARK: - 問題画面
-            else {
-                VStack(spacing: 0) {
-                    QuestionView(viewModel: viewModel)
-                        .padding(.top, 12)
-                    
-                    Spacer(minLength: 0)
-                    
-                    Divider()
-                        .background(Color.themeMain.opacity(0.2))
-                        .padding(.top, 12)
-                    
-                    AnswerAreaView(
-                        choices: viewModel.currentQuiz?.choices ?? [],
-                        selectAction: { selectedIndex in
-                            guard activeExplanationRoute == nil,
-                                  let quiz = viewModel.currentQuiz else { return }
-                            viewModel.recordAnswer(selectedIndex: selectedIndex)
-                            showExplanation(for: quiz, selectedAnswerIndex: selectedIndex)
-                        }
-                    )
-                    .padding(.top, 12)
-                    .padding(.bottom, 8)
-                }
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-            }
+            contentBody
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(Color.themeBase)
-        .background(
-            NavigationLink(item: $activeExplanationRoute) { destination in
-                ExplanationView(
-                    viewModel: viewModel,
-                    quiz: destination.quiz,
-                    selectedAnswerIndex: destination.selectedAnswerIndex
-                )
-            } label: {
-                EmptyView()
-            }
-        )
-
-        .onAppear {
-            mainViewState.quizCleanupDelegate = viewModel
-            updateHeaderForCurrentState()
-            guard !hasLoaded else { return }
-            loadQuizzes()
-            hasLoaded = true
+        .background(explanationNavigation)
+        .onAppear(perform: handleOnAppear)
+        .onChange(of: chapter.id, perform: handleChapterChange)
+        .onChange(of: viewModel.currentQuestionIndex, perform: { _ in refreshHeader() })
+        .onChange(of: viewModel.quizzes.count, perform: { _ in refreshHeader() })
+        .onChange(of: viewModel.isLoaded, perform: { _ in refreshHeader() })
+        .onChange(of: viewModel.hasError, perform: { _ in refreshHeader() })
+        .onChange(of: router.path.count, perform: handleRouterPathChange)
+        .onChange(of: activeExplanationRoute, perform: { _ in refreshHeader() })
+        .onChange(of: mainViewState.explanationDismissToken, perform: handleExplanationDismiss)
+        .onDisappear(perform: handleOnDisappear)
+    }
+    
+    private var viewState: QuizViewState {
+        if !viewModel.isLoaded {
+            return .loading
         }
-        .onChange(of: chapter.id) { _ in
-            updateHeaderForCurrentState()
-            loadQuizzes()
+        if viewModel.hasError || viewModel.quizzes.isEmpty {
+            return .empty
         }
-        .onChange(of: viewModel.currentQuestionIndex) { _ in
-            updateHeaderForCurrentState()
+        if viewModel.isFinished {
+            return .finished
         }
-        .onChange(of: viewModel.quizzes.count) { _ in
-            updateHeaderForCurrentState()
+        return .question
+    }
+    
+    @ViewBuilder
+    private var contentBody: some View {
+        switch viewState {
+        case .loading:
+            QuizLoadingView()
+        case .empty:
+            EmptyQuizStateView(onQuizEnd: onQuizEnd)
+        case .finished:
+            ResultView(
+                correctCount: viewModel.correctCount,
+                totalCount: viewModel.totalCount,
+                onRestart: onQuizEnd,
+                onBackToChapterSelection: onBackToChapterSelection,
+                onBackToUnitSelection: onBackToUnitSelection,
+                onImmediatePersist: viewModel.persistAllStatusesImmediately
+            )
+        case .question:#imageLiteral(resourceName: "スクリーンショット 2025-10-27 15.19.34.png")
+            QuizContentView(
+                viewModel: viewModel,
+                isExplanationPresented: activeExplanationRoute != nil,
+                onSelectAnswer: handleAnswerSelection
+            )
         }
-        .onChange(of: viewModel.isLoaded) { _ in
-            updateHeaderForCurrentState()
-        }
-        .onChange(of: viewModel.hasError) { _ in
-            updateHeaderForCurrentState()
-        }
-        .onChange(of: router.path.count) { count in
-            if count == 0 {
-                activeExplanationRoute = nil
-            }
-            updateHeaderForCurrentState()
-        }
-        .onChange(of: activeExplanationRoute) { _ in
-            updateHeaderForCurrentState()
-        }
-        .onChange(of: mainViewState.explanationDismissToken) { _ in
-            if activeExplanationRoute != nil {
-                closeExplanation()
-            }
-        }
-        .onDisappear {
-            if let delegate = mainViewState.quizCleanupDelegate,
-               delegate === viewModel {
-                mainViewState.quizCleanupDelegate = nil
-            }
+    }
+    
+    private var explanationNavigation: some View {
+        NavigationLink(item: $activeExplanationRoute) { destination in
+            ExplanationView(
+                viewModel: viewModel,
+                quiz: destination.quiz,
+                selectedAnswerIndex: destination.selectedAnswerIndex
+            )
+        } label: {
+            EmptyView()
         }
     }
 }
 
 private extension ContentView {
+    func handleOnAppear() {
+        mainViewState.quizCleanupDelegate = viewModel
+        refreshHeader()
+        guard !hasLoaded else { return }
+        loadQuizzes()
+        hasLoaded = true
+    }
+    
+    func handleChapterChange(_: ChapterMetadata.ID) {
+        refreshHeader()
+        loadQuizzes()
+    }
+    
+    func handleRouterPathChange(_ count: Int) {
+        if count == 0 {
+            activeExplanationRoute = nil
+        }
+        refreshHeader()
+    }
+    
+    func handleExplanationDismiss(_: UUID) {
+        guard activeExplanationRoute != nil else { return }
+        closeExplanation()
+    }
+    
+    func handleOnDisappear() {
+        if let delegate = mainViewState.quizCleanupDelegate,
+           delegate === viewModel {
+            mainViewState.quizCleanupDelegate = nil
+        }
+    }
+    
+    func handleAnswerSelection(_ selectedIndex: Int) {
+        guard let quiz = viewModel.currentQuiz else { return }
+        viewModel.recordAnswer(selectedIndex: selectedIndex)
+        showExplanation(for: quiz, selectedAnswerIndex: selectedIndex)
+    }
+    
+    func refreshHeader() {
+        updateHeaderForCurrentState()
+    }
     func showExplanation(for quiz: Quiz, selectedAnswerIndex: Int) {
         activeExplanationRoute = ExplanationRoute(
             quiz: quiz,
             selectedAnswerIndex: selectedAnswerIndex
         )
-
+        
         updateHeaderForCurrentState()
     }
-
+    
     func closeExplanation() {
         guard activeExplanationRoute != nil else { return }
         activeExplanationRoute = nil
@@ -192,5 +182,62 @@ private extension ContentView {
             mainViewState.setHeader(title: chapter.title, backButton: .toChapterList)
         }
     }
+}
+
+private struct QuizLoadingView: View {
+    var body: some View {
+        ProgressView("読み込み中...")
+            .padding()
+    }
+}
+
+private struct EmptyQuizStateView: View {
+    let onQuizEnd: () -> Void
     
+    var body: some View {
+        VStack(spacing: 12) {
+            Text("問題データが見つかりませんでした。")
+                .foregroundColor(.secondary)
+            
+            Button("前に戻る", action: onQuizEnd)
+                .padding(.horizontal, 16)
+                .padding(.vertical, 10)
+                .background(Color.themeButtonSecondary)
+                .foregroundColor(.themeTextPrimary)
+                .cornerRadius(10)
+        }
+        .padding()
+    }
+}
+
+private struct QuizContentView: View {
+    @ObservedObject var viewModel: QuizViewModel
+    let isExplanationPresented: Bool
+    let onSelectAnswer: (Int) -> Void
+    
+    var body: some View {
+        VStack(spacing: 0) {
+            QuestionView(viewModel: viewModel)
+                .padding(.top, 12)
+            
+            Spacer(minLength: 0)
+            
+            Divider()
+                .background(Color.themeMain.opacity(0.2))
+                .padding(.top, 12)
+            
+            AnswerAreaView(
+                choices: viewModel.currentQuiz?.choices ?? [],
+                selectAction: handleSelection
+            )
+            .padding(.top, 12)
+            .padding(.bottom, 8)
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+    }
+    
+    private func handleSelection(_ selectedIndex: Int) {
+        guard !isExplanationPresented else { return }
+        onSelectAnswer(selectedIndex)
+    }
 }
