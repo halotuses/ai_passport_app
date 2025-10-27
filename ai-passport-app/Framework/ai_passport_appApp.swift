@@ -25,7 +25,6 @@ struct ai_passport_appApp: SwiftUI.App {
             print("❌ Failed to prepare Realm directory: \(error)")
         }
         Realm.Configuration.defaultConfiguration = configuration
-
         // Realmファイルのパスを出力
         if let url = Realm.Configuration.defaultConfiguration.fileURL {
             print("✅ Realm file path:")
