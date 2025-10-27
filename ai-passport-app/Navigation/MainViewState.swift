@@ -9,15 +9,27 @@ protocol QuizNavigationCleanupDelegate: AnyObject {
 @MainActor
 final class MainViewState: ObservableObject {
     struct HeaderBackButton: Equatable {
-        enum Destination {
+        enum Destination: Equatable {
             case unitList
             case chapterList
             case home
             case quizQuestion
+            case custom
         }
         
         let title: String
         let destination: Destination
+        let action: (() -> Void)?
+
+        init(title: String, destination: Destination, action: (() -> Void)? = nil) {
+            self.title = title
+            self.destination = destination
+            self.action = action
+        }
+
+        static func == (lhs: HeaderBackButton, rhs: HeaderBackButton) -> Bool {
+            lhs.title == rhs.title && lhs.destination == rhs.destination
+        }
     }
     
     weak var quizCleanupDelegate: QuizNavigationCleanupDelegate?
@@ -131,6 +143,8 @@ final class MainViewState: ObservableObject {
             backToHome(router: router)
         case .quizQuestion:
             explanationDismissToken = UUID()
+        case .custom:
+            backButton.action?()
         }
     }
     
@@ -172,4 +186,8 @@ extension MainViewState.HeaderBackButton {
     static let toHome = Self(title: "◀ ホーム", destination: .home)
     /// 解説画面から問題画面へ戻る
     static let toQuizQuestion = Self(title: "◀ 問題", destination: .quizQuestion)
+    /// シートを閉じるためのボタン
+    static func close(action: @escaping () -> Void) -> Self {
+        Self(title: "閉じる", destination: .custom, action: action)
+    }
 }

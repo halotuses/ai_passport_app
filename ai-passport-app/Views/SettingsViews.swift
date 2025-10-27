@@ -27,13 +27,9 @@ struct SettingsView: View {
             .padding(.vertical, 32)
         }
         .background(Color.themeBase.ignoresSafeArea())
-        .navigationTitle("設定")
-        .toolbar {
-            ToolbarItem(placement: .navigationBarTrailing) {
-                Button("閉じる") { dismiss() }
-                    .foregroundColor(.themeAccent)
-            }
-        }
+        .navigationBarBackButtonHidden(true)
+        .toolbar(.hidden, for: .navigationBar)
+        
         .alert("データリセット", isPresented: $showResetConfirmation) {
             Button("キャンセル", role: .cancel) {}
             Button("リセット", role: .destructive, action: performDataReset)
@@ -53,7 +49,7 @@ struct SettingsView: View {
         }
         .onAppear {
             previousHeaderState = (mainViewState.headerTitle, mainViewState.headerBackButton)
-            mainViewState.setHeader(title: "設定")
+            mainViewState.setHeader(title: "設定", backButton: .close(action: { dismiss() }))
         }
         .onDisappear {
             if let previousHeaderState {
@@ -206,7 +202,7 @@ private extension SettingsView {
     }
 
     func openSupport() {
-        if let url = URL(string: "mailto:support@ai-passport.jp") {
+        if let url = URL(string: "https://docs.google.com/forms/d/e/1FAIpQLSc8-n5BuZjd_uG1co2_oMmwc-lQaw5GznifL7Z6XFO209MmAw/viewform") {
             open(link: url)
         }
     }
