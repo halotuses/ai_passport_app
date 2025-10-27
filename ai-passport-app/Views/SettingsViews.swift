@@ -32,7 +32,8 @@ struct SettingsView: View {
                 }
             }
             .padding(.horizontal, 20)
-            .padding(.vertical, 32)
+            .padding(.top, 12)
+            .padding(.bottom, 32)
         }
         .navigationTitle("")
         .navigationBarTitleDisplayMode(.inline)
@@ -78,8 +79,8 @@ private extension SettingsView {
             .frame(maxWidth: .infinity, alignment: .trailing)
         }
         .padding(.horizontal, 20)
-        .padding(.top, 28)
-        .padding(.bottom, 12)
+        .padding(.top, 12)
+        .padding(.bottom, 8)
         .background(Color.themeBase)
     }
     var accountSection: some View {

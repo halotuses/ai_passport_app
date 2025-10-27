@@ -20,6 +20,7 @@ struct AnswerHistoryView: View {
                 mainViewState.setHeader(title: "回答履歴", backButton: .toHome)
                 viewModel.refresh()
             }
+            .navigationBarBackButtonHidden(true)
     }
     @ViewBuilder
     private var content: some View {
