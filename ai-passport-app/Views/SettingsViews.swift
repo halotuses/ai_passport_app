@@ -40,19 +40,31 @@ struct SettingsView: View {
         .toolbar(.hidden, for: .navigationBar)
         
         .alert("データリセット", isPresented: $showResetConfirmation) {
-            Button("キャンセル", role: .cancel) {}
-            Button("リセット", role: .destructive, action: performDataReset)
+            Button("キャンセル", role: .cancel) {
+                SoundManager.shared.play(.tap)
+            }
+            Button("リセット", role: .destructive) {
+                SoundManager.shared.play(.tap)
+                performDataReset()
+            }
         } message: {
             Text("学習履歴をリセットします。よろしいですか？")
         }
         .alert("アプリを初期化", isPresented: $showInitializationConfirmation) {
-            Button("キャンセル", role: .cancel) {}
-            Button("初期化", role: .destructive, action: performInitialization)
+            Button("キャンセル", role: .cancel) {
+                SoundManager.shared.play(.tap)
+            }
+            Button("初期化", role: .destructive) {
+                SoundManager.shared.play(.tap)
+                performInitialization()
+            }
         } message: {
             Text("全ての学習データと設定を削除します。よろしいですか？")
         }
         .alert("エラー", isPresented: $showErrorAlert, presenting: errorMessage) { _ in
-            Button("OK", role: .cancel) {}
+            Button("OK", role: .cancel) {
+                SoundManager.shared.play(.tap)
+            }
         } message: { message in
             Text(message)
         }
@@ -71,6 +83,7 @@ private extension SettingsView {
                 Spacer()
 
                 Button("閉じる") {
+                    SoundManager.shared.play(.tap)
                     dismiss()
                 }
                 .font(.body)
@@ -140,6 +153,7 @@ private extension SettingsView {
         SettingsSection(title: "データ管理") {
             SettingsRow {
                 Button {
+                    SoundManager.shared.play(.tap)
                     showResetConfirmation = true
                 } label: {
                     rowLabel(title: "データリセット", systemImage: "arrow.counterclockwise", tint: .red, titleColor: .red, showsChevron: false)
@@ -149,6 +163,7 @@ private extension SettingsView {
 
             SettingsRow {
                 Button {
+                    SoundManager.shared.play(.tap)
                     showInitializationConfirmation = true
                 } label: {
                     rowLabel(title: "初期化", systemImage: "trash.fill", tint: .red, titleColor: .red, showsChevron: false)
@@ -162,6 +177,7 @@ private extension SettingsView {
         SettingsSection(title: "サポート・情報") {
             SettingsRow {
                 Button {
+                    SoundManager.shared.play(.tap)
                     openSupport()
                 } label: {
                     rowLabel(title: "お問い合わせ", systemImage: "envelope.fill", tint: .themeAccent)

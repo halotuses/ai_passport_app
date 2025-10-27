@@ -90,7 +90,10 @@ struct ResultView: View {
 
                     VStack(spacing: 16) {
                         VStack(spacing: 12) {
-                            Button(action: onBackToUnitSelection) {
+                            Button(action: {
+                                SoundManager.shared.play(.tap)
+                                onBackToUnitSelection()
+                            }) {
                                 HStack {
                                     Image(systemName: "arrow.uturn.backward")
                                         .font(.headline)
@@ -110,7 +113,10 @@ struct ResultView: View {
                             }
                             .shadow(color: Color.themeMainHover.opacity(0.3), radius: 16, x: 0, y: 10)
 
-                            Button(action: onBackToChapterSelection) {
+                            Button(action: {
+                                SoundManager.shared.play(.tap)
+                                onBackToChapterSelection()
+                            }) {
                                 HStack {
                                     Image(systemName: "arrow.uturn.backward")
                                         .font(.headline)
@@ -131,7 +137,10 @@ struct ResultView: View {
                             .shadow(color: Color.themeMainHover.opacity(0.3), radius: 16, x: 0, y: 10)
                         }
 
-                        Button(action: onRestart) {
+                        Button(action: {
+                            SoundManager.shared.play(.tap)
+                            onRestart()
+                        }) {
                             HStack {
                                 Image(systemName: "repeat")
                                     .font(.headline)

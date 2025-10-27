@@ -1,10 +1,9 @@
 import SwiftUI
 
-
 struct QuestionView: View {
     // ✅ QuizViewModelを監視するObservableObjectとして受け取る
     @ObservedObject var viewModel: QuizViewModel
-    
+    @State private var handledQuestionIndex: Int?
     var body: some View {
         VStack(spacing: 20) {
             
@@ -58,6 +57,18 @@ struct QuestionView: View {
                 }
                 .padding(.horizontal)
             }
+        }
+        .onChange(of: viewModel.selectedAnswerIndex) { newValue in
+            guard let selectedIndex = newValue,
+                  handledQuestionIndex != viewModel.currentQuestionIndex,
+                  let quiz = viewModel.currentQuiz else { return }
+
+            handledQuestionIndex = viewModel.currentQuestionIndex
+            let sound: SoundManager.SoundType = (selectedIndex == quiz.answerIndex) ? .correct : .wrong
+            SoundManager.shared.play(sound)
+        }
+        .onChange(of: viewModel.currentQuestionIndex) { _ in
+            handledQuestionIndex = nil
         }
     }
     

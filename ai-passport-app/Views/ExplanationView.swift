@@ -88,7 +88,10 @@ struct ExplanationView: View {
 
         // ✅ 常に画面下部にボタンを固定
         .safeAreaInset(edge: .bottom) {
-            Button(action: handleNextAction) {
+            Button(action: {
+                SoundManager.shared.play(.tap)
+                handleNextAction()
+            }) {
                 Text(hasNextQuestion ? "次の問題へ" : "結果表示")
                     .frame(maxWidth: .infinity)
                     .padding()

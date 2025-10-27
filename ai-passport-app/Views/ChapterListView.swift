@@ -28,7 +28,10 @@ struct ChapterListView: View {
         ScrollView {
             VStack(spacing: 8) {
                 ForEach(viewModel.progressViewModels) { progressVM in
-                    Button(action: { selectedChapter = progressVM.chapter }) {
+                    Button(action: {
+                        SoundManager.shared.play(.tap)
+                        selectedChapter = progressVM.chapter
+                    }) {
                         ChapterRowItem(viewModel: progressVM)
                     }
                 }

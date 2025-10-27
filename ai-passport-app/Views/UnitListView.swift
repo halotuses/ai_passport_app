@@ -17,6 +17,7 @@ struct UnitListView: View {
                 } else if let metadata = viewModel.metadata {
                     ForEach(metadata.sorted(by: { $0.key < $1.key }), id: \.key) { key, unit in
                         Button(action: {
+                            SoundManager.shared.play(.tap)
                             mainViewState.selectedUnitKey = key
                             selectedUnit = unit
                         }) {

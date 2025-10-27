@@ -208,7 +208,10 @@ private struct EmptyQuizStateView: View {
             Text("問題データが見つかりませんでした。")
                 .foregroundColor(.secondary)
             
-            Button("前に戻る", action: onQuizEnd)
+            Button("前に戻る") {
+                SoundManager.shared.play(.tap)
+                onQuizEnd()
+            }
                 .padding(.horizontal, 16)
                 .padding(.vertical, 10)
                 .background(Color.themeButtonSecondary)
