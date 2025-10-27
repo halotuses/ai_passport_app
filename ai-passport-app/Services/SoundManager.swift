@@ -32,6 +32,7 @@ final class SoundManager {
     }
 
     func play(_ type: SoundType) {
+        guard AppSoundSettings.isEnabled else { return }
         guard let soundID = prepareSoundID(for: type) else { return }
         AudioServicesPlaySystemSound(soundID)
     }

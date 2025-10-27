@@ -28,9 +28,16 @@ enum AppFontSettings {
         options.first(where: { $0.id == index }) ?? options[defaultIndex]
     }
 }
+enum AppSoundSettings {
+    private static let defaults: UserDefaults = .standard
 
+    static var isEnabled: Bool {
+        guard defaults.object(forKey: AppSettingsKeys.soundEnabled) != nil else { return true }
+        return defaults.bool(forKey: AppSettingsKeys.soundEnabled)
+    }
+}
 private struct AppSoundEnabledKey: EnvironmentKey {
-    static let defaultValue: Bool = true
+    static let defaultValue: Bool = AppSoundSettings.isEnabled
 }
 
 extension EnvironmentValues {
