@@ -76,13 +76,7 @@ struct ExplanationView: View {
             VStack(spacing: 12) {
                 VoiceExplanation(text: quiz.explanation ?? "")
 
-                Button(action: {
-                    if hasNextQuestion {
-                        onNextQuestion()
-                    } else {
-                        onShowResult()
-                    }
-                }) {
+                Button(action: handleNextAction) {
                     Text(hasNextQuestion ? "次の問題へ" : "結果表示")
                         .frame(maxWidth: .infinity)
                         .padding()
