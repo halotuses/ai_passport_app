@@ -198,30 +198,34 @@ struct HomeView: View {
             Divider().background(Color.gray.opacity(0.2))
             
             // 回答履歴リンク
-            NavigationLink {
-                AnswerHistoryView()
-            } label: {
-                HStack(spacing: 12) {
-                    Text("回答履歴を見る")
-                        .font(.subheadline.weight(.semibold))
-                        .foregroundColor(.themeSecondary)
-                    Spacer(minLength: 0)
-                    Image(systemName: "chevron.right")
-                        .font(.footnote.weight(.semibold))
-                        .foregroundColor(.themeSecondary)
+            NavigationLink(
+                isActive: $mainViewState.isShowingAnswerHistory,
+                destination: {
+                    AnswerHistoryView()
+                },
+                label: {
+                    HStack(spacing: 12) {
+                        Text("回答履歴を見る")
+                            .font(.subheadline.weight(.semibold))
+                            .foregroundColor(.themeSecondary)
+                        Spacer(minLength: 0)
+                        Image(systemName: "chevron.right")
+                            .font(.footnote.weight(.semibold))
+                            .foregroundColor(.themeSecondary)
+                    }
+                    .padding(.vertical, 10)
+                    .padding(.horizontal, 14)
+                    .frame(maxWidth: .infinity)
+                    .background(
+                        RoundedRectangle(cornerRadius: 16, style: .continuous)
+                            .fill(Color.themeButtonSecondary.opacity(0.14))
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 16, style: .continuous)
+                                    .stroke(Color.themeSecondary.opacity(0.12), lineWidth: 1)
+                            )
+                    )
                 }
-                .padding(.vertical, 10)
-                .padding(.horizontal, 14)
-                .frame(maxWidth: .infinity)
-                .background(
-                    RoundedRectangle(cornerRadius: 16, style: .continuous)
-                        .fill(Color.themeButtonSecondary.opacity(0.14))
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 16, style: .continuous)
-                                .stroke(Color.themeSecondary.opacity(0.12), lineWidth: 1)
-                        )
-                )
-            }
+            )
             .buttonStyle(.plain)
         }
         .padding(.horizontal, 22)

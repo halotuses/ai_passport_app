@@ -32,6 +32,7 @@ final class MainViewState: ObservableObject {
     @Published var headerTitle: String = "ホーム"
     @Published var headerBackButton: HeaderBackButton? = nil
     @Published var isOnHome: Bool = true
+    @Published var isShowingAnswerHistory: Bool = false
     
     /// ホーム画面（単元選択）に戻す
     func reset(router: NavigationRouter) {
@@ -58,6 +59,7 @@ final class MainViewState: ObservableObject {
         showResultView = false
         router.reset()
         navigationResetToken = UUID()
+        isShowingAnswerHistory = false
 
         let unitTitle = selectedUnit?.title ?? "章選択"
         setHeader(title: unitTitle, backButton: .toUnitList)
@@ -72,6 +74,7 @@ final class MainViewState: ObservableObject {
         showResultView = false
         router.reset()
         navigationResetToken = UUID()
+        isShowingAnswerHistory = false
 
         enterUnitSelection()
     }
@@ -79,12 +82,14 @@ final class MainViewState: ObservableObject {
     /// ホーム画面に遷移
     func enterHome() {
         isOnHome = true
+        isShowingAnswerHistory = false
         setHeader(title: "ホーム")
     }
     
     /// 単元一覧（学習開始画面）に遷移
     func enterUnitSelection() {
         isOnHome = false
+        isShowingAnswerHistory = false
         setHeader(title: "学習アプリ", backButton: .toHome)
 
     }
@@ -97,6 +102,7 @@ final class MainViewState: ObservableObject {
         showResultView = false
         router.reset()
         navigationResetToken = UUID()
+        isShowingAnswerHistory = false
         enterHome()
         
     }

@@ -35,7 +35,7 @@ struct AnswerHistoryView: View {
 
     
     private var historyList: some View {
-        ScrollView {
+        ScrollView(.vertical, showsIndicators: true) {
             LazyVStack(spacing: 16) {
                 ForEach(viewModel.histories) { history in
                     AnswerHistoryRow(history: history)
@@ -44,7 +44,6 @@ struct AnswerHistoryView: View {
             .padding(.vertical, 24)
             .padding(.horizontal, 20)
         }
-        .scrollIndicators(.hidden)
         .refreshable {
             await MainActor.run {
                 viewModel.refresh()
