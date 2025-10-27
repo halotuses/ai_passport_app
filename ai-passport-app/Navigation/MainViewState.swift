@@ -13,6 +13,7 @@ final class MainViewState: ObservableObject {
             case unitList
             case chapterList
             case home
+            case quizQuestion
         }
         
         let title: String
@@ -26,6 +27,7 @@ final class MainViewState: ObservableObject {
     @Published var selectedChapter: ChapterMetadata? = nil
     @Published var selectedUnitKey: String? = nil
     @Published var navigationResetToken = UUID()
+    @Published var explanationDismissToken = UUID()
     @Published var showResultView: Bool = false
     @Published var headerTitle: String = "ホーム"
     @Published var headerBackButton: HeaderBackButton? = nil
@@ -121,6 +123,8 @@ final class MainViewState: ObservableObject {
             backToChapterSelection(router: router)
         case .home:
             backToHome(router: router)
+        case .quizQuestion:
+            explanationDismissToken = UUID()
         }
     }
     
@@ -160,4 +164,6 @@ extension MainViewState.HeaderBackButton {
     static let toUnitList = Self(title: "◀ 単元", destination: .unitList)
     /// ホームに戻る際のラベル
     static let toHome = Self(title: "◀ ホーム", destination: .home)
+    /// 解説画面から問題画面へ戻る
+    static let toQuizQuestion = Self(title: "◀ 問題", destination: .quizQuestion)
 }

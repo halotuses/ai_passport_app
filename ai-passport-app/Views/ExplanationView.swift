@@ -1,20 +1,20 @@
 import SwiftUI
+import AVFoundation
 
 /// 解説画面（問題の正誤と解説を表示）
 struct ExplanationView: View {
+    @ObservedObject var viewModel: QuizViewModel
     let quiz: Quiz
     let selectedAnswerIndex: Int
-    let hasNextQuestion: Bool
-    let onNextQuestion: () -> Void
-    let onShowResult: () -> Void
-    let onDismiss: () -> Void
-    @EnvironmentObject private var mainViewState: MainViewState
+    @EnvironmentObject private var router: NavigationRouter
     
     private var isAnswerCorrect: Bool {
         selectedAnswerIndex == quiz.answerIndex
     }
 
-    
+    private var hasNextQuestion: Bool {
+        viewModel.hasNextQuestion
+    }
     
     var body: some View {
         ScrollView {
@@ -70,35 +70,36 @@ struct ExplanationView: View {
                 endPoint: .bottom
             )
         )
-        .onChange(of: mainViewState.navigationResetToken) { _ in
-            onDismiss()
-        }
 
         // ✅ 常に画面下部にボタンを固定
         .safeAreaInset(edge: .bottom) {
-            Button(action: {
-                if hasNextQuestion {
-                    onNextQuestion()
-                } else {
-                    onShowResult()
-                }
-            }) {
-                Text(hasNextQuestion ? "次の問題へ" : "結果表示")
-                    .frame(maxWidth: .infinity)
-                    .padding()
-                    .background(
-                        LinearGradient(
-                            colors: [Color.themeSecondary, Color.themeMain],
-                            startPoint: .leading,
-                            endPoint: .trailing
+            VStack(spacing: 12) {
+                VoiceExplanation(text: quiz.explanation ?? "")
+
+                Button(action: {
+                    if hasNextQuestion {
+                        onNextQuestion()
+                    } else {
+                        onShowResult()
+                    }
+                }) {
+                    Text(hasNextQuestion ? "次の問題へ" : "結果表示")
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(
+                            LinearGradient(
+                                colors: [Color.themeSecondary, Color.themeMain],
+                                startPoint: .leading,
+                                endPoint: .trailing
+                            )
                         )
-                    )
-                    .foregroundColor(.white)
-                    .cornerRadius(12)
-                    .shadow(color: Color.themeSecondary.opacity(0.25), radius: 12, x: 0, y: 6)
-                    .padding(.horizontal)
-                    .padding(.bottom, 8)
+                        .foregroundColor(.white)
+                        .cornerRadius(12)
+                        .shadow(color: Color.themeSecondary.opacity(0.25), radius: 12, x: 0, y: 6)
+                }
             }
+            .padding(.horizontal)
+            .padding(.bottom, 8)
         }
         .navigationBarBackButtonHidden(true)
         .toolbar(.hidden, for: .navigationBar)
@@ -193,5 +194,120 @@ private extension ExplanationView {
         case .selected:
             return isAnswerCorrect ? Color.themeCorrect : Color.themeIncorrect
         }
+    }
+    func handleNextAction() {
+        if hasNextQuestion {
+            viewModel.moveNext()
+        } else {
+            viewModel.finishQuiz()
+        }
+
+        if !router.path.isEmpty {
+            router.path.removeLast()
+        }
+    }
+}
+private struct VoiceExplanation: View {
+    let text: String
+    @StateObject private var speaker = VoiceExplanationSpeaker()
+
+    private var trimmedText: String {
+        text.trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+
+    private var canSpeak: Bool {
+        !trimmedText.isEmpty
+    }
+
+    var body: some View {
+        Button {
+            speaker.toggleSpeaking(text: trimmedText)
+        } label: {
+            HStack(spacing: 12) {
+                Image(systemName: speaker.isSpeaking ? "stop.circle.fill" : "speaker.wave.2.fill")
+                    .font(.title3.weight(.semibold))
+                    .foregroundColor(speaker.isSpeaking ? .themeSecondary : .themeMain)
+
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(speaker.isSpeaking ? "音声を停止" : "音声で解説を聞く")
+                        .font(.headline)
+                        .fontWeight(.semibold)
+                        .foregroundColor(.themeTextPrimary)
+
+                    Text("読み上げで理解をサポートします")
+                        .font(.caption)
+                        .foregroundColor(.themeTextSecondary)
+                }
+
+                Spacer(minLength: 0)
+            }
+            .padding(.vertical, 14)
+            .padding(.horizontal, 16)
+            .frame(maxWidth: .infinity)
+            .background(
+                RoundedRectangle(cornerRadius: 14, style: .continuous)
+                    .fill(Color.themeSurfaceAlt)
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: 14, style: .continuous)
+                    .stroke(Color.themeMain.opacity(0.18), lineWidth: 1)
+            )
+            .shadow(color: Color.themeShadowSoft.opacity(0.7), radius: 8, x: 0, y: 4)
+        }
+        .buttonStyle(.plain)
+        .disabled(!canSpeak)
+        .opacity(canSpeak ? 1 : 0.5)
+        .onDisappear {
+            speaker.stop()
+        }
+        .onChange(of: trimmedText) { _ in
+            speaker.stop()
+        }
+    }
+}
+
+@MainActor
+private final class VoiceExplanationSpeaker: NSObject, ObservableObject, AVSpeechSynthesizerDelegate {
+    @Published private(set) var isSpeaking: Bool = false
+    private let synthesizer = AVSpeechSynthesizer()
+
+    override init() {
+        super.init()
+        synthesizer.delegate = self
+    }
+
+    func toggleSpeaking(text: String) {
+        guard !text.isEmpty else { return }
+
+        if isSpeaking {
+            stop()
+        } else {
+            speak(text)
+        }
+    }
+
+    func stop() {
+        if synthesizer.isSpeaking {
+            synthesizer.stopSpeaking(at: .immediate)
+        }
+        isSpeaking = false
+    }
+
+    private func speak(_ text: String) {
+        stop()
+
+        let utterance = AVSpeechUtterance(string: text)
+        utterance.voice = AVSpeechSynthesisVoice(language: "ja-JP")
+        utterance.rate = AVSpeechUtteranceDefaultSpeechRate
+        synthesizer.speak(utterance)
+        isSpeaking = true
+    }
+
+    func speechSynthesizer(_ synthesizer: AVSpeechSynthesizer, didFinish utterance: AVSpeechUtterance) {
+        isSpeaking = false
+    }
+
+    func speechSynthesizer(_ synthesizer: AVSpeechSynthesizer, didCancel utterance: AVSpeechUtterance) {
+        isSpeaking = false
     }
 }

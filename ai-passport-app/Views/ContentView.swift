@@ -14,10 +14,9 @@ struct ContentView: View {
     
     @EnvironmentObject private var mainViewState: MainViewState
     
-    @State private var showExplanation = false
-    @State private var explanationQuiz: Quiz?
-    @State private var explanationSelectedAnswerIndex: Int = 0
+    @EnvironmentObject private var router: NavigationRouter
     @State private var hasLoaded = false
+    @State private var isShowingExplanation = false
     
     var body: some View {
         VStack(spacing: 0) {
@@ -76,10 +75,16 @@ struct ContentView: View {
                     AnswerAreaView(
                         choices: viewModel.currentQuiz?.choices ?? [],
                         selectAction: { selectedIndex in
+                            guard !isShowingExplanation,
+                                  let quiz = viewModel.currentQuiz else { return }
                             viewModel.recordAnswer(selectedIndex: selectedIndex)
-                            explanationQuiz = viewModel.currentQuiz
-                            explanationSelectedAnswerIndex = selectedIndex
-                            showExplanation = true
+                            let destination = ExplanationRoute(
+                                quiz: quiz,
+                                selectedAnswerIndex: selectedIndex
+                            )
+
+                            router.path.append(destination)
+                            isShowingExplanation = true
                         }
                     )
                     .padding(.top, 12)
@@ -90,31 +95,7 @@ struct ContentView: View {
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(Color.themeBase)
-        .overlay(
-            NavigationLink(isActive: $showExplanation) {
-                if let quiz = explanationQuiz {
-                    ExplanationView(
-                        quiz: quiz,
-                        selectedAnswerIndex: explanationSelectedAnswerIndex,
-                        hasNextQuestion: viewModel.hasNextQuestion,
-                        onNextQuestion: {
-                            proceedToNextQuestion()
-                        },
-                        onShowResult: {
-                            finishQuiz()
-                        },
-                        onDismiss: {
-                            closeExplanation()
-                        }
-                    )
-                } else {
-                    EmptyView()
-                }
-            } label: {
-                EmptyView()
-            }
-                .hidden()
-        )
+
         .onAppear {
             mainViewState.quizCleanupDelegate = viewModel
             updateHeaderForCurrentState()
@@ -138,11 +119,14 @@ struct ContentView: View {
         .onChange(of: viewModel.hasError) { _ in
             updateHeaderForCurrentState()
         }
-        .onChange(of: showExplanation) { isPresented in
-            if !isPresented {
-                resetExplanationState()
-            }
+        .onChange(of: router.path.count) { count in
+            isShowingExplanation = count > 0
             updateHeaderForCurrentState()
+        }
+        .onChange(of: mainViewState.explanationDismissToken) { _ in
+            if showExplanation {
+                closeExplanation()
+            }
         }
         .onDisappear {
             if let delegate = mainViewState.quizCleanupDelegate,
@@ -169,30 +153,11 @@ private extension ContentView {
         return ""
     }
     
-    func closeExplanation() {
-        showExplanation = false
-    }
-    
-    func proceedToNextQuestion() {
-        viewModel.moveNext()
-        viewModel.selectedAnswerIndex = nil
-        closeExplanation()
-    }
-    
-    func finishQuiz() {
-        viewModel.finishQuiz()
-        closeExplanation()
-    }
-    
-    func resetExplanationState() {
-        explanationQuiz = nil
-        explanationSelectedAnswerIndex = 0
-    }
     
     func updateHeaderForCurrentState() {
-        if showExplanation {
+        if isShowingExplanation {
             let questionNumber = min(viewModel.currentQuestionIndex + 1, viewModel.totalCount)
-            mainViewState.setHeader(title: "第\(questionNumber)問", backButton: .toChapterList)
+            mainViewState.setHeader(title: "第\(questionNumber)問 解説", backButton: .toQuizQuestion)
         } else if viewModel.totalCount > 0 && viewModel.currentQuestionIndex >= viewModel.totalCount {
             mainViewState.setHeader(title: "結果", backButton: .toChapterList)
         } else if viewModel.isLoaded && viewModel.totalCount > 0 {
