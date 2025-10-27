@@ -18,18 +18,42 @@ struct CircularProgressView: View {
 
     private struct SegmentSlice: Identifiable {
         let segment: Segment
-        let start: Double
-        let end: Double
+        let startAngle: Angle
+        let endAngle: Angle
+        let endFraction: Double
 
         var id: Segment.Kind { segment.id }
     }
+    private struct RingSegment: Shape {
+        var startAngle: Angle
+        var endAngle: Angle
+        var clockwise: Bool = true
 
+        func path(in rect: CGRect) -> Path {
+            let rotationAdjustment = Angle.degrees(90)
+            let adjustedStart = startAngle - rotationAdjustment
+            let adjustedEnd = endAngle - rotationAdjustment
+            let radius = min(rect.width, rect.height) / 2
+            let center = CGPoint(x: rect.midX, y: rect.midY)
+
+            var path = Path()
+            path.addArc(
+                center: center,
+                radius: radius,
+                startAngle: adjustedStart,
+                endAngle: adjustedEnd,
+                clockwise: !clockwise
+            )
+            return path
+        }
+    }
+    
     let segments: [Segment]
     let progress: Double
     var lineWidth: CGFloat = 12
     var size: CGFloat = 140
     
-    private let startAngleOrder: [Segment.Kind] = [.incorrect, .correct, .unanswered]
+    private let layoutOrder: [Segment.Kind] = [.unanswered, .incorrect, .correct]
     private let drawingOrder: [Segment.Kind] = [.unanswered, .incorrect, .correct]
 
     private var sanitizedSegments: [Segment] {
@@ -44,7 +68,7 @@ struct CircularProgressView: View {
 
     private var layoutSegments: [Segment] {
         sanitizedSegments.sorted { lhs, rhs in
-            orderIndex(for: lhs.kind, in: startAngleOrder) < orderIndex(for: rhs.kind, in: startAngleOrder)
+            orderIndex(for: lhs.kind, in: layoutOrder) < orderIndex(for: rhs.kind, in: layoutOrder)
         }
     }
 
@@ -55,25 +79,32 @@ struct CircularProgressView: View {
     
 
     private var segmentSlices: [SegmentSlice] {
-        let segments = layoutSegments
         guard totalValue > 0 else { return [] }
 
+        let epsilon = 0.1
         var slices: [SegmentSlice] = []
-        var start: Double = 0
-
-        for segment in segments {
-            guard segment.value > 0 else { continue }
+        var currentAngle: Double = 0
+        
+        for (index, segment) in segments.enumerated(){
 
             let fraction = segment.value / totalValue
-            let clampedEnd = min(start + fraction, 1)
+                let sweep = fraction * 360
+                let baseStartAngle = currentAngle
+                let baseEndAngle = currentAngle + sweep
+                let isFirst = index == 0
+                let isLast = index == segments.count - 1
+
+                let adjustedStart = isFirst ? baseStartAngle : baseStartAngle - epsilon
+                let adjustedEnd = isLast ? baseEndAngle + epsilon : baseEndAngle
             slices.append(
                 SegmentSlice(
                     segment: segment,
-                    start: start,
-                    end: clampedEnd
+                    startAngle: .degrees(adjustedStart),
+                    endAngle: .degrees(adjustedEnd),
+                    endFraction: min(baseEndAngle / 360, 1)
                 )
             )
-            start = clampedEnd
+            currentAngle = baseEndAngle
         }
 
         return slices
@@ -105,14 +136,13 @@ struct CircularProgressView: View {
                 ForEach(segmentSlices.sorted { lhs, rhs in
                     orderIndex(for: lhs.segment.kind, in: drawingOrder) < orderIndex(for: rhs.segment.kind, in: drawingOrder)
                 }) { slice in
-                    Circle()
-                        .trim(from: slice.start, to: slice.end)
+                    RingSegment(startAngle: slice.startAngle, endAngle: slice.endAngle)
                         .stroke(
                             slice.segment.color,
                             style: StrokeStyle(lineWidth: lineWidth, lineCap: .butt, lineJoin: .round)
                         )
-                        .rotationEffect(.degrees(-90))
-                        .animation(.easeInOut(duration: 0.6), value: slice.end)
+                        .opacity(1.0)
+                        .animation(.easeInOut(duration: 0.6), value: slice.endFraction)
                 }
             }
 
