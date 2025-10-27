@@ -25,6 +25,7 @@ struct MainRouterView: View {
                 )
             }
         }
+        .toolbar(.hidden, for: .navigationBar)
     }
 }
 
