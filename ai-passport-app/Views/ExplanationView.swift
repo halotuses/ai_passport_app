@@ -7,6 +7,7 @@ struct ExplanationView: View {
     let quiz: Quiz
     let selectedAnswerIndex: Int
     @Environment(\.dismiss) private var dismiss
+    let onNext: () -> Void
     
     private var isAnswerCorrect: Bool {
         selectedAnswerIndex == quiz.answerIndex
@@ -213,6 +214,6 @@ private extension ExplanationView {
             viewModel.finishQuiz()
         }
 
-        dismiss()
+        onNext()
     }
 }

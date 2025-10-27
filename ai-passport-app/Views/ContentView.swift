@@ -31,7 +31,8 @@ struct ContentView: View {
                 ExplanationView(
                     viewModel: viewModel,
                     quiz: route.quiz,
-                    selectedAnswerIndex: route.selectedAnswerIndex
+                    selectedAnswerIndex: route.selectedAnswerIndex,
+                    onNext: handleExplanationNext
                 )
             } else {
                 contentBody
@@ -129,6 +130,10 @@ private extension ContentView {
         guard let quiz = viewModel.currentQuiz else { return }
         viewModel.recordAnswer(selectedIndex: selectedIndex)
         showExplanation(for: quiz, selectedAnswerIndex: selectedIndex)
+    }
+    
+    func handleExplanationNext() {
+        closeExplanation()
     }
     
     func refreshHeader() {
