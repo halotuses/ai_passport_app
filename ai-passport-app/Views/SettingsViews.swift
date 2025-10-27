@@ -4,6 +4,7 @@ struct SettingsView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.openURL) private var openURL
     @EnvironmentObject private var progressManager: ProgressManager
+    @EnvironmentObject private var mainViewState: MainViewState
     @AppStorage(AppSettingsKeys.soundEnabled) private var soundEnabled = true
     @AppStorage(AppSettingsKeys.fontSizeIndex) private var fontSizeIndex = AppFontSettings.defaultIndex
 
@@ -11,6 +12,7 @@ struct SettingsView: View {
     @State private var showInitializationConfirmation = false
     @State private var errorMessage: String?
     @State private var showErrorAlert = false
+    @State private var previousHeaderState: (title: String, backButton: MainViewState.HeaderBackButton?)?
 
     private let fontSliderRange = 0.0...Double(AppFontSettings.options.count - 1)
 
@@ -49,6 +51,15 @@ struct SettingsView: View {
         } message: { message in
             Text(message)
         }
+        .onAppear {
+            previousHeaderState = (mainViewState.headerTitle, mainViewState.headerBackButton)
+            mainViewState.setHeader(title: "設定")
+        }
+        .onDisappear {
+            if let previousHeaderState {
+                mainViewState.setHeader(title: previousHeaderState.title, backButton: previousHeaderState.backButton)
+            }
+        }
     }
 }
 
@@ -72,29 +83,34 @@ private extension SettingsView {
             }
 
             SettingsRow(alignment: .leading, spacing: 16) {
-                VStack(alignment: .leading, spacing: 12) {
+                VStack(alignment: .leading, spacing: 16) {
                     Label("フォントサイズ", systemImage: "textformat.size")
-                    Slider(
-                        value: Binding(
-                            get: { Double(fontSizeIndex) },
-                            set: { fontSizeIndex = Int($0.rounded()) }
-                        ),
-                        in: fontSliderRange,
-                        step: 1
-                    )
-                    HStack {
-                        Text("小")
-                            .font(.caption)
-                            .foregroundColor(.themeTextSecondary)
-                        Spacer()
-                        Text(currentFontOption.label)
-                            .font(.caption)
-                            .fontWeight(.semibold)
-                            .foregroundColor(.themeAccent)
-                        Spacer()
-                        Text("大")
-                            .font(.caption)
-                            .foregroundColor(.themeTextSecondary)
+                    VStack(alignment: .leading, spacing: 12) {
+                        HStack(alignment: .center, spacing: 12) {
+                            Slider(
+                                value: Binding(
+                                    get: { Double(fontSizeIndex) },
+                                    set: { fontSizeIndex = Int($0.rounded()) }
+                                ),
+                                in: fontSliderRange,
+                                step: 1
+                            )
+                            .tint(.themeMain)
+
+                            Text("現在：\(currentFontOption.label)")
+                                .font(.subheadline)
+                                .fontWeight(.bold)
+                                .foregroundColor(.themeTextPrimary)
+                        }
+
+                        HStack {
+                            Text("小")
+                            Spacer()
+                            Text("大")
+                        }
+                        .font(.caption)
+                        .foregroundColor(.themeTextSecondary)
+                        .padding(.horizontal, 4)
                     }
                 }
             }
@@ -107,7 +123,7 @@ private extension SettingsView {
                 Button {
                     showResetConfirmation = true
                 } label: {
-                    rowLabel(title: "データリセット", systemImage: "arrow.counterclockwise", tint: .themeAccent, showsChevron: false)
+                    rowLabel(title: "データリセット", systemImage: "arrow.counterclockwise", tint: .red, titleColor: .red, showsChevron: false)
                 }
                 .buttonStyle(.plain)
             }
@@ -116,7 +132,7 @@ private extension SettingsView {
                 Button {
                     showInitializationConfirmation = true
                 } label: {
-                    rowLabel(title: "初期化", systemImage: "trash.fill", tint: .red, showsChevron: false)
+                    rowLabel(title: "初期化", systemImage: "trash.fill", tint: .red, titleColor: .red, showsChevron: false)
                 }
                 .buttonStyle(.plain)
             }
@@ -135,8 +151,8 @@ private extension SettingsView {
             }
 
             SettingsRow {
-                Button {
-                    open(link: URL(string: "https://ai-passport.jp/terms")!)
+                NavigationLink {
+                    TermsView()
                 } label: {
                     rowLabel(title: "利用規約", systemImage: "doc.text", tint: .themeAccent)
                 }
@@ -144,8 +160,8 @@ private extension SettingsView {
             }
 
             SettingsRow {
-                Button {
-                    open(link: URL(string: "https://ai-passport.jp/privacy")!)
+                NavigationLink {
+                    PrivacyPolicyView()
                 } label: {
                     rowLabel(title: "プライバシーポリシー", systemImage: "lock.shield", tint: .themeAccent)
                 }
@@ -173,12 +189,12 @@ private extension SettingsView {
         return "\(version) (\(build))"
     }
 
-    func rowLabel(title: String, systemImage: String, tint: Color, showsChevron: Bool = true) -> some View {
+    func rowLabel(title: String, systemImage: String, tint: Color, titleColor: Color = .themeTextPrimary, showsChevron: Bool = true) -> some View {
         HStack(spacing: 16) {
             Image(systemName: systemImage)
                 .foregroundColor(tint)
             Text(title)
-                .foregroundColor(.themeTextPrimary)
+                .foregroundColor(titleColor)
             Spacer()
             if showsChevron {
                 Image(systemName: "chevron.right")
@@ -242,7 +258,7 @@ private struct SettingsSection<Content: View>: View {
         VStack(alignment: .leading, spacing: 16) {
             Text(title)
                 .font(.headline)
-                .foregroundColor(.themeTextPrimary)
+                .foregroundColor(.secondary)
             VStack(spacing: 12) {
                 content
             }

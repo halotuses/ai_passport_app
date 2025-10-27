@@ -30,6 +30,7 @@ struct AppFrameView: View {
             NavigationStack {
                 SettingsView()
             }
+            .environmentObject(mainViewState)
             .environment(\.appSoundEnabled, soundEnabled)
             .environment(\.dynamicTypeSize, AppFontSettings.option(for: fontSizeIndex).dynamicTypeSize)
         }

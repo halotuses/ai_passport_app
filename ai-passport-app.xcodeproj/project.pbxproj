@@ -53,6 +53,7 @@
 		0CE6D5A12EAF675E00D38241 /* AppSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CE6D5A02EAF675C00D38241 /* AppSettings.swift */; };
 		0CE6D5A32EAF67D100D38241 /* AccountView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CE6D5A22EAF67CF00D38241 /* AccountView.swift */; };
 		0CE6D5A52EAF682B00D38241 /* SettingsViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CE6D5A42EAF682100D38241 /* SettingsViews.swift */; };
+		0CE6D5A72EAF709F00D38241 /* TermsPrivacyViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CE6D5A62EAF709D00D38241 /* TermsPrivacyViews.swift */; };
 		0CF00B642EA91BF300B8A6D0 /* QuestionProgress.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF00B632EA91BEC00B8A6D0 /* QuestionProgress.swift */; };
 		0CF00B662EA91D2700B8A6D0 /* ChapterProgressViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF00B652EA91D1400B8A6D0 /* ChapterProgressViewModel.swift */; };
 		0CF00B682EA91D5800B8A6D0 /* HomeProgressViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF00B672EA91D5700B8A6D0 /* HomeProgressViewModel.swift */; };
@@ -133,6 +134,7 @@
 		0CE6D5A02EAF675C00D38241 /* AppSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppSettings.swift; sourceTree = "<group>"; };
 		0CE6D5A22EAF67CF00D38241 /* AccountView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountView.swift; sourceTree = "<group>"; };
 		0CE6D5A42EAF682100D38241 /* SettingsViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViews.swift; sourceTree = "<group>"; };
+		0CE6D5A62EAF709D00D38241 /* TermsPrivacyViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TermsPrivacyViews.swift; sourceTree = "<group>"; };
 		0CF00B632EA91BEC00B8A6D0 /* QuestionProgress.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuestionProgress.swift; sourceTree = "<group>"; };
 		0CF00B652EA91D1400B8A6D0 /* ChapterProgressViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChapterProgressViewModel.swift; sourceTree = "<group>"; };
 		0CF00B672EA91D5700B8A6D0 /* HomeProgressViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeProgressViewModel.swift; sourceTree = "<group>"; };
@@ -306,6 +308,7 @@
 		0C30DDCE2DFF140C00F25D02 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				0CE6D5A62EAF709D00D38241 /* TermsPrivacyViews.swift */,
 				0CE6D5A42EAF682100D38241 /* SettingsViews.swift */,
 				0CE6D5A22EAF67CF00D38241 /* AccountView.swift */,
 				0CF00B732EAA83AF00B8A6D0 /* AnswerHistoryView.swift */,
@@ -659,6 +662,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				0CCB45A02E89853900C41D03 /* Constants.swift in Sources */,
+				0CE6D5A72EAF709F00D38241 /* TermsPrivacyViews.swift in Sources */,
 				0C30DDF12DFF1C1D00F25D02 /* NetworkManager.swift in Sources */,
 				0CE6D59D2EAE9C5500D38241 /* ExplanationRoute.swift in Sources */,
 				0CF00B6B2EA91FA900B8A6D0 /* CircularProgressView.swift in Sources */,
