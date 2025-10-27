@@ -209,7 +209,6 @@ private struct EmptyQuizStateView: View {
                 .foregroundColor(.secondary)
             
             Button("前に戻る") {
-                SoundManager.shared.play(.tap)
                 onQuizEnd()
             }
                 .padding(.horizontal, 16)

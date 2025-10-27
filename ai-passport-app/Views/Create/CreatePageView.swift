@@ -62,7 +62,6 @@ struct CreatePageView<Content: View>: View {
 
     private var primaryButton: some View {
         Button(action: {
-            SoundManager.shared.play(.tap)
             nextButtonAction()
         }) {
             Text(nextButtonTitle)

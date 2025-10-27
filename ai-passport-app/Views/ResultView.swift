@@ -91,7 +91,6 @@ struct ResultView: View {
                     VStack(spacing: 16) {
                         VStack(spacing: 12) {
                             Button(action: {
-                                SoundManager.shared.play(.tap)
                                 onBackToUnitSelection()
                             }) {
                                 HStack {
@@ -114,7 +113,6 @@ struct ResultView: View {
                             .shadow(color: Color.themeMainHover.opacity(0.3), radius: 16, x: 0, y: 10)
 
                             Button(action: {
-                                SoundManager.shared.play(.tap)
                                 onBackToChapterSelection()
                             }) {
                                 HStack {
@@ -138,7 +136,6 @@ struct ResultView: View {
                         }
 
                         Button(action: {
-                            SoundManager.shared.play(.tap)
                             onRestart()
                         }) {
                             HStack {
