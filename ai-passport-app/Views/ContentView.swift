@@ -11,13 +11,12 @@ struct ContentView: View {
     let onBackToChapterSelection: () -> Void
     let onBackToUnitSelection: () -> Void
     
-    
     @EnvironmentObject private var mainViewState: MainViewState
     
     @EnvironmentObject private var router: NavigationRouter
     @State private var hasLoaded = false
     @State private var activeExplanationRoute: ExplanationRoute?
-    
+    @State private var explanationPath: [ExplanationRoute] = []
     private enum QuizViewState {
         case loading
         case empty
@@ -26,23 +25,31 @@ struct ContentView: View {
     }
     
     var body: some View {
-        VStack(spacing: 0) {
-            
-            contentBody
+        NavigationStack(path: $explanationPath) {
+            VStack(spacing: 0) {
+                contentBody
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .background(Color.themeBase)
+            .onAppear(perform: handleOnAppear)
+            .onChange(of: chapter.id, perform: handleChapterChange)
+            .onChange(of: viewModel.currentQuestionIndex, perform: { _ in refreshHeader() })
+            .onChange(of: viewModel.quizzes.count, perform: { _ in refreshHeader() })
+            .onChange(of: viewModel.isLoaded, perform: { _ in refreshHeader() })
+            .onChange(of: viewModel.hasError, perform: { _ in refreshHeader() })
+            .onChange(of: router.path.count, perform: handleRouterPathChange)
+            .onChange(of: activeExplanationRoute, perform: { _ in refreshHeader() })
+            .onChange(of: explanationPath, perform: handleExplanationPathChange)
+            .onChange(of: mainViewState.explanationDismissToken, perform: handleExplanationDismiss)
+            .onDisappear(perform: handleOnDisappear)
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(Color.themeBase)
-        .background(explanationNavigation)
-        .onAppear(perform: handleOnAppear)
-        .onChange(of: chapter.id, perform: handleChapterChange)
-        .onChange(of: viewModel.currentQuestionIndex, perform: { _ in refreshHeader() })
-        .onChange(of: viewModel.quizzes.count, perform: { _ in refreshHeader() })
-        .onChange(of: viewModel.isLoaded, perform: { _ in refreshHeader() })
-        .onChange(of: viewModel.hasError, perform: { _ in refreshHeader() })
-        .onChange(of: router.path.count, perform: handleRouterPathChange)
-        .onChange(of: activeExplanationRoute, perform: { _ in refreshHeader() })
-        .onChange(of: mainViewState.explanationDismissToken, perform: handleExplanationDismiss)
-        .onDisappear(perform: handleOnDisappear)
+        .navigationDestination(for: ExplanationRoute.self) { destination in
+            ExplanationView(
+                viewModel: viewModel,
+                quiz: destination.quiz,
+                selectedAnswerIndex: destination.selectedAnswerIndex
+            )
+        }
     }
     
     private var viewState: QuizViewState {
@@ -77,23 +84,12 @@ struct ContentView: View {
         case .question:#imageLiteral(resourceName: "スクリーンショット 2025-10-27 15.19.34.png")
             QuizContentView(
                 viewModel: viewModel,
-                isExplanationPresented: activeExplanationRoute != nil,
+                isExplanationPresented: !explanationPath.isEmpty,
                 onSelectAnswer: handleAnswerSelection
             )
         }
     }
-    
-    private var explanationNavigation: some View {
-        NavigationLink(item: $activeExplanationRoute) { destination in
-            ExplanationView(
-                viewModel: viewModel,
-                quiz: destination.quiz,
-                selectedAnswerIndex: destination.selectedAnswerIndex
-            )
-        } label: {
-            EmptyView()
-        }
-    }
+
 }
 
 private extension ContentView {
