@@ -53,7 +53,7 @@ struct ProgressBadgeView: View {
 
     private var accuracyForegroundStyle: AnyShapeStyle {
         if isPerfectScore {
-            return AnyShapeStyle(LinearGradient.crownGold)
+            return AnyShapeStyle(Color.crownGoldDeep)
         }
 
         return AnyShapeStyle(Color.themeSecondary)
