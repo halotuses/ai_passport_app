@@ -47,6 +47,7 @@ struct ContentView: View {
         .onChange(of: viewModel.quizzes.count, perform: { _ in refreshHeader() })
         .onChange(of: viewModel.isLoaded, perform: { _ in refreshHeader() })
         .onChange(of: viewModel.hasError, perform: { _ in refreshHeader() })
+        .onChange(of: viewModel.bookmarkedQuizIds, perform: { _ in refreshHeader() })
         .onChange(of: router.path.count, perform: handleRouterPathChange)
         .onChange(of: activeExplanationRoute, perform: { _ in refreshHeader() })
         .onChange(of: mainViewState.explanationDismissToken, perform: handleExplanationDismiss)
@@ -124,6 +125,7 @@ private extension ContentView {
            delegate === viewModel {
             mainViewState.quizCleanupDelegate = nil
         }
+        mainViewState.clearHeaderBookmark()
     }
     
     func handleAnswerSelection(_ selectedIndex: Int) {
@@ -179,16 +181,32 @@ private extension ContentView {
     
     
     func updateHeaderForCurrentState() {
+        let bookmarkQuiz: Quiz?
         if activeExplanationRoute != nil {
             let questionNumber = min(viewModel.currentQuestionIndex + 1, viewModel.totalCount)
             mainViewState.setHeader(title: "第\(questionNumber)問 解説", backButton: .toQuizQuestion)
+            bookmarkQuiz = activeExplanationRoute?.quiz
         } else if viewModel.totalCount > 0 && viewModel.currentQuestionIndex >= viewModel.totalCount {
             mainViewState.setHeader(title: "結果", backButton: .toChapterList)
+            bookmarkQuiz = nil
         } else if viewModel.isLoaded && viewModel.totalCount > 0 {
             let questionNumber = min(viewModel.currentQuestionIndex + 1, viewModel.totalCount)
             mainViewState.setHeader(title: "第\(questionNumber)問", backButton: .toChapterList)
+            bookmarkQuiz = viewModel.currentQuiz
         } else {
             mainViewState.setHeader(title: chapter.title, backButton: .toChapterList)
+            bookmarkQuiz = nil
+        }
+
+        if let quiz = bookmarkQuiz {
+            let isBookmarked = viewModel.isBookmarked(quiz: quiz)
+            mainViewState.setHeaderBookmark(isActive: isBookmarked) {
+                viewModel.toggleBookmark(for: quiz)
+                let updated = viewModel.isBookmarked(quiz: quiz)
+                mainViewState.updateHeaderBookmarkState(isActive: updated)
+            }
+        } else {
+            mainViewState.clearHeaderBookmark()
         }
     }
 }

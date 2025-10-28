@@ -20,10 +20,6 @@ struct ExplanationView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 16) {
-                HStack {
-                    Spacer()
-                    BookmarkToggleButton(viewModel: viewModel, quiz: quiz)
-                }
                 
                 // MARK: - 正誤表示
                 HStack {

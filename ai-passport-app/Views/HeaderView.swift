@@ -10,7 +10,9 @@ struct HeaderView: View {
     @EnvironmentObject private var router: NavigationRouter
 
     var body: some View {
-        ZStack {
+        let needsSidePadding = (mainViewState.headerBackButton != nil) || (mainViewState.headerBookmark != nil)
+
+        return ZStack {
             // MARK: - タイトル部分
             // タイトル文字列は MainViewState.headerTitle から取得
             Text(mainViewState.headerTitle)
@@ -20,8 +22,8 @@ struct HeaderView: View {
                 .minimumScaleFactor(0.7) // 幅が足りない場合に縮小
                 .allowsTightening(true) // 文字間を詰めて収まりやすく
                 .frame(maxWidth: .infinity)
-                // 戻るボタンがある場合は左側に余白を確保
-                .padding(.horizontal, mainViewState.headerBackButton == nil ? 20 : 88)
+            // 戻る・ブックマークボタンがある場合は左右に余白を確保
+            .padding(.horizontal, needsSidePadding ? 88 : 20)
 
             // MARK: - 左側の戻るボタンエリア
             HStack {
@@ -44,6 +46,24 @@ struct HeaderView: View {
                 }
 
                 Spacer() // 左にボタンを寄せる
+            }
+            // MARK: - 右側のブックマークボタンエリア
+            HStack {
+                Spacer()
+
+                if let bookmark = mainViewState.headerBookmark {
+                    Button(action: bookmark.action) {
+                        Image(systemName: bookmark.isActive ? "bookmark.fill" : "bookmark")
+                            .font(.system(size: 22, weight: .semibold))
+                            .foregroundColor(bookmark.isActive ? .yellow : Color.yellow.opacity(0.6))
+                            .padding(10)
+                    }
+                    .buttonStyle(.plain)
+                    .background(Color.white.opacity(0.18))
+                    .clipShape(RoundedRectangle(cornerRadius: 12))
+                    .accessibilityLabel(bookmark.isActive ? "ブックマーク済み" : "ブックマーク")
+                    .accessibilityAddTraits(bookmark.isActive ? .isSelected : [])
+                }
             }
         }
         // MARK: - レイアウト全体設定

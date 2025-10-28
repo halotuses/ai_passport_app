@@ -32,6 +32,11 @@ final class MainViewState: ObservableObject {
         }
     }
     
+    struct HeaderBookmarkConfiguration {
+        let action: () -> Void
+        var isActive: Bool
+    }
+    
     weak var quizCleanupDelegate: QuizNavigationCleanupDelegate?
     var quizCleanupHandler: (() -> Void)?
     
@@ -43,6 +48,7 @@ final class MainViewState: ObservableObject {
     @Published var showResultView: Bool = false
     @Published var headerTitle: String = "ホーム"
     @Published var headerBackButton: HeaderBackButton? = nil
+    @Published var headerBookmark: HeaderBookmarkConfiguration? = nil
     @Published var isOnHome: Bool = true
     @Published var isShowingAnswerHistory: Bool = false
     @Published var isShowingBookmarks: Bool = false
@@ -56,6 +62,7 @@ final class MainViewState: ObservableObject {
         router.reset()
         navigationResetToken = UUID()
         showResultView = false
+        clearHeaderBookmark()
         enterHome()
     }
     
@@ -74,6 +81,7 @@ final class MainViewState: ObservableObject {
         navigationResetToken = UUID()
         isShowingAnswerHistory = false
         isShowingBookmarks = false
+        clearHeaderBookmark()
 
         let unitTitle = selectedUnit?.title ?? "章選択"
         setHeader(title: unitTitle, backButton: .toUnitList)
@@ -90,7 +98,7 @@ final class MainViewState: ObservableObject {
         navigationResetToken = UUID()
         isShowingAnswerHistory = false
         isShowingBookmarks = false
-
+        clearHeaderBookmark()
         enterUnitSelection()
     }
     
@@ -100,6 +108,7 @@ final class MainViewState: ObservableObject {
         isShowingAnswerHistory = false
         setHeader(title: "ホーム")
         isShowingBookmarks = false
+        clearHeaderBookmark()
     }
     
     /// 単元一覧（学習開始画面）に遷移
@@ -108,6 +117,7 @@ final class MainViewState: ObservableObject {
         isShowingAnswerHistory = false
         isShowingBookmarks = false
         setHeader(title: "学習アプリ", backButton: .toHome)
+        clearHeaderBookmark()
 
     }
 
@@ -122,6 +132,7 @@ final class MainViewState: ObservableObject {
         isShowingAnswerHistory = false
         isShowingBookmarks = false
         enterHome()
+        clearHeaderBookmark()
         
     }
     
@@ -150,7 +161,21 @@ final class MainViewState: ObservableObject {
         isOnHome = false
         isShowingAnswerHistory = false
         isShowingBookmarks = true
+        clearHeaderBookmark()
         setHeader(title: "ブックマーク", backButton: .toHome)
+    }
+    
+    func setHeaderBookmark(isActive: Bool, action: @escaping () -> Void) {
+        headerBookmark = HeaderBookmarkConfiguration(action: action, isActive: isActive)
+    }
+
+    func updateHeaderBookmarkState(isActive: Bool) {
+        guard let configuration = headerBookmark else { return }
+        headerBookmark = HeaderBookmarkConfiguration(action: configuration.action, isActive: isActive)
+    }
+
+    func clearHeaderBookmark() {
+        headerBookmark = nil
     }
     
     func handleBackAction(_ backButton: HeaderBackButton, router: NavigationRouter) {
