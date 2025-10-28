@@ -251,18 +251,23 @@ private struct QuizContentView: View {
             
             Spacer(minLength: 0)
             
-            Divider()
-                .background(Color.themeMain.opacity(0.2))
-                .padding(.top, 12)
-            
-            AnswerAreaView(
-                choices: viewModel.currentQuiz?.choices ?? [],
-                selectAction: handleSelection
-            )
-            .padding(.top, 12)
-            .padding(.bottom, 8)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .safeAreaInset(edge: .bottom, spacing: 0) {
+            VStack(spacing: 0) {
+                Divider()
+                    .background(Color.themeMain.opacity(0.2))
+                    .padding(.top, 12)
+
+                AnswerAreaView(
+                    choices: viewModel.currentQuiz?.choices ?? [],
+                    selectAction: handleSelection
+                )
+                .padding(.top, 12)
+                .padding(.bottom, 8)
+            }
+            .background(Color.themeBase)
+        }
     }
     
     private func handleSelection(_ selectedIndex: Int) {

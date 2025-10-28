@@ -86,11 +86,7 @@ private extension SettingsView {
                 .padding(.vertical, 6)
                 .background(
                     RoundedRectangle(cornerRadius: 12)
-                        .fill(Color.themeBase.opacity(0.6))
-                )
-                .overlay(
-                    RoundedRectangle(cornerRadius: 12)
-                        .stroke(Color.themeTextPrimary.opacity(0.3), lineWidth: 1)
+                        .fill(Color.themeTextSecondary.opacity(0.12))
                 )
             }
             .frame(maxWidth: .infinity, alignment: .trailing)

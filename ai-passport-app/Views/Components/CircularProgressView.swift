@@ -48,10 +48,10 @@ struct CircularProgressView: View {
                 let greyStart = greenEnd             // グレーの開始位置
                 let greyEnd = 1.0                    // グレーの終了位置（円全体）
 
-                // ✅ セグメント境界が重なって見えないように、微小なオフセットを設ける
+                // ✅ セグメントの境界がにじまないように、マスク用の微小オフセットを設定
                 let boundaryOffset = 0.003
-                let adjustedRedEnd = redEnd > 0 ? max(0, redEnd - boundaryOffset) : redEnd
-                let adjustedGreenStart = redEnd > 0 ? min(greenEnd, redEnd + boundaryOffset) : greenStart
+                let maskedRedEnd = max(0, redEnd - boundaryOffset)
+                let maskedGreenStart = min(greenEnd, greenStart + boundaryOffset)
 
                 // ⚪️ グレーのセグメント（未達成部分）
                 if greyEnd > greyStart {
@@ -65,25 +65,59 @@ struct CircularProgressView: View {
                 }
 
                 // 🟢 緑のセグメント（ハイライト以外の進捗部分）
-                if greenEnd > adjustedGreenStart {
-                    segment(
-                        start: adjustedGreenStart,
-                        end: greenEnd,
-                        color: .green,
-                        ringWidth: ringWidth
-                    )
-                    .animation(.easeOut(duration: 0.6), value: animatedTotal)
+                if greenEnd > greenStart {
+                    if maskedGreenStart < greenEnd {
+                        segment(
+                            start: greenStart,
+                            end: greenEnd,
+                            color: .green,
+                            ringWidth: ringWidth
+                        )
+                        .mask(
+                            segmentMask(
+                                start: maskedGreenStart,
+                                end: greenEnd,
+                                ringWidth: ringWidth
+                            )
+                        )
+                        .animation(.easeOut(duration: 0.6), value: animatedTotal)
+                    } else {
+                        segment(
+                            start: greenStart,
+                            end: greenEnd,
+                            color: .green,
+                            ringWidth: ringWidth
+                        )
+                        .animation(.easeOut(duration: 0.6), value: animatedTotal)
+                    }
                 }
 
                 // 🔴 赤いセグメント（ハイライト部分）
-                if adjustedRedEnd > 0 {
-                    segment(
-                        start: 0,
-                        end: adjustedRedEnd,
-                        color: .red,
-                        ringWidth: ringWidth
-                    )
-                    .animation(.easeOut(duration: 0.6), value: animatedHighlight)
+                if redEnd > 0 {
+                    if maskedRedEnd > 0 {
+                        segment(
+                            start: 0,
+                            end: redEnd,
+                            color: .red,
+                            ringWidth: ringWidth
+                        )
+                        .mask(
+                            segmentMask(
+                                start: 0,
+                                end: maskedRedEnd,
+                                ringWidth: ringWidth
+                            )
+                        )
+                        .animation(.easeOut(duration: 0.6), value: animatedHighlight)
+                    } else {
+                        segment(
+                            start: 0,
+                            end: redEnd,
+                            color: .red,
+                            ringWidth: ringWidth
+                        )
+                        .animation(.easeOut(duration: 0.6), value: animatedHighlight)
+                    }
                 }
 
                 // 中央のテキスト（進捗率を表示）
@@ -134,6 +168,20 @@ extension CircularProgressView {
                 style: StrokeStyle(lineWidth: ringWidth, lineCap: .round)
             )
             // 円の開始位置を上（12時）にする
+            .rotationEffect(.degrees(-90))
+    }
+    // セグメント同士の重なりを避けるためのマスクを生成
+    private func segmentMask(
+        start: Double,
+        end: Double,
+        ringWidth: CGFloat
+    ) -> some View {
+        Circle()
+            .trim(from: start, to: end)
+            .stroke(
+                Color.white,
+                style: StrokeStyle(lineWidth: ringWidth, lineCap: .butt)
+            )
             .rotationEffect(.degrees(-90))
     }
 }
