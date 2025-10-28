@@ -35,89 +35,58 @@ struct CircularProgressView: View {
             let diameter = min(geometry.size.width, geometry.size.height)
             // リングの線幅を直径の12%に設定
             let ringWidth = diameter * 0.12
+            let radius = diameter / 2
 
             ZStack {
-                // 背景の薄い灰色リング（全体のガイド）
-                Circle()
-                    .stroke(Color.gray.opacity(0.2), lineWidth: ringWidth)
+                // ⚪️ 背景の薄い灰色リング（全体のガイド）
+                Path { path in
+                    path.addArc(center: CGPoint(x: radius, y: radius),
+                                radius: radius - ringWidth / 2,
+                                startAngle: .degrees(0),
+                                endAngle: .degrees(360),
+                                clockwise: false)
+                }
+                .stroke(Color.gray.opacity(0.2), lineWidth: ringWidth)
 
-                // 各進捗セグメントの描画範囲を計算
-                let redEnd = animatedHighlight       // 赤（ハイライト）の終了位置
-                let greenStart = redEnd              // 緑の開始位置
-                let greenEnd = animatedTotal         // 緑の終了位置
-                let greyStart = greenEnd             // グレーの開始位置
-                let greyEnd = 1.0                    // グレーの終了位置（円全体）
+                // 各進捗セグメントの角度を算出
+                let redEnd = animatedHighlight       // 赤（ハイライト）の終了割合
+                let greenStart = redEnd              // 緑の開始割合
+                let greenEnd = animatedTotal         // 緑の終了割合
 
-                // ✅ セグメントの境界がにじまないように、マスク用の微小オフセットを設定
-                let boundaryOffset = 0.003
-                let maskedRedEnd = max(0, redEnd - boundaryOffset)
-                let maskedGreenStart = min(greenEnd, greenStart + boundaryOffset)
-
-                // ⚪️ グレーのセグメント（未達成部分）
-                if greyEnd > greyStart {
-                    segment(
-                        start: greyStart,
-                        end: greyEnd,
-                        color: .gray,
-                        ringWidth: ringWidth
+                // 🔴 赤いセグメント（ハイライト部分）
+                if redEnd > 0 {
+                    segmentArc(
+                        start: 0,
+                        end: redEnd,
+                        color: .red,
+                        ringWidth: ringWidth,
+                        diameter: diameter
                     )
-                    .animation(.easeOut(duration: 0.6), value: animatedTotal)
+                    .animation(.easeOut(duration: 0.6), value: animatedHighlight)
                 }
 
                 // 🟢 緑のセグメント（ハイライト以外の進捗部分）
                 if greenEnd > greenStart {
-                    if maskedGreenStart < greenEnd {
-                        segment(
-                            start: greenStart,
-                            end: greenEnd,
-                            color: .green,
-                            ringWidth: ringWidth
-                        )
-                        .mask(
-                            segmentMask(
-                                start: maskedGreenStart,
-                                end: greenEnd,
-                                ringWidth: ringWidth
-                            )
-                        )
-                        .animation(.easeOut(duration: 0.6), value: animatedTotal)
-                    } else {
-                        segment(
-                            start: greenStart,
-                            end: greenEnd,
-                            color: .green,
-                            ringWidth: ringWidth
-                        )
-                        .animation(.easeOut(duration: 0.6), value: animatedTotal)
-                    }
+                    segmentArc(
+                        start: greenStart,
+                        end: greenEnd,
+                        color: .green,
+                        ringWidth: ringWidth,
+                        diameter: diameter
+                    )
+                    .animation(.easeOut(duration: 0.6), value: animatedTotal)
                 }
 
-                // 🔴 赤いセグメント（ハイライト部分）
-                if redEnd > 0 {
-                    if maskedRedEnd > 0 {
-                        segment(
-                            start: 0,
-                            end: redEnd,
-                            color: .red,
-                            ringWidth: ringWidth
-                        )
-                        .mask(
-                            segmentMask(
-                                start: 0,
-                                end: maskedRedEnd,
-                                ringWidth: ringWidth
-                            )
-                        )
-                        .animation(.easeOut(duration: 0.6), value: animatedHighlight)
-                    } else {
-                        segment(
-                            start: 0,
-                            end: redEnd,
-                            color: .red,
-                            ringWidth: ringWidth
-                        )
-                        .animation(.easeOut(duration: 0.6), value: animatedHighlight)
-                    }
+                // ⚪️ グレーのセグメント（未達成部分）
+                if greenEnd < 1.0 {
+                    segmentArc(
+                        start: greenEnd,
+                        end: 1.0,
+                        color: .gray,
+                        ringWidth: ringWidth,
+                        diameter: diameter
+                    )
+                    .animation(.easeOut(duration: 0.6), value: animatedTotal)
                 }
 
                 // 中央のテキスト（進捗率を表示）
@@ -152,37 +121,28 @@ extension CircularProgressView {
         }
     }
 
-    // 円弧（セグメント）を描画する共通処理
-    private func segment(
-        start: Double,    // 開始位置（0〜1）
-        end: Double,      // 終了位置（0〜1）
-        color: Color,     // セグメントの色
-        ringWidth: CGFloat // 線の太さ
-    ) -> some View {
-        Circle()
-            // trimで円の一部だけを描画
-            .trim(from: start, to: end)
-            // 線のスタイルを指定（線端は丸）
-            .stroke(
-                color,
-                style: StrokeStyle(lineWidth: ringWidth, lineCap: .round)
-            )
-            // 円の開始位置を上（12時）にする
-            .rotationEffect(.degrees(-90))
-    }
-    // セグメント同士の重なりを避けるためのマスクを生成
-    private func segmentMask(
+    // Pathベースの円弧セグメント描画（ブレンド完全排除版）
+    private func segmentArc(
         start: Double,
         end: Double,
-        ringWidth: CGFloat
+        color: Color,
+        ringWidth: CGFloat,
+        diameter: CGFloat
     ) -> some View {
-        Circle()
-            .trim(from: start, to: end)
-            .stroke(
-                Color.white,
-                style: StrokeStyle(lineWidth: ringWidth, lineCap: .butt)
-            )
-            .rotationEffect(.degrees(-90))
+        let radius = diameter / 2
+        return Path { path in
+            let startAngle = Angle(degrees: -90 + 360 * start)
+            let endAngle = Angle(degrees: -90 + 360 * end)
+            path.addArc(center: CGPoint(x: radius, y: radius),
+                        radius: radius - ringWidth / 2,
+                        startAngle: startAngle,
+                        endAngle: endAngle,
+                        clockwise: false)
+        }
+        .stroke(
+            color,
+            style: StrokeStyle(lineWidth: ringWidth, lineCap: .round)
+        )
     }
 }
 

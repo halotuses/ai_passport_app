@@ -263,7 +263,7 @@ private struct QuizContentView: View {
                     choices: viewModel.currentQuiz?.choices ?? [],
                     selectAction: handleSelection
                 )
-                .padding(.top, 12)
+                .padding(.top, 28)
                 .padding(.bottom, 8)
             }
             .background(Color.themeBase)
