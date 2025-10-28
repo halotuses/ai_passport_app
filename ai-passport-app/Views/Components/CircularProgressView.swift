@@ -126,7 +126,7 @@ extension CircularProgressView {
             // 線のスタイルを指定
             .stroke(
                 color,
-                style: StrokeStyle(lineWidth: ringWidth, lineCap: .round)
+                style: StrokeStyle(lineWidth: ringWidth, lineCap: .butt)
             )
             // 円の開始位置を上（12時）にする
             .rotationEffect(.degrees(-90))

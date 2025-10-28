@@ -187,7 +187,8 @@ struct HomeView: View {
                     detailText: progressRingDetailText,
                     highlightValue: (completionPercentageValue ?? 0) == 100
                 )
-                HStack(spacing: 10) {
+                HStack(spacing: 8) {
+                    StatColumnView(color: .themeStreak, label: "連続正解", value: progressViewModel.currentCorrectStreak)
                     StatColumnView(color: .themeCorrect, label: "正解", value: progressViewModel.totalCorrect)
                     StatColumnView(color: .themeIncorrect, label: "不正解", value: progressViewModel.totalIncorrect)
                     StatColumnView(color: .gray, label: "未回答", value: unansweredCount)
@@ -511,9 +512,13 @@ private struct StatColumnView: View {
             Text(label)
                 .font(.caption)
                 .foregroundColor(.themeTextSecondary)
+                .lineLimit(1)
+                .minimumScaleFactor(0.8)
             Text("\(value)問")
                 .font(.subheadline.weight(.semibold))
                 .foregroundColor(.themeTextPrimary)
+                .lineLimit(1)
+                .minimumScaleFactor(0.75)
         }
         .frame(maxWidth: .infinity)
         .padding(.vertical, 12)
