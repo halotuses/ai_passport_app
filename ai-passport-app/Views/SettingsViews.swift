@@ -82,6 +82,16 @@ private extension SettingsView {
                 }
                 .font(.body)
                 .foregroundColor(.themeTextPrimary)
+                .padding(.horizontal, 12)
+                .padding(.vertical, 6)
+                .background(
+                    RoundedRectangle(cornerRadius: 12)
+                        .fill(Color.themeBase.opacity(0.6))
+                )
+                .overlay(
+                    RoundedRectangle(cornerRadius: 12)
+                        .stroke(Color.themeTextPrimary.opacity(0.3), lineWidth: 1)
+                )
             }
             .frame(maxWidth: .infinity, alignment: .trailing)
         }

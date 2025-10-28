@@ -38,7 +38,7 @@ struct HomeView: View {
     // MARK: - 学習進捗テキスト
     private var progressSummaryText: String {
         if progressViewModel.totalQuestions > 0 {
-            return "全\(progressViewModel.totalQuestions)問中\(progressViewModel.totalCorrect)問に正解"
+            return "全\(progressViewModel.totalQuestions)問中\(progressViewModel.totalAnswered)問に回答済"
         }
         if progressViewModel.totalAnswered > 0 {
             return "これまでに\(progressViewModel.totalAnswered)問に挑戦しました"

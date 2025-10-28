@@ -59,6 +59,8 @@ struct QuestionView: View {
                 .padding(.horizontal)
             }
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+        .padding(.top, 60)
         .onChange(of: viewModel.selectedAnswerIndex) { newValue in
             guard let selectedIndex = newValue,
                   handledQuestionIndex != viewModel.currentQuestionIndex,
