@@ -106,7 +106,7 @@ struct ExplanationView: View {
                     .shadow(color: Color.themeSecondary.opacity(0.25), radius: 12, x: 0, y: 6)
             }
             .padding(.horizontal)
-            .padding(.bottom, 8)
+            .padding(.bottom, 20)
         }
         .navigationBarBackButtonHidden(true)
         .toolbar(.hidden, for: .navigationBar)

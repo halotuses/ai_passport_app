@@ -239,39 +239,67 @@ private struct EmptyQuizStateView: View {
     }
 }
 
+// QuizContentView は、問題文と回答選択肢を表示する中核ビュー。
+// 問題部分（QuestionView）＋回答部分（AnswerAreaView）で構成される。
 private struct QuizContentView: View {
+    // 問題データや選択状態などを保持する ViewModel
     @ObservedObject var viewModel: QuizViewModel
+    
+    // 解説表示中かどうかを判定するフラグ（解説中は回答不可）
     let isExplanationPresented: Bool
+    
+    // 回答選択時に呼ばれる外部ハンドラ（親ビューに選択結果を伝える）
     let onSelectAnswer: (Int) -> Void
     
+    // View のメイン構成
     var body: some View {
+        // 縦方向に要素を積むレイアウト
         VStack(spacing: 0) {
+            // 問題文などを表示するビュー
             QuestionView(viewModel: viewModel)
+                // 上部に余白を追加（見た目調整）
                 .padding(.top, 12)
             
+            // 可変スペースを入れて下部エリアを押し下げる
             Spacer(minLength: 0)
-            
         }
+        // 親コンテナのサイズを最大に広げる
         .frame(maxWidth: .infinity, maxHeight: .infinity)
+        
+        // safeAreaInset は、指定した辺に追加ビューを埋め込む SwiftUI のモディファイア。
+        // ここでは「画面下部」に回答エリアを固定表示するために使用。
         .safeAreaInset(edge: .bottom, spacing: 0) {
+            // 下部に配置する VStack（区切り線＋回答エリア）
             VStack(spacing: 0) {
+                // 区切り線（上との視覚的な境界）
                 Divider()
+                    // 区切り線の色をテーマカラーに合わせ、透明度で調整
                     .background(Color.themeMain.opacity(0.2))
+                    // 上に少し余白をとって配置
                     .padding(.top, 12)
 
+                // 回答選択肢エリア
                 AnswerAreaView(
+                    // 選択肢データ（なければ空配列）
                     choices: viewModel.currentQuiz?.choices ?? [],
+                    // 選択時に handleSelection を呼び出す
                     selectAction: handleSelection
                 )
-                .padding(.top, 28)
-                .padding(.bottom, 8)
+
+                // 回答エリア下部に余白（SafeAreaに収まるよう調整）
+                .padding(.bottom, 0)
             }
+            // 下部ビューの背景色（画面全体のテーマ色に合わせる）
             .background(Color.themeBase)
         }
     }
     
+    // 回答がタップされたときに呼ばれる処理
     private func handleSelection(_ selectedIndex: Int) {
+        // 解説画面が出ているときは回答操作を無効化
         guard !isExplanationPresented else { return }
+        
+        // 親ビューに「どの選択肢が選ばれたか」を伝える
         onSelectAnswer(selectedIndex)
     }
 }
