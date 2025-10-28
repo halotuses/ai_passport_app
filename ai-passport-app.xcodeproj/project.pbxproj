@@ -62,6 +62,7 @@
 		0CE6D5B32EAFD25B00D38241 /* wrong.wav in Resources */ = {isa = PBXBuildFile; fileRef = 0CE6D5B02EAFD25A00D38241 /* wrong.wav */; };
 		0CE6D5B52EAFD48C00D38241 /* SoundManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CE6D5B42EAFD48A00D38241 /* SoundManager.swift */; };
 		0CE6D5B72EAFE7E200D38241 /* BookmarkListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CE6D5B62EAFE7E000D38241 /* BookmarkListView.swift */; };
+		0CE6D5B92EB0DDD200D38241 /* BookmarkObject.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CE6D5B82EB0DD9E00D38241 /* BookmarkObject.swift */; };
 		0CF00B642EA91BF300B8A6D0 /* QuestionProgress.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF00B632EA91BEC00B8A6D0 /* QuestionProgress.swift */; };
 		0CF00B662EA91D2700B8A6D0 /* ChapterProgressViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF00B652EA91D1400B8A6D0 /* ChapterProgressViewModel.swift */; };
 		0CF00B682EA91D5800B8A6D0 /* HomeProgressViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF00B672EA91D5700B8A6D0 /* HomeProgressViewModel.swift */; };
@@ -151,6 +152,7 @@
 		0CE6D5B02EAFD25A00D38241 /* wrong.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = wrong.wav; sourceTree = "<group>"; };
 		0CE6D5B42EAFD48A00D38241 /* SoundManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoundManager.swift; sourceTree = "<group>"; };
 		0CE6D5B62EAFE7E000D38241 /* BookmarkListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarkListView.swift; sourceTree = "<group>"; };
+		0CE6D5B82EB0DD9E00D38241 /* BookmarkObject.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarkObject.swift; sourceTree = "<group>"; };
 		0CF00B632EA91BEC00B8A6D0 /* QuestionProgress.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuestionProgress.swift; sourceTree = "<group>"; };
 		0CF00B652EA91D1400B8A6D0 /* ChapterProgressViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChapterProgressViewModel.swift; sourceTree = "<group>"; };
 		0CF00B672EA91D5700B8A6D0 /* HomeProgressViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeProgressViewModel.swift; sourceTree = "<group>"; };
@@ -383,6 +385,7 @@
 		0C87869F2EA672720052D2A8 /* Persistance */ = {
 			isa = PBXGroup;
 			children = (
+				0CE6D5B82EB0DD9E00D38241 /* BookmarkObject.swift */,
 				0C87869D2EA6725F0052D2A8 /* QuestionProgressObject.swift */,
 			);
 			path = Persistance;
@@ -716,6 +719,7 @@
 				0C30DDE32DFF1AAA00F25D02 /* ResultView.swift in Sources */,
 				0CF00B642EA91BF300B8A6D0 /* QuestionProgress.swift in Sources */,
 				0C8786A12EA672D90052D2A8 /* RealmAnswerHistoryRepository.swift in Sources */,
+				0CE6D5B92EB0DDD200D38241 /* BookmarkObject.swift in Sources */,
 				0C30DDD52DFF16FE00F25D02 /* AppFrameView.swift in Sources */,
 				0C30DDDB2DFF1A7F00F25D02 /* UnitListView.swift in Sources */,
 				0C87869E2EA6725F0052D2A8 /* QuestionProgressObject.swift in Sources */,

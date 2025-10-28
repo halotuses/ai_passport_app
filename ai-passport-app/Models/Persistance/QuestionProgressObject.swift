@@ -20,7 +20,6 @@ final class QuestionProgressObject: Object, Identifiable {
     @Persisted var correctChoiceIndex: Int?
     @Persisted var questionText: String?
     @Persisted var choiceTexts = List<String>()
-    @Persisted var isBookmarked: Bool = false
 
     var status: QuestionStatus {
         get { QuestionStatus(rawValue: statusRaw) ?? .unanswered }

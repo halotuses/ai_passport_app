@@ -27,10 +27,19 @@ class QuizViewModel: ObservableObject {
     
     private let repository: RealmAnswerHistoryRepository
     private let persistenceQueue = DispatchQueue(label: "com.ai-passport.quizAnswerPersistence", qos: .utility)
+    static let bookmarkUserIdKey = "bookmark_user_id"
 
     init(repository: RealmAnswerHistoryRepository = RealmAnswerHistoryRepository()) {
         self.repository = repository
-        
+    }
+
+    private var currentUserId: String {
+        if let stored = UserDefaults.standard.string(forKey: Self.bookmarkUserIdKey) {
+            return stored
+        }
+        let newValue = UUID().uuidString
+        UserDefaults.standard.set(newValue, forKey: Self.bookmarkUserIdKey)
+        return newValue
     }
     
     // MARK: - Load
@@ -68,7 +77,7 @@ class QuizViewModel: ObservableObject {
                 self.hasError = false
                 let chapterNumericId = IdentifierGenerator.chapterNumericId(unitId: self.unitId, chapterId: self.chapterId)
                 let storedStatuses = self.repository.loadStatuses(chapterId: chapterNumericId)
-                self.bookmarkedQuizIds = self.loadBookmarkedQuizIds(chapterId: chapterNumericId)
+                self.bookmarkedQuizIds = self.loadBookmarkedQuizIds(unitId: self.unitId, chapterId: self.chapterId)
                 self.questionStatuses = qs.enumerated().map { index, _ in
                     let quizId = "\(self.unitId)-\(self.chapterId)#\(index)"
                     return storedStatuses[quizId] ?? .unanswered
@@ -171,34 +180,49 @@ class QuizViewModel: ObservableObject {
     func toggleBookmark(for quiz: Quiz) {
         guard let stableQuizId = bookmarkIdentifier(for: quiz) else { return }
         let chapterNumericId = IdentifierGenerator.chapterNumericId(unitId: unitId, chapterId: chapterId)
-
+        let now = Date()
+        
         do {
             let realm = try Realm()
-            var newState = false
+            var isNowBookmarked = false
             try realm.write {
-                let object: QuestionProgressObject
-                if let existing = realm.object(ofType: QuestionProgressObject.self, forPrimaryKey: stableQuizId) {
-                    object = existing
+                if let existingBookmark = realm.object(ofType: BookmarkObject.self, forPrimaryKey: stableQuizId) {
+                    realm.delete(existingBookmark)
+                    isNowBookmarked = false
                 } else {
-                    let newObject = QuestionProgressObject()
-                    newObject.quizId = stableQuizId
-                    newObject.chapterId = chapterNumericId
-                    realm.add(newObject)
-                    object = newObject
-                }
+                    let bookmark = BookmarkObject()
+                    bookmark.quizId = stableQuizId
+                    bookmark.userId = currentUserId
+                    bookmark.createdAt = now
+                    bookmark.updatedAt = now
+                    bookmark.isBookmarked = true
+                    realm.add(bookmark)
 
-                object.unitIdentifier = unitId
-                object.chapterIdentifier = chapterId
-                object.questionText = quiz.question
-                object.choiceTexts.removeAll()
-                object.choiceTexts.append(objectsIn: quiz.choices)
-                object.correctChoiceIndex = quiz.answerIndex
-                object.updatedAt = Date()
-                object.isBookmarked.toggle()
-                newState = object.isBookmarked
+                    let progressObject: QuestionProgressObject
+                    if let existingProgress = realm.object(ofType: QuestionProgressObject.self, forPrimaryKey: stableQuizId) {
+                        progressObject = existingProgress
+                    } else {
+                        let newProgress = QuestionProgressObject()
+                        newProgress.quizId = stableQuizId
+                        newProgress.chapterId = chapterNumericId
+                        realm.add(newProgress)
+                        progressObject = newProgress
+                    }
+
+                    progressObject.chapterId = chapterNumericId
+                    progressObject.unitIdentifier = unitId
+                    progressObject.chapterIdentifier = chapterId
+                    progressObject.questionText = quiz.question
+                    progressObject.choiceTexts.removeAll()
+                    progressObject.choiceTexts.append(objectsIn: quiz.choices)
+                    progressObject.correctChoiceIndex = quiz.answerIndex
+                    progressObject.updatedAt = now
+
+                    isNowBookmarked = true
+                }
             }
 
-            if newState {
+            if isNowBookmarked {
                 bookmarkedQuizIds.insert(stableQuizId)
             } else {
                 bookmarkedQuizIds.remove(stableQuizId)
@@ -317,12 +341,19 @@ private extension QuizViewModel {
             questionStatuses[index] = status
         }
     }
-    func loadBookmarkedQuizIds(chapterId: Int) -> Set<String> {
+    func loadBookmarkedQuizIds(unitId: String, chapterId: String) -> Set<String> {
         do {
             let realm = try Realm()
-            let results = realm.objects(QuestionProgressObject.self)
-                .filter("chapterId == %d AND isBookmarked == true", chapterId)
-            return Set(results.map { $0.quizId })
+            let predicate = NSPredicate(format: "userId == %@ AND isBookmarked == true", currentUserId)
+            let baseResults = realm.objects(BookmarkObject.self).filter(predicate)
+
+            guard !unitId.isEmpty, !chapterId.isEmpty else {
+                return Set(baseResults.map { $0.quizId })
+            }
+
+            let prefix = "\(unitId)-\(chapterId)#"
+            let filtered = baseResults.filter("quizId BEGINSWITH %@", prefix)
+            return Set(filtered.map { $0.quizId })
         } catch {
             print("❌ Failed to load bookmarks: \(error)")
             return []

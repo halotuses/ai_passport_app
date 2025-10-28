@@ -15,7 +15,6 @@ struct QuestionProgress: Identifiable, Sendable {
     var correctAnswerIndex: Int?
     var questionText: String?
     var choiceTexts: [String]
-    var isBookmarked: Bool
 
     init(
         quizId: String,
@@ -39,7 +38,7 @@ struct QuestionProgress: Identifiable, Sendable {
         self.correctAnswerIndex = correctAnswerIndex
         self.questionText = questionText
         self.choiceTexts = choiceTexts
-        self.isBookmarked = false
+
     }
 
     init(object: QuestionProgressObject) {
@@ -53,7 +52,7 @@ struct QuestionProgress: Identifiable, Sendable {
         self.correctAnswerIndex = object.correctChoiceIndex
         self.questionText = object.questionText
         self.choiceTexts = Array(object.choiceTexts)
-        self.isBookmarked = object.isBookmarked
+
     }
 }
 
