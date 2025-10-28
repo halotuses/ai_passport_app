@@ -13,6 +13,7 @@ final class ChapterProgressViewModel: ObservableObject, Identifiable {
 
     private let repository: RealmAnswerHistoryRepository
     private let realmConfiguration: Realm.Configuration
+    private let realmManager: RealmManager
     private let unitIdentifier: String
     private let chapterIdentifier: String
     private let chapterNumericId: Int
@@ -22,7 +23,8 @@ final class ChapterProgressViewModel: ObservableObject, Identifiable {
     init(
         unitId: String,
         chapter: ChapterMetadata,
-        repository: RealmAnswerHistoryRepository = RealmAnswerHistoryRepository()
+        repository: RealmAnswerHistoryRepository = RealmAnswerHistoryRepository(),
+        realmManager: RealmManager = .shared
     ) {
         self.chapter = chapter
         self.repository = repository
@@ -31,6 +33,7 @@ final class ChapterProgressViewModel: ObservableObject, Identifiable {
         self.chapterIdentifier = chapter.id
         self.chapterNumericId = IdentifierGenerator.chapterNumericId(unitId: unitId, chapterId: chapter.id)
         self.realmConfiguration = repository.realmConfiguration
+        self.realmManager = realmManager
 
         loadInitialProgress()
         observeProgressChanges()
@@ -63,7 +66,7 @@ final class ChapterProgressViewModel: ObservableObject, Identifiable {
 
     private func observeProgressChanges() {
         do {
-            let realm = try Realm(configuration: realmConfiguration)
+            let realm = try realmManager.realm(configuration: realmConfiguration)
             let results = realm.objects(QuestionProgressObject.self)
                 .filter(
                     "(unitIdentifier == %@ AND chapterIdentifier == %@) OR chapterId == %d",

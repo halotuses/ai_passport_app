@@ -26,11 +26,16 @@ class QuizViewModel: ObservableObject {
     var chapterId: String = ""
     
     private let repository: RealmAnswerHistoryRepository
+    private let realmManager: RealmManager
     private let persistenceQueue = DispatchQueue(label: "com.ai-passport.quizAnswerPersistence", qos: .utility)
     static let bookmarkUserIdKey = "bookmark_user_id"
 
-    init(repository: RealmAnswerHistoryRepository = RealmAnswerHistoryRepository()) {
+    init(
+        repository: RealmAnswerHistoryRepository = RealmAnswerHistoryRepository(),
+        realmManager: RealmManager = .shared
+    ) {
         self.repository = repository
+        self.realmManager = realmManager
     }
 
     private var currentUserId: String {
@@ -183,7 +188,7 @@ class QuizViewModel: ObservableObject {
         let now = Date()
         
         do {
-            let realm = try Realm()
+            let realm = try realmManager.realm()
             var isNowBookmarked = false
             try realm.write {
                 if let existingBookmark = realm.object(ofType: BookmarkObject.self, forPrimaryKey: stableQuizId) {
@@ -343,7 +348,7 @@ private extension QuizViewModel {
     }
     func loadBookmarkedQuizIds(unitId: String, chapterId: String) -> Set<String> {
         do {
-            let realm = try Realm()
+            let realm = try realmManager.realm()
             let predicate = NSPredicate(format: "userId == %@ AND isBookmarked == true", currentUserId)
             let baseResults = realm.objects(BookmarkObject.self).filter(predicate)
 

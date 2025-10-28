@@ -10,8 +10,8 @@ struct ai_passport_appApp: SwiftUI.App {
         // Realm設定
         var configuration = Realm.Configuration(schemaVersion: 2)
         configuration.deleteRealmIfMigrationNeeded = true
-        let fileManager = FileManager.default
         do {
+            let fileManager = FileManager.default
             let appSupportURL = try fileManager.url(
                 for: .applicationSupportDirectory,
                 in: .userDomainMask,
@@ -24,7 +24,7 @@ struct ai_passport_appApp: SwiftUI.App {
         } catch {
             print("❌ Failed to prepare Realm directory: \(error)")
         }
-        Realm.Configuration.defaultConfiguration = configuration
+        RealmManager.shared.configureDefaultRealmIfNeeded(configuration)
         // Realmファイルのパスを出力
         if let url = Realm.Configuration.defaultConfiguration.fileURL {
             print("✅ Realm file path:")

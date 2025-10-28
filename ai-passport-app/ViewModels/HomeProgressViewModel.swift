@@ -12,13 +12,18 @@ final class HomeProgressViewModel: ObservableObject {
 
     private let repository: RealmAnswerHistoryRepository
     private let realmConfiguration: Realm.Configuration
+    private let realmManager: RealmManager
     private var hasLoadedMetadata = false
     private var progressToken: NotificationToken?
     private var progressResults: Results<QuestionProgressObject>?
 
-    init(repository: RealmAnswerHistoryRepository = RealmAnswerHistoryRepository()) {
+    init(
+        repository: RealmAnswerHistoryRepository = RealmAnswerHistoryRepository(),
+        realmManager: RealmManager = .shared
+    ) {
         self.repository = repository
         self.realmConfiguration = repository.realmConfiguration
+        self.realmManager = realmManager
 
         observeAllProgress()
     }
@@ -130,7 +135,7 @@ final class HomeProgressViewModel: ObservableObject {
 
     private func observeAllProgress() {
         do {
-            let realm = try Realm(configuration: realmConfiguration)
+            let realm = try realmManager.realm(configuration: realmConfiguration)
             let results = realm.objects(QuestionProgressObject.self)
             progressResults = results
 

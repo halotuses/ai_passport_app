@@ -63,6 +63,7 @@
 		0CE6D5B52EAFD48C00D38241 /* SoundManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CE6D5B42EAFD48A00D38241 /* SoundManager.swift */; };
 		0CE6D5B72EAFE7E200D38241 /* BookmarkListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CE6D5B62EAFE7E000D38241 /* BookmarkListView.swift */; };
 		0CE6D5B92EB0DDD200D38241 /* BookmarkObject.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CE6D5B82EB0DD9E00D38241 /* BookmarkObject.swift */; };
+		0CE6D5BB2EB0F8C300D38241 /* RealmManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CE6D5BA2EB0F8C100D38241 /* RealmManager.swift */; };
 		0CF00B642EA91BF300B8A6D0 /* QuestionProgress.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF00B632EA91BEC00B8A6D0 /* QuestionProgress.swift */; };
 		0CF00B662EA91D2700B8A6D0 /* ChapterProgressViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF00B652EA91D1400B8A6D0 /* ChapterProgressViewModel.swift */; };
 		0CF00B682EA91D5800B8A6D0 /* HomeProgressViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF00B672EA91D5700B8A6D0 /* HomeProgressViewModel.swift */; };
@@ -153,6 +154,7 @@
 		0CE6D5B42EAFD48A00D38241 /* SoundManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoundManager.swift; sourceTree = "<group>"; };
 		0CE6D5B62EAFE7E000D38241 /* BookmarkListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarkListView.swift; sourceTree = "<group>"; };
 		0CE6D5B82EB0DD9E00D38241 /* BookmarkObject.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarkObject.swift; sourceTree = "<group>"; };
+		0CE6D5BA2EB0F8C100D38241 /* RealmManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RealmManager.swift; sourceTree = "<group>"; };
 		0CF00B632EA91BEC00B8A6D0 /* QuestionProgress.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuestionProgress.swift; sourceTree = "<group>"; };
 		0CF00B652EA91D1400B8A6D0 /* ChapterProgressViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChapterProgressViewModel.swift; sourceTree = "<group>"; };
 		0CF00B672EA91D5700B8A6D0 /* HomeProgressViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeProgressViewModel.swift; sourceTree = "<group>"; };
@@ -301,6 +303,7 @@
 		0C30DDCB2DFF13E800F25D02 /* Core */ = {
 			isa = PBXGroup;
 			children = (
+				0CE6D5BA2EB0F8C100D38241 /* RealmManager.swift */,
 				0CE6D5A02EAF675C00D38241 /* AppSettings.swift */,
 				0CE6D5982EAE0C0F00D38241 /* ProgressManager.swift */,
 				0C30DDFE2DFF1E9A00F25D02 /* PersistenceController.swift */,
@@ -702,6 +705,7 @@
 				0CCB45A22E8994E800C41D03 /* QuizList.swift in Sources */,
 				0C30DDDD2DFF1A8B00F25D02 /* ChapterListView.swift in Sources */,
 				0C30DDEF2DFF1B8E00F25D02 /* QuizViewModel.swift in Sources */,
+				0CE6D5BB2EB0F8C300D38241 /* RealmManager.swift in Sources */,
 				0C31AD832EA51B97007500F7 /* LegacyAnswerHistoryMigrator.swift in Sources */,
 				0CE6D5992EAE0C1900D38241 /* ProgressManager.swift in Sources */,
 				0C30DDF92DFF1CE300F25D02 /* QuizMetadata.swift in Sources */,

@@ -25,12 +25,15 @@ enum IdentifierGenerator {
 
 final class RealmAnswerHistoryRepository {
     private let configuration: Realm.Configuration
+    private let realmManager: RealmManager
     
     init(
         configuration: Realm.Configuration = Realm.Configuration.defaultConfiguration,
-        fileManager: FileManager = .default
+        fileManager: FileManager = .default,
+        realmManager: RealmManager = .shared
     ) {
         self.configuration = configuration
+        self.realmManager = realmManager
         Self.prepareRealmDirectoryIfNeeded(for: configuration, fileManager: fileManager)
         repairInvalidProgressIfNeeded()
     }
@@ -42,7 +45,10 @@ final class RealmAnswerHistoryRepository {
         guard let realmFileURL = configuration.fileURL else { return }
         let directoryURL = realmFileURL.deletingLastPathComponent()
         do {
-            try fileManager.createDirectory(at: directoryURL, withIntermediateDirectories: true)
+            if !fileManager.fileExists(atPath: directoryURL.path) {
+                try fileManager.createDirectory(at: directoryURL, withIntermediateDirectories: true)
+                print("✅ Prepared Realm directory: \(directoryURL.path)")
+            }
         } catch {
             print("❌ Failed to create Realm directory: \(error)")
         }
@@ -380,7 +386,7 @@ final class RealmAnswerHistoryRepository {
     }
     
     private func realm() throws -> Realm {
-        try Realm(configuration: configuration)
+        try realmManager.realm(configuration: configuration)
     }
     private func repairInvalidProgressIfNeeded() {
         do {
