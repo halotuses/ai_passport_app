@@ -1,180 +1,83 @@
 import SwiftUI
 
-/// ホーム画面で全体の学習状況を示す円形プログレスビュー
 struct CircularProgressView: View {
-    struct Segment: Identifiable {
-        enum Kind: Hashable {
-            case correct
-            case incorrect
-            case unanswered
-        }
+    var totalProgress: Double
+    var highlightProgress: Double
+    var percentageText: String
 
-        let kind: Kind
-        let value: Double
-        let color: Color
+    @State private var animatedTotal: Double = 0
+    @State private var animatedHighlight: Double = 0
 
-        var id: Kind { kind }
+    private func clampedProgress(_ value: Double) -> Double {
+        guard !value.isNaN else { return 0 }
+        return min(max(value, 0), 1)
     }
 
-    private struct SegmentSlice: Identifiable {
-        let segment: Segment
-        let startAngle: Angle
-        let endAngle: Angle
-        let endFraction: Double
-
-        var id: Segment.Kind { segment.id }
-    }
-    private struct RingSegment: Shape {
-        var startAngle: Angle
-        var endAngle: Angle
-        var clockwise: Bool = true
-
-        func path(in rect: CGRect) -> Path {
-            let rotationAdjustment = Angle.degrees(90)
-            let adjustedStart = startAngle - rotationAdjustment
-            let adjustedEnd = endAngle - rotationAdjustment
-            let radius = min(rect.width, rect.height) / 2
-            let center = CGPoint(x: rect.midX, y: rect.midY)
-
-            var path = Path()
-            path.addArc(
-                center: center,
-                radius: radius,
-                startAngle: adjustedStart,
-                endAngle: adjustedEnd,
-                clockwise: clockwise
-            )
-            return path
-        }
-    }
-    
-    let segments: [Segment]
-    let progress: Double
-    var lineWidth: CGFloat = 12
-    var size: CGFloat = 140
-    
-    private let layoutOrder: [Segment.Kind] = [.unanswered, .incorrect, .correct]
-    private let drawingOrder: [Segment.Kind] = [.unanswered, .incorrect, .correct]
-
-    private var sanitizedSegments: [Segment] {
-        segments.map { segment in
-            Segment(kind: segment.kind, value: max(segment.value, 0), color: segment.color)
-        }
+    private var sanitizedTotal: Double {
+        clampedProgress(totalProgress)
     }
 
-    private func orderIndex(for kind: Segment.Kind, in order: [Segment.Kind]) -> Int {
-        order.firstIndex(of: kind) ?? order.count
-    }
-
-    private var layoutSegments: [Segment] {
-        sanitizedSegments.sorted { lhs, rhs in
-            orderIndex(for: lhs.kind, in: layoutOrder) < orderIndex(for: rhs.kind, in: layoutOrder)
-        }
-    }
-
-    
-    private var totalValue: Double {
-        sanitizedSegments.reduce(0) { $0 + $1.value }
-    }
-    
-
-    private var segmentSlices: [SegmentSlice] {
-        guard totalValue > 0 else { return [] }
-
-        let epsilon = 0.1
-        var slices: [SegmentSlice] = []
-        var currentAngle: Double = 0
-        
-        let orderedSegments = layoutSegments
-        let nonZeroIndices = orderedSegments.enumerated().compactMap { index, segment in
-            segment.value > 0 ? index : nil
-        }
-        let firstNonZeroIndex = nonZeroIndices.first
-        let lastNonZeroIndex = nonZeroIndices.last
-
-        for (index, segment) in orderedSegments.enumerated() {
-
-            let fraction = segment.value / totalValue
-            let sweep = fraction * 360
-            let baseStartAngle = currentAngle
-            let baseEndAngle = currentAngle + sweep
-            let isFirstNonZero = index == firstNonZeroIndex
-            let isLastNonZero = index == lastNonZeroIndex
-
-            guard sweep > 0 else {
-                currentAngle = baseEndAngle
-                continue
-            }
-
-            let adjustedStart = isFirstNonZero ? baseStartAngle : baseStartAngle - epsilon
-            let adjustedEnd = isLastNonZero ? baseEndAngle + epsilon : baseEndAngle
-            slices.append(
-                SegmentSlice(
-                    segment: segment,
-                    startAngle: .degrees(adjustedStart),
-                    endAngle: .degrees(adjustedEnd),
-                    endFraction: min(baseEndAngle / 360, 1)
-                )
-            )
-            currentAngle = baseEndAngle
-        }
-
-        return slices
-    }
-
-    private var sanitizedProgress: Double? {
-        guard !progress.isNaN, progress >= 0 else { return nil }
-        return min(max(progress, 0), 1)
-    }
-
-    private var progressText: String {
-        guard let sanitizedProgress else { return "--%" }
-        return "\(Int((sanitizedProgress * 100).rounded()))%"
-    }
-
-    private var shouldDisplayPlaceholder: Bool {
-        segmentSlices.isEmpty
+    private var sanitizedHighlight: Double {
+        min(clampedProgress(highlightProgress), sanitizedTotal)
     }
 
     var body: some View {
-        ZStack {
-            Circle()
-                .stroke(Color.themeSurfaceElevated.opacity(0.35), lineWidth: lineWidth)
-
-            if shouldDisplayPlaceholder {
+        GeometryReader { geometry in
+            let diameter = min(geometry.size.width, geometry.size.height)
+            let ringWidth = diameter * 0.12
+            ZStack {
                 Circle()
-                    .stroke(Color.themeSurfaceElevated.opacity(0.2), lineWidth: lineWidth)
-            } else {
-                ForEach(segmentSlices.sorted { lhs, rhs in
-                    orderIndex(for: lhs.segment.kind, in: drawingOrder) < orderIndex(for: rhs.segment.kind, in: drawingOrder)
-                }) { slice in
-                    RingSegment(startAngle: slice.startAngle, endAngle: slice.endAngle)
-                        .stroke(
-                            slice.segment.color,
-                            style: StrokeStyle(lineWidth: lineWidth, lineCap: .butt, lineJoin: .round)
-                        )
-                        .opacity(1.0)
-                        .animation(.easeInOut(duration: 0.6), value: slice.endFraction)
+                    .stroke(Color.gray.opacity(0.2), lineWidth: ringWidth)
+                Circle()
+                
+                    .trim(from: 0, to: animatedTotal)
+                    .stroke(
+                        Color.blue,
+                        style: StrokeStyle(lineWidth: ringWidth, lineCap: .round)
+                    )
+                    .rotationEffect(.degrees(-90))
+                    .animation(.easeOut(duration: 0.6), value: animatedTotal)
+
+                Circle()
+                    .trim(
+                        from: max(0, animatedTotal - animatedHighlight),
+                        to: animatedTotal
+                    )
+                    .stroke(
+                        Color.red,
+                        style: StrokeStyle(lineWidth: ringWidth, lineCap: .round)
+                    )
+                    .rotationEffect(.degrees(-90))
+                    .animation(.easeOut(duration: 0.6), value: animatedHighlight)
+
+                Text(percentageText)
+                    .font(.system(size: diameter * 0.25, weight: .bold))
+                    .foregroundColor(.primary)
+                    .minimumScaleFactor(0.5)
+                    .lineLimit(1)
+                    .animation(.easeOut(duration: 0.6), value: percentageText)
+            }
+            .frame(width: diameter, height: diameter)
+            .onAppear {
+                withAnimation(.easeOut(duration: 0.6)) {
+                    animatedTotal = sanitizedTotal
+                    animatedHighlight = sanitizedHighlight
                 }
             }
-
-            Text(progressText)
-                .font(.system(size: size * 0.2, weight: .bold))
-                .foregroundColor(.themeTextPrimary)
+            .onChange(of: totalProgress) { _ in
+                withAnimation(.easeOut(duration: 0.6)) {
+                    animatedTotal = sanitizedTotal
+                    animatedHighlight = sanitizedHighlight
+                }
+            }
+            .onChange(of: highlightProgress) { _ in
+                withAnimation(.easeOut(duration: 0.6)) {
+                    animatedTotal = sanitizedTotal
+                    animatedHighlight = sanitizedHighlight
+                }
+            }
         }
-        .frame(width: size, height: size)
-        .padding(lineWidth / 2)
-        .background(
-            Circle()
-                .fill(
-                    LinearGradient(
-                        colors: [Color.themeSurfaceElevated, Color.themeSurfaceAlt],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    )
-                )
-        )
-        .shadow(color: Color.themeShadowSoft.opacity(0.6), radius: 12, x: 0, y: 8)
+        .aspectRatio(1, contentMode: .fit)
     }
 }
 
@@ -182,21 +85,18 @@ struct CircularProgressView_Previews: PreviewProvider {
     static var previews: some View {
         VStack(spacing: 24) {
             CircularProgressView(
-                segments: [
-                    .init(kind: .correct, value: 12, color: .themeCorrect),
-                    .init(kind: .incorrect, value: 3, color: .themeIncorrect),
-                    .init(kind: .unanswered, value: 5, color: .themeButtonSecondary)
-                ],
-                progress: 0.68
+                totalProgress: 0.25,
+                highlightProgress: 0.05,
+                percentageText: "25%"
             )
+            .frame(width: 160, height: 160)
             CircularProgressView(
-                segments: [
-                    .init(kind: .correct, value: 0, color: .themeCorrect),
-                    .init(kind: .incorrect, value: 0, color: .themeIncorrect),
-                    .init(kind: .unanswered, value: 0, color: .themeButtonSecondary)
-                ],
-                progress: -1
+                
+                totalProgress: 0.75,
+                highlightProgress: 0.15,
+                percentageText: "75%"
             )
+            .frame(width: 160, height: 160)
         }
         .padding()
         .previewLayout(.sizeThatFits)
