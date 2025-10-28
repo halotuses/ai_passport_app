@@ -48,29 +48,12 @@ struct CircularProgressView: View {
                 let greyStart = greenEnd             // グレーの開始位置
                 let greyEnd = 1.0                    // グレーの終了位置（円全体）
 
-                // 赤いセグメント（ハイライト部分）
-                if redEnd > 0 {
-                    segment(
-                        start: 0,
-                        end: redEnd,
-                        color: .red,
-                        ringWidth: ringWidth
-                    )
-                    .animation(.easeOut(duration: 0.6), value: animatedHighlight)
-                }
+                // ✅ セグメント境界が重なって見えないように、微小なオフセットを設ける
+                let boundaryOffset = 0.003
+                let adjustedRedEnd = redEnd > 0 ? max(0, redEnd - boundaryOffset) : redEnd
+                let adjustedGreenStart = redEnd > 0 ? min(greenEnd, redEnd + boundaryOffset) : greenStart
 
-                // 緑のセグメント（ハイライト以外の進捗部分）
-                if greenEnd > greenStart {
-                    segment(
-                        start: greenStart,
-                        end: greenEnd,
-                        color: .green,
-                        ringWidth: ringWidth
-                    )
-                    .animation(.easeOut(duration: 0.6), value: animatedTotal)
-                }
-
-                // グレーのセグメント（未達成部分）
+                // ⚪️ グレーのセグメント（未達成部分）
                 if greyEnd > greyStart {
                     segment(
                         start: greyStart,
@@ -79,6 +62,28 @@ struct CircularProgressView: View {
                         ringWidth: ringWidth
                     )
                     .animation(.easeOut(duration: 0.6), value: animatedTotal)
+                }
+
+                // 🟢 緑のセグメント（ハイライト以外の進捗部分）
+                if greenEnd > adjustedGreenStart {
+                    segment(
+                        start: adjustedGreenStart,
+                        end: greenEnd,
+                        color: .green,
+                        ringWidth: ringWidth
+                    )
+                    .animation(.easeOut(duration: 0.6), value: animatedTotal)
+                }
+
+                // 🔴 赤いセグメント（ハイライト部分）
+                if adjustedRedEnd > 0 {
+                    segment(
+                        start: 0,
+                        end: adjustedRedEnd,
+                        color: .red,
+                        ringWidth: ringWidth
+                    )
+                    .animation(.easeOut(duration: 0.6), value: animatedHighlight)
                 }
 
                 // 中央のテキスト（進捗率を表示）
@@ -123,10 +128,10 @@ extension CircularProgressView {
         Circle()
             // trimで円の一部だけを描画
             .trim(from: start, to: end)
-            // 線のスタイルを指定
+            // 線のスタイルを指定（線端は丸）
             .stroke(
                 color,
-                style: StrokeStyle(lineWidth: ringWidth, lineCap: .butt)
+                style: StrokeStyle(lineWidth: ringWidth, lineCap: .round)
             )
             // 円の開始位置を上（12時）にする
             .rotationEffect(.degrees(-90))

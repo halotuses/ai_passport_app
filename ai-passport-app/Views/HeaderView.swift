@@ -59,8 +59,6 @@ struct HeaderView: View {
                             .padding(10)
                     }
                     .buttonStyle(.plain)
-                    .background(Color.white.opacity(0.18))
-                    .clipShape(RoundedRectangle(cornerRadius: 12))
                     .accessibilityLabel(bookmark.isActive ? "ブックマーク済み" : "ブックマーク")
                     .accessibilityAddTraits(bookmark.isActive ? .isSelected : [])
                 }
