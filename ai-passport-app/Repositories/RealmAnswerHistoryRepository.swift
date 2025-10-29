@@ -23,6 +23,17 @@ enum IdentifierGenerator {
     }
 }
 
+struct ProgressChapterIdentifier: Hashable {
+    let unitId: String
+    let chapterId: String
+
+    init(unitId: String, chapterId: String) {
+        self.unitId = unitId
+        self.chapterId = chapterId
+    }
+}
+
+
 final class RealmAnswerHistoryRepository {
     private let configuration: Realm.Configuration
     private let realmManager: RealmManager
@@ -478,15 +489,46 @@ final class RealmAnswerHistoryRepository {
         target.unitIdentifier = unitId
         target.chapterIdentifier = chapterIdentifier
     }
-    func deleteAllProgress() throws {
+    func deleteProgress(
+        for chapters: Set<ProgressChapterIdentifier>,
+        statuses: Set<QuestionStatus>
+    ) throws {
         let realm = try realm()
-        let objects = realm.objects(QuestionProgressObject.self)
+        var objects = realm.objects(QuestionProgressObject.self)
+
+        if !chapters.isEmpty {
+            let predicates = chapters.map {
+                NSPredicate(
+                    format: "unitIdentifier == %@ AND chapterIdentifier == %@",
+                    $0.unitId,
+                    $0.chapterId
+                )
+            }
+            let compound = NSCompoundPredicate(orPredicateWithSubpredicates: predicates)
+            objects = objects.filter(compound)
+        }
+
+        if !statuses.isEmpty && statuses.count < QuestionStatus.allCases.count {
+            let rawValues = statuses.map { $0.rawValue }
+            objects = objects.filter("statusRaw IN %@", rawValues)
+        }
         guard !objects.isEmpty else { return }
         try realm.write {
             realm.delete(objects)
         }
     }
+    func deleteAllProgress() throws {
+        try deleteProgress(for: [], statuses: [])
+    }
 
+    func deleteAllBookmarks() throws {
+        let realm = try realm()
+        let bookmarks = realm.objects(BookmarkObject.self)
+        guard !bookmarks.isEmpty else { return }
+        try realm.write {
+            realm.delete(bookmarks)
+        }
+    }
     func deleteAllData() throws {
         let realm = try realm()
         try realm.write {
