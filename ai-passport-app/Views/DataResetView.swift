@@ -772,7 +772,7 @@ private struct CheckboxToggleStyle: ToggleStyle {
 }
 
 private struct ResetHierarchyLoader {
-    struct Unit: Identifiable {
+    struct Unit: Identifiable, Equatable {
         let id: String
         let title: String
         let chapters: [ChapterMetadata]

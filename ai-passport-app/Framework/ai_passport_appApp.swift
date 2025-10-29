@@ -5,7 +5,7 @@ import RealmSwift
 /// アプリ起動エントリーポイント
 @main
 struct ai_passport_appApp: SwiftUI.App {
-    @StateObject private var progressManager = ProgressManager()
+    @StateObject private var progressManager: ProgressManager
     init() {
         // Realm設定
         var configuration = Realm.Configuration(schemaVersion: 3)
@@ -31,9 +31,10 @@ struct ai_passport_appApp: SwiftUI.App {
             print(url)
         }
 
-        // マイグレーションなどの初期化処理
+        // Realmリポジトリの準備とマイグレーションなどの初期化処理
         let repository = RealmAnswerHistoryRepository(configuration: configuration)
         LegacyAnswerHistoryMigrator(repository: repository).migrateIfNeeded()
+        _progressManager = StateObject(wrappedValue: ProgressManager(repository: repository))
     }
 
     var body: some Scene {
