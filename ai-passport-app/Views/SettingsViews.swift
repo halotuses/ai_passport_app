@@ -3,8 +3,6 @@ import SwiftUI
 struct SettingsView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.openURL) private var openURL
-    @EnvironmentObject private var router: NavigationRouter
-    @EnvironmentObject private var mainViewState: MainViewState
 
     @AppStorage(AppSettingsKeys.soundEnabled) private var soundEnabled = true
     @AppStorage(AppSettingsKeys.fontSizeIndex) private var fontSizeIndex = AppFontSettings.defaultIndex
@@ -43,7 +41,6 @@ private extension SettingsView {
     var titleSection: some View {
         ZStack {
             HStack {
-                homeButton
                 Spacer()
                 closeButton
             }
@@ -58,23 +55,6 @@ private extension SettingsView {
         .background(Color.themeBase)
     }
 
-    var homeButton: some View {
-        Button {
-            mainViewState.reset(router: router)
-            dismiss()
-        } label: {
-            Label("ホームに戻る", systemImage: "house.fill")
-                .font(.body)
-                .foregroundColor(.themeTextPrimary)
-                .padding(.horizontal, 12)
-                .padding(.vertical, 6)
-                .background(
-                    RoundedRectangle(cornerRadius: 12)
-                        .fill(Color.themeTextSecondary.opacity(0.12))
-                )
-
-        }
-    }
 
     var closeButton: some View {
         Button("閉じる") {
