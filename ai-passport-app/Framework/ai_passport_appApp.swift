@@ -8,7 +8,7 @@ struct ai_passport_appApp: SwiftUI.App {
     @StateObject private var progressManager = ProgressManager()
     init() {
         // Realm設定
-        var configuration = Realm.Configuration(schemaVersion: 2)
+        var configuration = Realm.Configuration(schemaVersion: 3)
         configuration.deleteRealmIfMigrationNeeded = true
         do {
             let fileManager = FileManager.default

@@ -57,14 +57,19 @@ private extension BookmarkListView {
 
     @ViewBuilder
     func bookmarkRow(for bookmark: BookmarkObject, progress: QuestionProgressObject?) -> some View {
+        let questionText = bookmark.questionText.isEmpty
+            ? (progress?.questionText ?? "問題文なし")
+            : bookmark.questionText
+        
         VStack(alignment: .leading, spacing: 6) {
-            Text(progress?.questionText ?? "問題文なし")
+            Text(questionText)
                 .font(.headline)
                 .foregroundColor(.themeTextPrimary)
                 .lineLimit(3)
             if let answer = correctAnswerText(for: progress) {
                 Text("正解: \(answer)")
                     .font(.subheadline)
+             
                     .foregroundColor(.themeTextSecondary)
             }
             if let location = locationText(for: progress) {

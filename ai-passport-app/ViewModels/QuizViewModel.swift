@@ -201,6 +201,7 @@ class QuizViewModel: ObservableObject {
                     bookmark.createdAt = now
                     bookmark.updatedAt = now
                     bookmark.isBookmarked = true
+                    bookmark.questionText = quiz.question
                     realm.add(bookmark)
 
                     let progressObject: QuestionProgressObject
