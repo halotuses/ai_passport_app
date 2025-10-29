@@ -10,16 +10,16 @@ struct DataResetView: View {
     @State private var showErrorAlert = false
 
     @State private var units = ResetHierarchyLoader.loadUnits()
-     @State private var expandedUnitIds: Set<String> = []
-     @State private var isProblemSectionExpanded = true
-     @State private var isProgressSectionExpanded = false
-     @State private var isBookmarkSectionExpanded = false
+    @State private var expandedUnitIds: Set<String> = []
+    @State private var isProblemSectionExpanded = true
+    @State private var isProgressSectionExpanded = false
+    @State private var isBookmarkSectionExpanded = false
 
-     @State private var isProblemDataEnabled = false
-     @State private var selectedChapters: Set<ProgressChapterIdentifier> = []
-     @State private var isProgressFiltersEnabled = false
-     @State private var selectedStatuses: Set<QuestionStatus> = []
-     @State private var shouldDeleteBookmarks = false
+    @State private var isProblemDataEnabled = false
+    @State private var selectedChapters: Set<ProgressChapterIdentifier> = []
+    @State private var isProgressFiltersEnabled = false
+    @State private var selectedStatuses: Set<QuestionStatus> = []
+    @State private var shouldDeleteBookmarks = false
     
     var body: some View {
         ScrollView(showsIndicators: false) {
@@ -78,6 +78,8 @@ struct DataResetView: View {
             }
         }
     }
+}
+    
 private extension DataResetView {
     var infoCard: some View {
         VStack(alignment: .leading, spacing: 20) {
