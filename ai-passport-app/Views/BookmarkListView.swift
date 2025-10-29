@@ -22,6 +22,7 @@ struct BookmarkListView: View {
         Group {
             if bookmarks.isEmpty {
                 VStack(spacing: 12) {
+                    bookmarkCountSummary()
                     Image(systemName: "bookmark")
                         .font(.largeTitle)
                         .foregroundColor(.secondary)
@@ -33,9 +34,14 @@ struct BookmarkListView: View {
                 .padding()
             } else {
                 List {
-                    ForEach(bookmarks.sorted(by: { $0.quizId < $1.quizId })) { item in
-                        bookmarkRow(for: item, progress: progress(for: item))
+                    Section {
+                        ForEach(bookmarks.sorted(by: { $0.quizId < $1.quizId })) { item in
+                            bookmarkRow(for: item, progress: progress(for: item))
+                        }
+                    } header: {
+                        bookmarkListHeader()
                     }
+                    .textCase(nil)
                 }
                 .listStyle(.insetGrouped)
             }
@@ -68,6 +74,42 @@ private extension BookmarkListView {
             }
         }
         .padding(.vertical, 4)
+    }
+    
+    @ViewBuilder
+    func bookmarkListHeader() -> some View {
+        HStack(alignment: .center) {
+            Text("ブックマーク")
+                .font(.headline)
+                .foregroundColor(.themeTextPrimary)
+            Spacer()
+            bookmarkCountBadge(for: bookmarks.count)
+        }
+        .padding(.bottom, 4)
+    }
+
+    @ViewBuilder
+    func bookmarkCountSummary() -> some View {
+        HStack(spacing: 12) {
+            Text("ブックマーク")
+                .font(.headline)
+                .foregroundColor(.themeTextPrimary)
+            bookmarkCountBadge(for: bookmarks.count)
+        }
+        .padding(.horizontal)
+    }
+
+    @ViewBuilder
+    func bookmarkCountBadge(for count: Int) -> some View {
+        Text("\(count)件")
+            .font(.subheadline.weight(.semibold))
+            .foregroundColor(.themeAccent)
+            .padding(.vertical, 6)
+            .padding(.horizontal, 12)
+            .background(
+                Capsule()
+                    .fill(Color.themePillBackground)
+            )
     }
 
     func correctAnswerText(for progress: QuestionProgressObject?) -> String? {
