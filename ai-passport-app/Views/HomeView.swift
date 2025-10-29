@@ -301,7 +301,9 @@ struct HomeView: View {
     }
     private var startReviewButton: some View {
         Button {
-            // TODO: 復習機能の実装時に処理を追加
+            withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
+                mainViewState.enterReview()
+            }
         } label: {
             ZStack {
                 HStack(spacing: 12) {

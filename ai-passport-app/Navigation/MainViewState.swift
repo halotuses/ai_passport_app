@@ -52,6 +52,7 @@ final class MainViewState: ObservableObject {
     @Published var isOnHome: Bool = true
     @Published var isShowingAnswerHistory: Bool = false
     @Published var isShowingBookmarks: Bool = false
+    @Published var isShowingReview: Bool = false
     
     /// ホーム画面（単元選択）に戻す
     func reset(router: NavigationRouter) {
@@ -81,6 +82,7 @@ final class MainViewState: ObservableObject {
         navigationResetToken = UUID()
         isShowingAnswerHistory = false
         isShowingBookmarks = false
+        isShowingReview = false
         clearHeaderBookmark()
 
         let unitTitle = selectedUnit?.title ?? "章選択"
@@ -98,6 +100,7 @@ final class MainViewState: ObservableObject {
         navigationResetToken = UUID()
         isShowingAnswerHistory = false
         isShowingBookmarks = false
+        isShowingReview = false
         clearHeaderBookmark()
         enterUnitSelection()
     }
@@ -106,6 +109,7 @@ final class MainViewState: ObservableObject {
     func enterHome() {
         isOnHome = true
         isShowingAnswerHistory = false
+        isShowingReview = false
         setHeader(title: "ホーム")
         isShowingBookmarks = false
         clearHeaderBookmark()
@@ -116,9 +120,20 @@ final class MainViewState: ObservableObject {
         isOnHome = false
         isShowingAnswerHistory = false
         isShowingBookmarks = false
+        isShowingReview = false
         setHeader(title: "学習アプリ", backButton: .toHome)
         clearHeaderBookmark()
 
+    }
+    
+    /// 復習画面に遷移
+    func enterReview() {
+        isOnHome = false
+        isShowingAnswerHistory = false
+        isShowingBookmarks = false
+        isShowingReview = true
+        setHeader(title: "復習", backButton: .toHome)
+        clearHeaderBookmark()
     }
 
     func backToHome(router: NavigationRouter) {
@@ -131,6 +146,7 @@ final class MainViewState: ObservableObject {
         navigationResetToken = UUID()
         isShowingAnswerHistory = false
         isShowingBookmarks = false
+        isShowingReview = false
         enterHome()
         clearHeaderBookmark()
         
@@ -161,6 +177,7 @@ final class MainViewState: ObservableObject {
         isOnHome = false
         isShowingAnswerHistory = false
         isShowingBookmarks = true
+        isShowingReview = false
         clearHeaderBookmark()
         setHeader(title: "ブックマーク", backButton: .toHome)
     }

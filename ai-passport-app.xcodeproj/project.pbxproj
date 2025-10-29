@@ -64,6 +64,8 @@
 		0CE6D5B72EAFE7E200D38241 /* BookmarkListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CE6D5B62EAFE7E000D38241 /* BookmarkListView.swift */; };
 		0CE6D5B92EB0DDD200D38241 /* BookmarkObject.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CE6D5B82EB0DD9E00D38241 /* BookmarkObject.swift */; };
 		0CE6D5BB2EB0F8C300D38241 /* RealmManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CE6D5BA2EB0F8C100D38241 /* RealmManager.swift */; };
+		0CE6D5BD2EB25B3200D38241 /* ReviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CE6D5BC2EB25B0E00D38241 /* ReviewView.swift */; };
+		0CE6D5BF2EB25B8400D38241 /* DataResetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CE6D5BE2EB25B8200D38241 /* DataResetView.swift */; };
 		0CF00B642EA91BF300B8A6D0 /* QuestionProgress.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF00B632EA91BEC00B8A6D0 /* QuestionProgress.swift */; };
 		0CF00B662EA91D2700B8A6D0 /* ChapterProgressViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF00B652EA91D1400B8A6D0 /* ChapterProgressViewModel.swift */; };
 		0CF00B682EA91D5800B8A6D0 /* HomeProgressViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF00B672EA91D5700B8A6D0 /* HomeProgressViewModel.swift */; };
@@ -155,6 +157,8 @@
 		0CE6D5B62EAFE7E000D38241 /* BookmarkListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarkListView.swift; sourceTree = "<group>"; };
 		0CE6D5B82EB0DD9E00D38241 /* BookmarkObject.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarkObject.swift; sourceTree = "<group>"; };
 		0CE6D5BA2EB0F8C100D38241 /* RealmManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RealmManager.swift; sourceTree = "<group>"; };
+		0CE6D5BC2EB25B0E00D38241 /* ReviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewView.swift; sourceTree = "<group>"; };
+		0CE6D5BE2EB25B8200D38241 /* DataResetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataResetView.swift; sourceTree = "<group>"; };
 		0CF00B632EA91BEC00B8A6D0 /* QuestionProgress.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuestionProgress.swift; sourceTree = "<group>"; };
 		0CF00B652EA91D1400B8A6D0 /* ChapterProgressViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChapterProgressViewModel.swift; sourceTree = "<group>"; };
 		0CF00B672EA91D5700B8A6D0 /* HomeProgressViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeProgressViewModel.swift; sourceTree = "<group>"; };
@@ -329,6 +333,8 @@
 		0C30DDCE2DFF140C00F25D02 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				0CE6D5BE2EB25B8200D38241 /* DataResetView.swift */,
+				0CE6D5BC2EB25B0E00D38241 /* ReviewView.swift */,
 				0CE6D5B62EAFE7E000D38241 /* BookmarkListView.swift */,
 				0CE6D5A62EAF709D00D38241 /* TermsPrivacyViews.swift */,
 				0CE6D5A42EAF682100D38241 /* SettingsViews.swift */,
@@ -720,6 +726,7 @@
 				0CE6D5AB2EAFC11C00D38241 /* SplashView.swift in Sources */,
 				0C30DDD72DFF183F00F25D02 /* NavigationRouter.swift in Sources */,
 				0CE6D5AD2EAFC3E500D38241 /* SplashSumusView.swift in Sources */,
+				0CE6D5BD2EB25B3200D38241 /* ReviewView.swift in Sources */,
 				0C30DDE32DFF1AAA00F25D02 /* ResultView.swift in Sources */,
 				0CF00B642EA91BF300B8A6D0 /* QuestionProgress.swift in Sources */,
 				0C8786A12EA672D90052D2A8 /* RealmAnswerHistoryRepository.swift in Sources */,
@@ -736,6 +743,7 @@
 				0C30DDEB2DFF1B7A00F25D02 /* UnitListViewModel.swift in Sources */,
 				0CE6D59B2EAE867B00D38241 /* ContentStateView.swift in Sources */,
 				0C30DD9A2DFF116F00F25D02 /* ai_passport_appApp.swift in Sources */,
+				0CE6D5BF2EB25B8400D38241 /* DataResetView.swift in Sources */,
 				0C30DDF52DFF1C7100F25D02 /* AnswerHistoryRepository.swift in Sources */,
 				0CE6D5A32EAF67D100D38241 /* AccountView.swift in Sources */,
 				0CE6D59F2EAF618E00D38241 /* QuizQuestionCatalog.swift in Sources */,

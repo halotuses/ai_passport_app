@@ -3,15 +3,12 @@ import SwiftUI
 struct SettingsView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.openURL) private var openURL
-    @EnvironmentObject private var progressManager: ProgressManager
+    @EnvironmentObject private var router: NavigationRouter
+    @EnvironmentObject private var mainViewState: MainViewState
 
     @AppStorage(AppSettingsKeys.soundEnabled) private var soundEnabled = true
     @AppStorage(AppSettingsKeys.fontSizeIndex) private var fontSizeIndex = AppFontSettings.defaultIndex
 
-    @State private var showResetConfirmation = false
-    @State private var showInitializationConfirmation = false
-    @State private var errorMessage: String?
-    @State private var showErrorAlert = false
 
     private let fontSliderRange = 0.0...Double(AppFontSettings.options.count - 1)
 
@@ -39,47 +36,34 @@ struct SettingsView: View {
         .navigationBarTitleDisplayMode(.inline)
         .toolbar(.hidden, for: .navigationBar)
         
-        .alert("データリセット", isPresented: $showResetConfirmation) {
-            Button("キャンセル", role: .cancel) {
-            }
-            Button("リセット", role: .destructive) {
-                performDataReset()
-            }
-        } message: {
-            Text("学習履歴をリセットします。よろしいですか？")
-        }
-        .alert("アプリを初期化", isPresented: $showInitializationConfirmation) {
-            Button("キャンセル", role: .cancel) {
-            }
-            Button("初期化", role: .destructive) {
-                performInitialization()
-            }
-        } message: {
-            Text("全ての学習データと設定を削除します。よろしいですか？")
-        }
-        .alert("エラー", isPresented: $showErrorAlert, presenting: errorMessage) { _ in
-            Button("OK", role: .cancel) {
-            }
-        } message: { message in
-            Text(message)
-        }
     }
 }
 
 private extension SettingsView {
     var titleSection: some View {
         ZStack {
+            HStack {
+                homeButton
+                Spacer()
+                closeButton
+            }
             Text("設定")
                 .font(.title2.bold())
                 .foregroundColor(.themeTextPrimary)
                 .frame(maxWidth: .infinity, alignment: .center)
+        }
+        .padding(.horizontal, 20)
+        .padding(.top, 12)
+        .padding(.bottom, 8)
+        .background(Color.themeBase)
+    }
 
-            HStack {
-                Spacer()
-
-                Button("閉じる") {
-                    dismiss()
-                }
+    var homeButton: some View {
+        Button {
+            mainViewState.reset(router: router)
+            dismiss()
+        } label: {
+            Label("ホームに戻る", systemImage: "house.fill")
                 .font(.body)
                 .foregroundColor(.themeTextPrimary)
                 .padding(.horizontal, 12)
@@ -88,13 +72,22 @@ private extension SettingsView {
                     RoundedRectangle(cornerRadius: 12)
                         .fill(Color.themeTextSecondary.opacity(0.12))
                 )
-            }
-            .frame(maxWidth: .infinity, alignment: .trailing)
+
         }
-        .padding(.horizontal, 20)
-        .padding(.top, 12)
-        .padding(.bottom, 8)
-        .background(Color.themeBase)
+    }
+
+    var closeButton: some View {
+        Button("閉じる") {
+            dismiss()
+        }
+        .font(.body)
+        .foregroundColor(.themeTextPrimary)
+        .padding(.horizontal, 12)
+        .padding(.vertical, 6)
+        .background(
+            RoundedRectangle(cornerRadius: 12)
+                .fill(Color.themeTextSecondary.opacity(0.12))
+        )
     }
     var accountSection: some View {
         SettingsSection(title: "アカウント設定") {
@@ -152,19 +145,10 @@ private extension SettingsView {
     var dataSection: some View {
         SettingsSection(title: "データ管理") {
             SettingsRow {
-                Button {
-                    showResetConfirmation = true
+                NavigationLink {
+                    DataResetView()
                 } label: {
-                    rowLabel(title: "データリセット", systemImage: "arrow.counterclockwise", tint: .red, titleColor: .red, showsChevron: false)
-                }
-                .buttonStyle(.plain)
-            }
-
-            SettingsRow {
-                Button {
-                    showInitializationConfirmation = true
-                } label: {
-                    rowLabel(title: "初期化", systemImage: "trash.fill", tint: .red, titleColor: .red, showsChevron: false)
+                    rowLabel(title: "データリセット", systemImage: "arrow.counterclockwise", tint: .red, titleColor: .red)
                 }
                 .buttonStyle(.plain)
             }
@@ -245,35 +229,6 @@ private extension SettingsView {
 
     func open(link: URL) {
         openURL(link)
-    }
-
-    func performDataReset() {
-        do {
-            try progressManager.repository.deleteAllProgress()
-            progressManager.homeProgressViewModel.refresh()
-        } catch {
-            presentError(message: "データのリセットに失敗しました。\n\(error.localizedDescription)")
-        }
-    }
-
-    func performInitialization() {
-        do {
-            try progressManager.repository.deleteAllData()
-            resetSettings()
-            progressManager.homeProgressViewModel.refresh()
-        } catch {
-            presentError(message: "初期化に失敗しました。\n\(error.localizedDescription)")
-        }
-    }
-
-    func resetSettings() {
-        soundEnabled = true
-        fontSizeIndex = AppFontSettings.defaultIndex
-    }
-
-    func presentError(message: String) {
-        errorMessage = message
-        showErrorAlert = true
     }
 }
 
