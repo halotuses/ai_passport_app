@@ -285,7 +285,8 @@ private struct QuizContentView: View {
                     // 選択時に handleSelection を呼び出す
                     selectAction: handleSelection
                 )
-
+                // 回答エリア上部に余白
+                .padding(.top, 8)
                 // 回答エリア下部に余白（SafeAreaに収まるよう調整）
                 .padding(.bottom, 0)
             }

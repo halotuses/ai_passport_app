@@ -60,7 +60,7 @@ struct QuestionView: View {
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
-        .padding(.top, 80)
+        .padding(.top, 16)
         .onChange(of: viewModel.selectedAnswerIndex) { newValue in
             guard let selectedIndex = newValue,
                   handledQuestionIndex != viewModel.currentQuestionIndex,
