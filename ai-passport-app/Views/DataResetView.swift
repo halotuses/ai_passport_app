@@ -639,6 +639,7 @@ private struct CheckboxLabel: View {
             }
             .contentShape(Rectangle())
         }
+        .frame(maxWidth: .infinity, alignment: .leading)
         .buttonStyle(.plain)
     }
 }
@@ -705,6 +706,7 @@ private struct TriStateCheckbox: View {
             }
             .contentShape(Rectangle())
         }
+        .frame(maxWidth: .infinity, alignment: .leading)
         .buttonStyle(.plain)
     }
 
@@ -764,6 +766,7 @@ private struct CheckboxToggleStyle: ToggleStyle {
             }
             .contentShape(Rectangle())
         }
+        .frame(maxWidth: .infinity, alignment: .leading)
         .buttonStyle(.plain)
     }
 }
