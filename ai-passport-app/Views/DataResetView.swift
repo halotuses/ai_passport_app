@@ -13,7 +13,7 @@ struct DataResetView: View {
     @State private var expandedChapterIds: Set<String> = []
     @State private var isProblemSectionExpanded = true
     @State private var isProgressSectionExpanded = false
-    @State private var isBookmarkSectionExpanded = false
+
 
     @State private var isProblemDataEnabled = false
     @State private var selectedChapters: Set<ProgressChapterIdentifier> = []
@@ -207,11 +207,6 @@ private extension DataResetView {
                       }
                       .toggleStyle(CheckboxToggleStyle())
                       .padding(.leading, 4)
-                  } else {
-                      Text("チェックを入れると、章や単元ごとに削除対象を選べます。")
-                          .font(.footnote)
-                          .foregroundColor(.themeTextSecondary)
-                          .padding(.leading, 4)
                   }
               }
               .padding(.top, 6)
@@ -220,7 +215,7 @@ private extension DataResetView {
                   CheckboxLabel(
                       isOn: isProblemDataEnabled,
                       title: "問題データ",
-                      subtitle: "章や単元ごとに学習履歴を削除"
+                      subtitle: "チェックを入れると、章や単元ごとに削除対象を選べます。"
                   ) {
                       toggleProblemData()
                   }
@@ -259,11 +254,6 @@ private extension DataResetView {
                           }
                           .toggleStyle(CheckboxToggleStyle())
                       }
-                  } else {
-                      Text("正解・不正解・未回答など、進捗の状態を個別に削除できます。")
-                          .font(.footnote)
-                          .foregroundColor(.themeTextSecondary)
-                          .padding(.leading, 4)
                   }
               }
               .padding(.top, 6)
@@ -272,7 +262,7 @@ private extension DataResetView {
                   CheckboxLabel(
                       isOn: isProgressFiltersEnabled,
                       title: "進捗ごと",
-                      subtitle: "正解・不正解・未回答を選択"
+                      subtitle: "正解・不正解・未回答など、進捗の状態を個別に削除できます。"
                   ) {
                       toggleProgressFilters()
                   }
@@ -290,31 +280,12 @@ private extension DataResetView {
       }
 
       var bookmarkSection: some View {
-          DisclosureGroup(isExpanded: $isBookmarkSectionExpanded) {
-              Text("保存しているすべてのブックマークを削除します。")
-                  .font(.footnote)
-                  .foregroundColor(.themeTextSecondary)
-                  .padding(.top, 6)
-                  .padding(.leading, 4)
-          } label: {
-              HStack(spacing: 12) {
-                  CheckboxLabel(
-                      isOn: shouldDeleteBookmarks,
-                      title: "ブックマーク",
-                      subtitle: "保存した問題を削除"
-                  ) {
-                      shouldDeleteBookmarks.toggle()
-                  }
-
-                  Spacer(minLength: 8)
-
-                  ChevronButton(isExpanded: isBookmarkSectionExpanded) {
-                      withAnimation(.easeInOut) {
-                          isBookmarkSectionExpanded.toggle()
-                      }
-                  }
-              }
-              .contentShape(Rectangle())
+          CheckboxLabel(
+              isOn: shouldDeleteBookmarks,
+              title: "ブックマーク",
+              subtitle: "保存しているすべてのブックマークを削除します。"
+          ) {
+              shouldDeleteBookmarks.toggle()
           }
       }
 
