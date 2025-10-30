@@ -11,9 +11,6 @@ struct DataResetView: View {
 
     @State private var chapters = ResetHierarchyLoader.loadChapters()
     @State private var expandedChapterIds: Set<String> = []
-    @State private var isProblemSectionExpanded = true
-    @State private var isProgressSectionExpanded = false
-
 
     @State private var isProblemDataEnabled = false
     @State private var selectedChapters: Set<ProgressChapterIdentifier> = []
@@ -188,9 +185,17 @@ private extension DataResetView {
       }
 
       var problemDataSection: some View {
-          DisclosureGroup(isExpanded: $isProblemSectionExpanded) {
-              VStack(alignment: .leading, spacing: 14) {
-                  if isProblemDataEnabled {
+          VStack(alignment: .leading, spacing: 14) {
+              CheckboxLabel(
+                  isOn: isProblemDataEnabled,
+                  title: "問題データ",
+                  subtitle: "チェックを入れると、章や単元ごとに削除対象を選べます。"
+              ) {
+                  toggleProblemData()
+              }
+
+              if isProblemDataEnabled {
+                  VStack(alignment: .leading, spacing: 14) {
                       ForEach(chapters) { chapter in
                           chapterSection(for: chapter)
                       }
@@ -208,34 +213,24 @@ private extension DataResetView {
                       .toggleStyle(CheckboxToggleStyle())
                       .padding(.leading, 4)
                   }
+                  .padding(.top, 6)
               }
-              .padding(.top, 6)
-          } label: {
-              HStack(spacing: 12) {
-                  CheckboxLabel(
-                      isOn: isProblemDataEnabled,
-                      title: "問題データ",
-                      subtitle: "チェックを入れると、章や単元ごとに削除対象を選べます。"
-                  ) {
-                      toggleProblemData()
-                  }
 
-                  Spacer(minLength: 8)
-
-                  ChevronButton(isExpanded: isProblemSectionExpanded) {
-                      withAnimation(.easeInOut) {
-                          isProblemSectionExpanded.toggle()
-                      }
-                  }
-              }
-              .contentShape(Rectangle())
           }
       }
 
       var progressSection: some View {
-          DisclosureGroup(isExpanded: $isProgressSectionExpanded) {
-              VStack(alignment: .leading, spacing: 12) {
-                  if isProgressFiltersEnabled {
+          VStack(alignment: .leading, spacing: 14) {
+               CheckboxLabel(
+                   isOn: isProgressFiltersEnabled,
+                   title: "進捗ごと",
+                   subtitle: "正解・不正解・未回答など、進捗の状態を個別に削除できます。"
+               ) {
+                   toggleProgressFilters()
+               }
+
+               if isProgressFiltersEnabled {
+                   VStack(alignment: .leading, spacing: 12) {
                       ForEach(ProgressStatusOption.allCases) { option in
                           Toggle(isOn: Binding(
                               get: { selectedStatuses.contains(option.status) },
@@ -255,27 +250,8 @@ private extension DataResetView {
                           .toggleStyle(CheckboxToggleStyle())
                       }
                   }
-              }
-              .padding(.top, 6)
-          } label: {
-              HStack(spacing: 12) {
-                  CheckboxLabel(
-                      isOn: isProgressFiltersEnabled,
-                      title: "進捗ごと",
-                      subtitle: "正解・不正解・未回答など、進捗の状態を個別に削除できます。"
-                  ) {
-                      toggleProgressFilters()
-                  }
-
-                  Spacer(minLength: 8)
-
-                  ChevronButton(isExpanded: isProgressSectionExpanded) {
-                      withAnimation(.easeInOut) {
-                          isProgressSectionExpanded.toggle()
-                      }
-                  }
-              }
-              .contentShape(Rectangle())
+                   .padding(.top, 6)
+               }
           }
       }
 
