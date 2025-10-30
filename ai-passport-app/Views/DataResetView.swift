@@ -72,7 +72,7 @@ struct DataResetView: View {
         }
         .onChange(of: isProgressFiltersEnabled) { newValue in
             if newValue && selectedStatuses.isEmpty {
-                selectedStatuses = Set(QuestionStatus.allCases)
+                selectedStatuses = deletableStatusChoices
             }
         }
     }
@@ -224,7 +224,7 @@ private extension DataResetView {
                CheckboxLabel(
                    isOn: isProgressFiltersEnabled,
                    title: "進捗ごと",
-                   subtitle: "正解・不正解・未回答など、進捗の状態を個別に削除できます。"
+                   subtitle: "正解・不正解の、進捗の状態を個別に削除できます。"
                ) {
                    toggleProgressFilters()
                }
@@ -488,7 +488,7 @@ private extension DataResetView {
             isProgressFiltersEnabled.toggle()
             if isProgressFiltersEnabled {
                 if selectedStatuses.isEmpty {
-                    selectedStatuses = Set(QuestionStatus.allCases)
+                    selectedStatuses = deletableStatusChoices
                 }
             } else {
                 selectedStatuses.removeAll()
@@ -498,6 +498,7 @@ private extension DataResetView {
 
 
     func updateStatusSelection(for status: QuestionStatus, isOn: Bool) {
+        guard status != .unanswered else { return }
         if isOn {
             selectedStatuses.insert(status)
         } else {
@@ -511,7 +512,7 @@ private extension DataResetView {
     var canPerformReset: Bool {
         let chapters = isProblemDataEnabled ? selectedChapters.intersection(allChapterSelections) : Set<ProgressChapterIdentifier>()
         let hasChapterSelection = !chapters.isEmpty
-        let hasProgressSelection = isProgressFiltersEnabled && !selectedStatuses.isEmpty
+        let hasProgressSelection = isProgressFiltersEnabled && !effectiveSelectedStatuses.isEmpty
         return hasChapterSelection || hasProgressSelection || shouldDeleteBookmarks
     }
 
@@ -526,7 +527,14 @@ private extension DataResetView {
             }
         )
     }
-            
+
+    var deletableStatusChoices: Set<QuestionStatus> {
+        Set(QuestionStatus.allCases.filter { $0 != .unanswered })
+    }
+
+    var effectiveSelectedStatuses: Set<QuestionStatus> {
+        selectedStatuses.intersection(deletableStatusChoices)
+    }
 
     func synchronizeSelectionsWithAvailableUnits() {
         let available = allChapterSelections
@@ -558,10 +566,14 @@ private extension DataResetView {
 
         var statusesToDelete: Set<QuestionStatus> = []
         if isProgressFiltersEnabled {
-            statusesToDelete = selectedStatuses.isEmpty ? Set(QuestionStatus.allCases) : selectedStatuses
+            if selectedStatuses.isEmpty {
+                statusesToDelete = deletableStatusChoices
+            } else {
+                statusesToDelete = effectiveSelectedStatuses
+            }
         }
 
-        let shouldDeleteProgress = !chaptersToDelete.isEmpty || isProgressFiltersEnabled
+        let shouldDeleteProgress = !chaptersToDelete.isEmpty || !statusesToDelete.isEmpty
 
         do {
             if shouldDeleteProgress {
@@ -735,11 +747,6 @@ private struct ProgressStatusOption: Identifiable {
             status: .incorrect,
             title: "不正解データのみ削除",
             subtitle: "間違えた問題の履歴をリセット"
-        ),
-        ProgressStatusOption(
-            status: .unanswered,
-            title: "未回答データのみ削除",
-            subtitle: "未回答として保存されている履歴をリセット"
         )
     ]
 }
