@@ -540,7 +540,7 @@ private struct ReviewCategoryButtonSection: View {
                 Button(action: action) {
                     HStack(spacing: 12) {
                         VStack(alignment: .leading, spacing: 4) {
-                            Text("章を選択する")
+                            Text("単元を選択する")
                                 .font(.headline)
                                 .foregroundColor(.themeTextPrimary)
                             Text("正解済み \(count) 問")

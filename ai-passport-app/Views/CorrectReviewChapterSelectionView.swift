@@ -16,7 +16,7 @@ struct CorrectReviewChapterSelectionView: View {
     @Environment(\.dismiss) private var dismiss
 
     @State private var isLoading = true
-    @State private var groups: [UnitGroup] = []
+    @State private var units: [UnitEntry] = []
     @State private var hasError = false
 
     var body: some View {
@@ -53,7 +53,7 @@ private extension CorrectReviewChapterSelectionView {
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .padding()
             .background(Color.themeBase.ignoresSafeArea())
-        } else if groups.isEmpty {
+        } else if units.isEmpty {
             VStack(spacing: 12) {
                 Image(systemName: "checkmark.circle")
                     .font(.largeTitle)
@@ -66,66 +66,68 @@ private extension CorrectReviewChapterSelectionView {
             .padding()
             .background(Color.themeBase.ignoresSafeArea())
         } else {
-            List {
-                ForEach(groups) { group in
-                    Section(header: sectionHeader(for: group)) {
-                        ForEach(group.chapters) { chapter in
-                            Button {
-                                let selection = Selection(
-                                    unitId: group.unitId,
-                                    unit: group.unit,
-                                    chapter: chapter.chapter,
-                                    initialQuestionIndex: chapter.initialQuestionIndex
-                                )
-                                dismiss()
-                                DispatchQueue.main.async {
-                                    onSelect(selection)
-                                }
-                            } label: {
-                                chapterRow(for: chapter)
-                            }
-                            .buttonStyle(.plain)
+            ScrollView {
+                LazyVStack(spacing: 16) {
+                    ForEach(units) { unit in
+                        Button {
+                            handleSelection(for: unit)
+                        } label: {
+                            unitCard(for: unit)
                         }
+                        .buttonStyle(.plain)
                     }
                 }
+                
+                .padding(.vertical, 24)
+                .padding(.horizontal, 20)
             }
-            .listStyle(.insetGrouped)
+
             .background(Color.themeBase.ignoresSafeArea())
         }
     }
 
-    func sectionHeader(for group: UnitGroup) -> some View {
-        VStack(alignment: .leading, spacing: 2) {
-            Text(group.unit.title)
-                .font(.headline)
-                .foregroundColor(.themeTextPrimary)
-            if !group.unit.subtitle.isEmpty {
-                Text(group.unit.subtitle)
-                    .font(.footnote)
-                    .foregroundColor(.themeTextSecondary)
-            }
-        }
-        .textCase(nil)
-    }
-
-    func chapterRow(for chapter: ChapterEntry) -> some View {
-        HStack(spacing: 12) {
+    func unitCard(for unit: UnitEntry) -> some View {
+        VStack(alignment: .leading, spacing: 16) {
             VStack(alignment: .leading, spacing: 4) {
-                Text(chapter.chapter.title)
+                Text(unit.unit.title)
                     .font(.headline)
                     .foregroundColor(.themeTextPrimary)
-                Text("正解済み \(chapter.correctCount) 問")
-                    .font(.subheadline)
-                    .foregroundColor(.themeTextSecondary)
+                if !unit.unit.subtitle.isEmpty {
+                    Text(unit.unit.subtitle)
+                        .font(.footnote)
+                        .foregroundColor(.themeTextSecondary)
+                }
             }
 
-            Spacer()
+            HStack(alignment: .center, spacing: 12) {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("正解済み \(unit.totalCorrectCount) 問")
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundColor(.themeCorrect)
 
-            Image(systemName: "chevron.right")
-                .font(.footnote.weight(.semibold))
-                .foregroundColor(.themeTextSecondary)
+                    Text("正解した章数: \(unit.chapters.count)")
+                        .font(.caption)
+                        .foregroundColor(.themeTextSecondary)
+                }
+
+                Spacer()
+
+                Image(systemName: "chevron.right")
+                    .font(.headline.weight(.semibold))
+                    .foregroundColor(.themeTextSecondary)
+            }
         }
-        .padding(.vertical, 8)
+        .padding(20)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(
+            RoundedRectangle(cornerRadius: 20, style: .continuous)
+                .fill(Color.themeSurface)
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 20, style: .continuous)
+                .stroke(Color.black.opacity(0.04), lineWidth: 0.5)
+        )
+        .shadow(color: Color.themeShadowSoft, radius: 12, x: 0, y: 8)
     }
 
     func loadDataIfNeeded() async {
@@ -134,7 +136,7 @@ private extension CorrectReviewChapterSelectionView {
         let aggregated = aggregateProgresses()
         guard !aggregated.isEmpty else {
             await MainActor.run {
-                groups = []
+                units = []
                 hasError = false
                 isLoading = false
             }
@@ -149,7 +151,7 @@ private extension CorrectReviewChapterSelectionView {
             return
         }
 
-        var builtGroups: [UnitGroup] = []
+        var builtUnits: [UnitEntry] = []
         var encounteredError = false
 
         for (unitId, chapterInfo) in aggregated {
@@ -185,8 +187,8 @@ private extension CorrectReviewChapterSelectionView {
             entries.sort { $0.chapter.title.localizedCompare($1.chapter.title) == .orderedAscending }
 
             if !entries.isEmpty {
-                builtGroups.append(
-                    UnitGroup(
+                builtUnits.append(
+                    UnitEntry(
                         id: unitId,
                         unitId: unitId,
                         unit: unitMetadata,
@@ -196,11 +198,11 @@ private extension CorrectReviewChapterSelectionView {
             }
         }
 
-        builtGroups.sort { $0.unit.title.localizedCompare($1.unit.title) == .orderedAscending }
+        builtUnits.sort { $0.unit.title.localizedCompare($1.unit.title) == .orderedAscending }
 
         await MainActor.run {
-            groups = builtGroups
-            hasError = encounteredError && builtGroups.isEmpty
+            units = builtUnits
+            hasError = encounteredError && builtUnits.isEmpty
             isLoading = false
         }
     }
@@ -225,14 +227,40 @@ private extension CorrectReviewChapterSelectionView {
 
         return result
     }
+    func handleSelection(for unit: UnitEntry) {
+        guard let chapter = unit.chapters.min(by: chapterComparator) else { return }
+
+        let selection = Selection(
+            unitId: unit.unitId,
+            unit: unit.unit,
+            chapter: chapter.chapter,
+            initialQuestionIndex: chapter.initialQuestionIndex
+        )
+
+        dismiss()
+
+        DispatchQueue.main.async {
+            onSelect(selection)
+        }
+    }
+
+    private func chapterComparator(_ lhs: ChapterEntry, _ rhs: ChapterEntry) -> Bool {
+        if lhs.initialQuestionIndex == rhs.initialQuestionIndex {
+            return lhs.chapter.title.localizedCompare(rhs.chapter.title) == .orderedAscending
+        }
+        return lhs.initialQuestionIndex < rhs.initialQuestionIndex
+    }
 }
 
 private extension CorrectReviewChapterSelectionView {
-    struct UnitGroup: Identifiable {
+    struct UnitEntry: Identifiable {
         let id: String
         let unitId: String
         let unit: QuizMetadata
         let chapters: [ChapterEntry]
+        var totalCorrectCount: Int {
+            chapters.reduce(into: 0) { $0 += $1.correctCount }
+        }
     }
 
     struct ChapterEntry: Identifiable {
