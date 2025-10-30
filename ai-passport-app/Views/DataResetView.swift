@@ -11,7 +11,6 @@ struct DataResetView: View {
 
     @State private var chapters = ResetHierarchyLoader.loadChapters()
     @State private var expandedChapterIds: Set<String> = []
-    @State private var expandedUnitIds: Set<String> = []
     @State private var isProblemSectionExpanded = true
     @State private var isProgressSectionExpanded = false
     @State private var isBookmarkSectionExpanded = false
@@ -418,7 +417,8 @@ private extension DataResetView {
         )) {
             VStack(alignment: .leading, spacing: 12) {
                 ForEach(chapter.units) { unit in
-                    unitSection(unit, in: chapter)
+                    unitRow(for: unit)
+                        .padding(.leading, 44)
                 }
             }
             .padding(.top, 6)
@@ -449,75 +449,26 @@ private extension DataResetView {
         }
     }
 
-    func unitSection(_ unit: ResetHierarchyLoader.Unit, in chapter: ResetHierarchyLoader.Chapter) -> some View {
-        let unitIdentifier = unitKey(forChapter: chapter.id, unitId: unit.id)
-        return DisclosureGroup(isExpanded: Binding(
-            get: { expandedUnitIds.contains(unitIdentifier) },
-            set: { isExpanded in
-                withAnimation(.easeInOut) {
-                    if isExpanded {
-                        expandedUnitIds.insert(unitIdentifier)
-                    } else {
-                        expandedUnitIds.remove(unitIdentifier)
-                    }
-                }
+    func unitRow(for unit: ResetHierarchyLoader.Unit) -> some View {
+        Toggle(isOn: Binding(
+            get: { unitCheckboxState(for: unit) == .on },
+            set: { isOn in
+                updateUnitSelection(unit, isOn: isOn)
             }
         )) {
-            VStack(alignment: .leading, spacing: 10) {
-                ForEach(unit.chapters) { chapter in
-                    Toggle(isOn: Binding(
-                        get: {
-                            let identifier = ProgressChapterIdentifier(unitId: unit.id, chapterId: chapter.id)
-                            return selectedChapters.contains(identifier)
-                        },
-                        set: { isOn in
-                            let identifier = ProgressChapterIdentifier(unitId: unit.id, chapterId: chapter.id)
-                            if isOn {
-                                selectedChapters.insert(identifier)
-                            } else {
-                                selectedChapters.remove(identifier)
-                            }
-                        }
-                    )) {
-                        VStack(alignment: .leading, spacing: 2) {
-                            Text(chapter.title.isEmpty ? chapter.id : chapter.title)
-                                .font(.subheadline)
-                                .foregroundColor(.themeTextPrimary)
-                            Text(chapter.id)
-                                .font(.caption)
-                                .foregroundColor(.themeTextSecondary)
-                        }
-                    }
-                    .toggleStyle(CheckboxToggleStyle())
-                    .padding(.leading, 44)
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text(unit.title)
+                    .font(.subheadline)
+                    .foregroundColor(.themeTextPrimary)
+                if !unit.subtitle.isEmpty {
+                    Text(unit.subtitle)
+                        .font(.caption)
+                        .foregroundColor(.themeTextSecondary)
                 }
             }
-            .padding(.top, 6)
-        } label: {
-            HStack(spacing: 12) {
-                TriStateCheckbox(
-                    state: unitCheckboxState(for: unit),
-                    title: unit.title,
-                    subtitle: unit.subtitle
-                ) {
-                    toggleUnitSelection(unit)
-                }
-
-                Spacer(minLength: 8)
-
-                ChevronButton(isExpanded: expandedUnitIds.contains(unitIdentifier)) {
-                    let isExpanded = expandedUnitIds.contains(unitIdentifier)
-                    withAnimation(.easeInOut) {
-                        if isExpanded {
-                            expandedUnitIds.remove(unitIdentifier)
-                        } else {
-                            expandedUnitIds.insert(unitIdentifier)
-                        }
-                    }
-                }
-            }
-            .contentShape(Rectangle())
         }
+        .toggleStyle(CheckboxToggleStyle())
     }
     func chapterCheckboxState(for chapter: ResetHierarchyLoader.Chapter) -> TriStateCheckbox.State {
         let identifiers = Set(
@@ -562,14 +513,12 @@ private extension DataResetView {
             selectedChapters.formUnion(identifiers)
         }
     }
-    func toggleUnitSelection(_ unit: ResetHierarchyLoader.Unit) {
+    func updateUnitSelection(_ unit: ResetHierarchyLoader.Unit, isOn: Bool) {
         let identifiers = Set(unit.chapters.map { ProgressChapterIdentifier(unitId: unit.id, chapterId: $0.id) })
-        let currentCount = identifiers.intersection(selectedChapters).count
-
-        if currentCount == identifiers.count {
-            selectedChapters.subtract(identifiers)
-        } else {
+        if isOn {
             selectedChapters.formUnion(identifiers)
+        } else {
+            selectedChapters.subtract(identifiers)
         }
     }
 
@@ -598,9 +547,7 @@ private extension DataResetView {
             }
         }
     }
-    func unitKey(forChapter chapterId: String, unitId: String) -> String {
-        "\(chapterId)::\(unitId)"
-    }
+
 
     func updateStatusSelection(for status: QuestionStatus, isOn: Bool) {
         if isOn {
