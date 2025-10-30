@@ -12,6 +12,8 @@ struct ReviewView: View {
         return newValue
     }()
     @EnvironmentObject private var mainViewState: MainViewState
+    @EnvironmentObject private var router: NavigationRouter
+    @EnvironmentObject private var progressManager: ProgressManager
     @ObservedResults(
         BookmarkObject.self,
         where: { $0.userId == ReviewView.userId && $0.isBookmarked == true },
@@ -21,6 +23,10 @@ struct ReviewView: View {
         QuestionProgressObject.self,
         sortDescriptor: SortDescriptor(keyPath: "updatedAt", ascending: false)
     ) private var progresses
+    @State private var metadataCache: QuizMetadataMap? = nil
+    @State private var chapterListCache: [String: [ChapterMetadata]] = [:]
+    @State private var isNavigatingToQuiz = false
+    @State private var navigationErrorMessage: String? = nil
 
     var body: some View {
         ScrollView(showsIndicators: false) {
@@ -38,6 +44,25 @@ struct ReviewView: View {
         .onAppear {
             mainViewState.setHeader(title: "復習", backButton: .toHome)
         }
+        .alert(
+            "復習を開始できませんでした",
+            isPresented: Binding(
+                get: { navigationErrorMessage != nil },
+                set: { value in
+                    if !value {
+                        navigationErrorMessage = nil
+                    }
+                }
+            ),
+            actions: {
+                Button("OK", role: .cancel) {}
+            },
+            message: {
+                if let navigationErrorMessage {
+                    Text(navigationErrorMessage)
+                }
+            }
+        )
     }
 }
 
@@ -63,53 +88,60 @@ private extension ReviewView {
                 .foregroundColor(.themeTextPrimary)
 
             LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 16), count: 2), spacing: 16) {
-                 summaryCard(title: "ブックマーク", value: bookmarks.count, icon: "bookmark.fill", tint: .themeAccent)
-                 summaryCard(title: "正解", value: correctProgresses.count, icon: "checkmark.circle.fill", tint: .themeCorrect)
-                 summaryCard(title: "不正解", value: incorrectProgresses.count, icon: "xmark.circle.fill", tint: .themeIncorrect)
-                 summaryCard(title: "未回答", value: unansweredProgresses.count, icon: "questionmark.circle.fill", tint: .themeTextSecondary)
-             }
-         }
-     }
+                summaryCard(title: "ブックマーク", value: bookmarks.count, icon: "bookmark.fill", tint: .themeAccent)
+                summaryCard(title: "正解", value: correctProgresses.count, icon: "checkmark.circle.fill", tint: .themeCorrect)
+                summaryCard(title: "不正解", value: incorrectProgresses.count, icon: "xmark.circle.fill", tint: .themeIncorrect)
+                summaryCard(title: "未回答", value: unansweredProgresses.count, icon: "questionmark.circle.fill", tint: .themeTextSecondary)
+            }
+        }
+    }
+    var reviewSections: some View {
+        VStack(spacing: 24) {
+            ReviewCategorySection(
+                title: "ブックマーク",
+                subtitle: "後で見返したい問題を集めています。",
+                iconName: "bookmark.fill",
+                tintColor: .themeAccent,
+                items: bookmarkItems,
+                emptyMessage: "ブックマークした問題はまだありません。",
+                isInteractionDisabled: isNavigatingToQuiz,
+                onSelect: handleItemSelection
+            )
 
-     var reviewSections: some View {
-         VStack(spacing: 24) {
-             ReviewCategorySection(
-                 title: "ブックマーク",
-                 subtitle: "後で見返したい問題を集めています。",
-                 iconName: "bookmark.fill",
-                 tintColor: .themeAccent,
-                 items: bookmarkItems,
-                 emptyMessage: "ブックマークした問題はまだありません。"
-             )
+            ReviewCategorySection(
+                title: "正解した問題",
+                subtitle: "正解できた問題も定期的に復習して定着させましょう。",
+                iconName: "checkmark.circle.fill",
+                tintColor: .themeCorrect,
+                items: correctProgresses.map { ReviewItem(progress: $0, context: .status(.correct)) },
+                emptyMessage: "まだ正解した問題はありません。",
+                isInteractionDisabled: isNavigatingToQuiz,
+                onSelect: handleItemSelection
+            )
 
-             ReviewCategorySection(
-                 title: "正解した問題",
-                 subtitle: "正解できた問題も定期的に復習して定着させましょう。",
-                 iconName: "checkmark.circle.fill",
-                 tintColor: .themeCorrect,
-                 items: correctProgresses.map { ReviewItem(progress: $0, context: .status(.correct)) },
-                 emptyMessage: "まだ正解した問題はありません。"
-             )
+            ReviewCategorySection(
+                title: "不正解だった問題",
+                subtitle: "苦手な問題を重点的に振り返りましょう。",
+                iconName: "xmark.circle.fill",
+                tintColor: .themeIncorrect,
+                items: incorrectProgresses.map { ReviewItem(progress: $0, context: .status(.incorrect)) },
+                emptyMessage: "不正解の問題はありません。",
+                isInteractionDisabled: isNavigatingToQuiz,
+                onSelect: handleItemSelection
+            )
 
-             ReviewCategorySection(
-                 title: "不正解だった問題",
-                 subtitle: "苦手な問題を重点的に振り返りましょう。",
-                 iconName: "xmark.circle.fill",
-                 tintColor: .themeIncorrect,
-                 items: incorrectProgresses.map { ReviewItem(progress: $0, context: .status(.incorrect)) },
-                 emptyMessage: "不正解の問題はありません。"
-             )
-
-             ReviewCategorySection(
-                 title: "未回答の問題",
-                 subtitle: "まだ挑戦できていない問題を確認してみましょう。",
-                 iconName: "questionmark.circle.fill",
-                 tintColor: .themeTextSecondary,
-                 items: unansweredProgresses.map { ReviewItem(progress: $0, context: .status(.unanswered)) },
-                 emptyMessage: "未回答の問題はありません。"
-             )
-         }
-     }
+            ReviewCategorySection(
+                title: "未回答の問題",
+                subtitle: "まだ挑戦できていない問題を確認してみましょう。",
+                iconName: "questionmark.circle.fill",
+                tintColor: .themeTextSecondary,
+                items: unansweredProgresses.map { ReviewItem(progress: $0, context: .status(.unanswered)) },
+                emptyMessage: "未回答の問題はありません。",
+                isInteractionDisabled: isNavigatingToQuiz,
+                onSelect: handleItemSelection
+            )
+        }
+    }
 
      var bookmarkItems: [ReviewItem] {
          let progressLookup = Dictionary(uniqueKeysWithValues: progresses.map { ($0.quizId, QuestionProgress(object: $0)) })
@@ -175,6 +207,102 @@ private extension ReviewView {
         )
         .shadow(color: Color.themeShadowSoft, radius: 12, x: 0, y: 8)
     }
+    func handleItemSelection(_ item: ReviewItem) {
+        guard !isNavigatingToQuiz else { return }
+        guard let context = item.makeNavigationContext() else {
+            navigationErrorMessage = "問題の位置情報を取得できませんでした。"
+            return
+        }
+
+        SoundManager.shared.play(.tap)
+        isNavigatingToQuiz = true
+        navigationErrorMessage = nil
+
+        Task {
+            await navigateToQuiz(context)
+            await MainActor.run {
+                isNavigatingToQuiz = false
+            }
+        }
+    }
+
+    func navigateToQuiz(_ context: ReviewItem.NavigationContext) async {
+        guard let metadata = await fetchMetadataIfNeeded() else {
+            await presentNavigationError("コンテンツ情報を取得できませんでした。")
+            return
+        }
+
+        guard let unit = metadata[context.unitId] else {
+            await presentNavigationError("対応する単元が見つかりませんでした。")
+            return
+        }
+
+        guard let chapters = await fetchChaptersIfNeeded(for: context.unitId, filePath: unit.file) else {
+            await presentNavigationError("章の情報を取得できませんでした。")
+            return
+        }
+
+        guard let chapter = chapters.first(where: { $0.id == context.chapterId }) else {
+            await presentNavigationError("対応する章が見つかりませんでした。")
+            return
+        }
+
+        await MainActor.run {
+            router.reset()
+            mainViewState.enterUnitSelection()
+            mainViewState.selectedUnitKey = context.unitId
+            mainViewState.selectedUnit = unit
+            progressManager.chapterListViewModel.fetchChapters(forUnitId: context.unitId, filePath: unit.file)
+            progressManager.quizViewModel.prepareForReviewNavigation(initialQuestionIndex: context.questionIndex)
+            mainViewState.selectedChapter = chapter
+        }
+    }
+
+    func fetchMetadataIfNeeded() async -> QuizMetadataMap? {
+        if let metadataCache {
+            return metadataCache
+        }
+
+        let metadata = await withCheckedContinuation { continuation in
+            NetworkManager.fetchMetadata { result in
+                continuation.resume(returning: result)
+            }
+        }
+
+        if let metadata {
+            await MainActor.run {
+                metadataCache = metadata
+            }
+        }
+
+        return metadata
+    }
+
+    func fetchChaptersIfNeeded(for unitId: String, filePath: String) async -> [ChapterMetadata]? {
+        if let cached = chapterListCache[unitId] {
+            return cached
+        }
+
+        let chapters = await withCheckedContinuation { continuation in
+            NetworkManager.fetchChapterList(from: Constants.url(filePath)) { chapterList in
+                continuation.resume(returning: chapterList?.chapters)
+            }
+        }
+
+        guard let chapters else { return nil }
+
+        await MainActor.run {
+            chapterListCache[unitId] = chapters
+        }
+
+        return chapters
+    }
+
+    func presentNavigationError(_ message: String) async {
+        await MainActor.run {
+            navigationErrorMessage = message
+        }
+    }
 }
 
 private struct ReviewItem: Identifiable {
@@ -202,7 +330,63 @@ private struct ReviewItem: Identifiable {
         self.timestamp = timestamp
     }
 }
+private extension ReviewItem {
+    struct NavigationContext {
+        let unitId: String
+        let chapterId: String
+        let questionIndex: Int
+    }
 
+    func makeNavigationContext() -> NavigationContext? {
+        let identifier = progress?.quizId ?? id
+        guard let parsed = Self.parseQuizIdentifier(identifier) else {
+            return nil
+        }
+
+        let unitId: String
+        if let storedUnit = progress?.unitId, !storedUnit.isEmpty {
+            unitId = storedUnit
+        } else {
+            unitId = parsed.unitId
+        }
+
+        let chapterId: String
+        if let storedChapter = progress?.chapterIdentifier, !storedChapter.isEmpty {
+            chapterId = storedChapter
+        } else {
+            chapterId = parsed.chapterId
+        }
+
+        guard let questionIndex = parsed.questionIndex else { return nil }
+
+        return NavigationContext(
+            unitId: unitId,
+            chapterId: chapterId,
+            questionIndex: max(questionIndex, 0)
+        )
+    }
+
+    private static func parseQuizIdentifier(_ identifier: String) -> (unitId: String, chapterId: String, questionIndex: Int?)? {
+        let components = identifier.split(separator: "#", maxSplits: 1, omittingEmptySubsequences: false)
+        guard let pairComponent = components.first else { return nil }
+
+        let unitAndChapter = pairComponent.split(separator: "-", maxSplits: 1, omittingEmptySubsequences: false)
+        guard unitAndChapter.count == 2 else { return nil }
+
+        let questionIndex: Int?
+        if components.count > 1 {
+            questionIndex = Int(components[1])
+        } else {
+            questionIndex = nil
+        }
+
+        return (
+            unitId: String(unitAndChapter[0]),
+            chapterId: String(unitAndChapter[1]),
+            questionIndex: questionIndex
+        )
+    }
+}
 private struct ReviewCategorySection: View {
     let title: String
     let subtitle: String
@@ -210,6 +394,8 @@ private struct ReviewCategorySection: View {
     let tintColor: Color
     let items: [ReviewItem]
     let emptyMessage: String
+    let isInteractionDisabled: Bool
+    let onSelect: (ReviewItem) -> Void
 
     var body: some View {
         VStack(alignment: .leading, spacing: 20) {
@@ -256,7 +442,13 @@ private struct ReviewCategorySection: View {
             } else {
                 VStack(spacing: 16) {
                     ForEach(items) { item in
-                        ReviewQuestionRow(item: item)
+                        Button {
+                            onSelect(item)
+                        } label: {
+                            ReviewQuestionRow(item: item)
+                        }
+                        .buttonStyle(.plain)
+                        .disabled(isInteractionDisabled)
                     }
                 }
             }
@@ -402,4 +594,6 @@ private struct ReviewQuestionRow: View {
 #Preview {
     ReviewView()
         .environmentObject(MainViewState())
+        .environmentObject(NavigationRouter())
+        .environmentObject(ProgressManager())
 }

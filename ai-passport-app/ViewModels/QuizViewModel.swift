@@ -24,6 +24,7 @@ class QuizViewModel: ObservableObject {
     // MARK: - Identifiers
     var unitId: String = ""
     var chapterId: String = ""
+    private var pendingInitialQuestionIndex: Int? = nil
     
     private let repository: RealmAnswerHistoryRepository
     private let realmManager: RealmManager
@@ -87,7 +88,20 @@ class QuizViewModel: ObservableObject {
                     let quizId = "\(self.unitId)-\(self.chapterId)#\(index)"
                     return storedStatuses[quizId] ?? .unanswered
                 }
-                
+                let preferredIndex = self.pendingInitialQuestionIndex ?? 0
+                if qs.indices.contains(preferredIndex) {
+                    self.currentQuestionIndex = preferredIndex
+                } else {
+                    self.currentQuestionIndex = 0
+                }
+
+                if self.selectedAnswers.indices.contains(self.currentQuestionIndex) {
+                    self.selectedAnswerIndex = self.selectedAnswers[self.currentQuestionIndex]
+                } else {
+                    self.selectedAnswerIndex = nil
+                }
+
+                self.pendingInitialQuestionIndex = nil
             } else {
                 self.quizzes = []
                 self.selectedAnswers = []
@@ -97,6 +111,7 @@ class QuizViewModel: ObservableObject {
                 self.hasError = true
                 self.questionStatuses = []
                 self.bookmarkedQuizIds = []
+                self.pendingInitialQuestionIndex = nil
                 
             }
         }
@@ -272,6 +287,7 @@ class QuizViewModel: ObservableObject {
         selectedAnswers = Array(repeating: nil, count: quizzes.count)
         questionStatuses = Array(repeating: .unanswered, count: quizzes.count)
         showResultView = false
+        pendingInitialQuestionIndex = nil
     }
     
     // MARK: - Computed
@@ -320,6 +336,7 @@ class QuizViewModel: ObservableObject {
         showResultView = false
         questionStatuses = Array(repeating: .unanswered, count: quizzes.count)
         bookmarkedQuizIds = []
+        pendingInitialQuestionIndex = nil
     }
 }
 
@@ -374,5 +391,12 @@ private extension QuizViewModel {
     func progressIdentifier(for index: Int) -> String? {
         guard quizzes.indices.contains(index) else { return nil }
         return "\(unitId)-\(chapterId)#\(index)"
+    }
+}
+
+extension QuizViewModel {
+    /// 復習画面などから特定の問題に直接遷移する際の初期位置を設定する
+    func prepareForReviewNavigation(initialQuestionIndex: Int) {
+        pendingInitialQuestionIndex = max(0, initialQuestionIndex)
     }
 }
