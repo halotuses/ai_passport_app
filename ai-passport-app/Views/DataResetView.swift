@@ -398,22 +398,38 @@ private extension DataResetView {
     }
 
     func unitRow(for unit: ResetHierarchyLoader.Unit) -> some View {
+        VStack(alignment: .leading, spacing: 12) {
+            TriStateCheckbox(
+                state: unitCheckboxState(for: unit),
+                title: unit.title,
+                subtitle: unit.subtitle
+            ) {
+                toggleUnitSelection(unit)
+            }
+
+            if !unit.chapters.isEmpty {
+                VStack(alignment: .leading, spacing: 10) {
+                    ForEach(unit.chapters) { chapter in
+                        chapterRow(for: chapter, in: unit)
+                    }
+                }
+                .padding(.leading, 32)
+            }
+        }
+    }
+
+    func chapterRow(for chapter: ChapterMetadata, in unit: ResetHierarchyLoader.Unit) -> some View {
         Toggle(isOn: Binding(
-            get: { unitCheckboxState(for: unit) == .on },
+            get: { isChapterSelected(chapter, in: unit) },
             set: { isOn in
-                updateUnitSelection(unit, isOn: isOn)
+                updateChapterSelection(for: unit, chapter: chapter, isOn: isOn)
             }
         )) {
 
             VStack(alignment: .leading, spacing: 2) {
-                Text(unit.title)
+                Text(chapter.title.isEmpty ? chapter.id : chapter.title)
                     .font(.subheadline)
                     .foregroundColor(.themeTextPrimary)
-                if !unit.subtitle.isEmpty {
-                    Text(unit.subtitle)
-                        .font(.caption)
-                        .foregroundColor(.themeTextSecondary)
-                }
             }
         }
         .toggleStyle(CheckboxToggleStyle())
@@ -447,6 +463,12 @@ private extension DataResetView {
             return .indeterminate
         }
     }
+    
+    func isChapterSelected(_ chapter: ChapterMetadata, in unit: ResetHierarchyLoader.Unit) -> Bool {
+        let identifier = ProgressChapterIdentifier(unitId: unit.id, chapterId: chapter.id)
+        return selectedChapters.contains(identifier)
+    }
+    
     func toggleChapterSelection(_ chapter: ResetHierarchyLoader.Chapter) {
         let identifiers = Set(
             chapter.units.flatMap { unit in
@@ -470,6 +492,19 @@ private extension DataResetView {
         }
     }
 
+    func toggleUnitSelection(_ unit: ResetHierarchyLoader.Unit) {
+        let shouldSelectAll = unitCheckboxState(for: unit) != .on
+        updateUnitSelection(unit, isOn: shouldSelectAll)
+    }
+    func updateChapterSelection(for unit: ResetHierarchyLoader.Unit, chapter: ChapterMetadata, isOn: Bool) {
+        let identifier = ProgressChapterIdentifier(unitId: unit.id, chapterId: chapter.id)
+        if isOn {
+            selectedChapters.insert(identifier)
+        } else {
+            selectedChapters.remove(identifier)
+        }
+    }
+    
     func toggleProblemData() {
         withAnimation(.easeInOut) {
             isProblemDataEnabled.toggle()
