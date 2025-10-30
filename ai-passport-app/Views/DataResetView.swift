@@ -9,10 +9,10 @@ struct DataResetView: View {
     @State private var errorMessage: String?
     @State private var showErrorAlert = false
 
-    @State private var chapters = ResetHierarchyLoader.loadChapters()
-    @State private var expandedChapterIds: Set<String> = []
+    @State private var units: [ResetHierarchyLoader.Unit] = ResetHierarchyLoader.loadUnits()
 
     @State private var isProblemDataEnabled = false
+    @State private var isProblemDataExpanded = false
     @State private var selectedChapters: Set<ProgressChapterIdentifier> = []
     @State private var isProgressFiltersEnabled = false
     @State private var selectedStatuses: Set<QuestionStatus> = []
@@ -57,7 +57,7 @@ struct DataResetView: View {
         .onAppear {
             synchronizeSelectionsWithAvailableUnits()
         }
-        .onChange(of: chapters) { _ in
+        .onChange(of: units) { _ in
             synchronizeSelectionsWithAvailableUnits()
         }
         .onChange(of: selectedChapters) { _ in
@@ -66,8 +66,13 @@ struct DataResetView: View {
             }
         }
         .onChange(of: isProblemDataEnabled) { newValue in
-            if newValue && selectedChapters.isEmpty {
-                selectedChapters = allChapterSelections
+            if newValue {
+                if selectedChapters.isEmpty {
+                    selectedChapters = allChapterSelections
+                }
+                if !chapterSelectionItems.isEmpty {
+                    isProblemDataExpanded = true
+                }
             }
         }
         .onChange(of: isProgressFiltersEnabled) { newValue in
@@ -185,37 +190,76 @@ private extension DataResetView {
       }
 
       var problemDataSection: some View {
-          VStack(alignment: .leading, spacing: 14) {
-              CheckboxLabel(
-                  isOn: isProblemDataEnabled,
-                  title: "問題データ",
-                  subtitle: "チェックを入れると、章や単元ごとに削除対象を選べます。"
-              ) {
-                  toggleProblemData()
-              }
-
-              if isProblemDataEnabled {
-                  VStack(alignment: .leading, spacing: 14) {
-                      ForEach(chapters) { chapter in
-                          chapterSection(for: chapter)
+          DisclosureGroup(
+              isExpanded: Binding(
+                  get: { isProblemDataExpanded },
+                  set: { isExpanded in
+                      withAnimation(.easeInOut) {
+                          isProblemDataExpanded = isExpanded
                       }
 
-                      Toggle(isOn: selectAllBinding) {
-                          VStack(alignment: .leading, spacing: 2) {
-                              Text("全選択")
-                                  .font(.subheadline.weight(.semibold))
-                                  .foregroundColor(.themeTextPrimary)
-                              Text("すべての章と単元を対象に含めます")
-                                  .font(.caption)
-                                  .foregroundColor(.themeTextSecondary)
-                          }
-                      }
-                      .toggleStyle(CheckboxToggleStyle())
-                      .padding(.leading, 4)
                   }
-                  .padding(.top, 6)
-              }
+              )
+          ) {
+              VStack(alignment: .leading, spacing: 14) {
+                  if isProblemDataEnabled {
+                      if chapterSelectionItems.isEmpty {
+                          Text("削除できる章が見つかりません。")
+                              .font(.footnote)
+                              .foregroundColor(.themeTextSecondary)
+                              .padding(.leading, 16)
+                      } else {
+                          chapterSelectionList
 
+                          Toggle(isOn: selectAllBinding) {
+                              VStack(alignment: .leading, spacing: 2) {
+                                  Text("全選択")
+                                      .font(.subheadline.weight(.semibold))
+                                      .foregroundColor(.themeTextPrimary)
+                                  Text("すべての章を削除対象に含めます")
+                                      .font(.caption)
+                                      .foregroundColor(.themeTextSecondary)
+                              }
+                          }
+                          .toggleStyle(CheckboxToggleStyle())
+                          .padding(.leading, 16)
+                      }
+                  } else {
+                      Text("チェックを入れると、章ごとに削除対象を選べます。")
+                          .font(.footnote)
+                          .foregroundColor(.themeTextSecondary)
+                          .padding(.leading, 16)
+                  }
+              }
+              .padding(.top, 6)
+          } label: {
+              HStack(spacing: 12) {
+                  Toggle(isOn: Binding(
+                      get: { isProblemDataEnabled },
+                      set: { isOn in
+                          setProblemDataEnabled(isOn)
+                      }
+                  )) {
+                      VStack(alignment: .leading, spacing: 2) {
+                          Text("問題データ")
+                              .font(.subheadline.weight(.semibold))
+                              .foregroundColor(.themeTextPrimary)
+                          Text("チェックを入れると、章ごとに削除対象を選べます。")
+                              .font(.caption)
+                              .foregroundColor(.themeTextSecondary)
+                      }
+                  }
+                  .toggleStyle(CheckboxToggleStyle())
+
+                  Spacer(minLength: 8)
+
+                  ChevronButton(isExpanded: isProblemDataExpanded) {
+                      withAnimation(.easeInOut) {
+                          isProblemDataExpanded.toggle()
+                      }
+                  }
+              }
+              .contentShape(Rectangle())
           }
       }
 
@@ -350,154 +394,48 @@ private extension DataResetView {
         )
     }
 
-    func chapterSection(for chapter: ResetHierarchyLoader.Chapter) -> some View {
-        DisclosureGroup(isExpanded: Binding(
-            get: { expandedChapterIds.contains(chapter.id) },
-            set: { isExpanded in
-                withAnimation(.easeInOut) {
-                    if isExpanded {
-                        expandedChapterIds.insert(chapter.id)
-                    } else {
-                        expandedChapterIds.remove(chapter.id)
-                    }
-                }
+    var chapterSelectionItems: [ChapterSelectionItem] {
+        units.flatMap { unit in
+            unit.chapters.map { chapter in
+                ChapterSelectionItem(
+                    identifier: ProgressChapterIdentifier(unitId: unit.id, chapterId: chapter.id),
+                    title: chapter.title.isEmpty ? chapter.id : chapter.title
+                )
             }
-        )) {
-            VStack(alignment: .leading, spacing: 12) {
-                ForEach(chapter.units) { unit in
-                    unitRow(for: unit)
-                        .padding(.leading, 44)
-                }
-            }
-            .padding(.top, 6)
-        } label: {
-            HStack(spacing: 12) {
-                TriStateCheckbox(
-                    state: chapterCheckboxState(for: chapter),
-                    title: chapter.title,
-                    subtitle: chapter.subtitle
-                ) {
-                    toggleChapterSelection(chapter)
-                }
+        }
+    }
 
-                Spacer(minLength: 8)
-
-                ChevronButton(isExpanded: expandedChapterIds.contains(chapter.id)) {
-                    let isExpanded = expandedChapterIds.contains(chapter.id)
-                    withAnimation(.easeInOut) {
-                        if isExpanded {
-                            expandedChapterIds.remove(chapter.id)
-                        } else {
-                            expandedChapterIds.insert(chapter.id)
+    @ViewBuilder
+    var chapterSelectionList: some View {
+        let items = chapterSelectionItems
+        if !items.isEmpty {
+            VStack(alignment: .leading, spacing: 0) {
+                ForEach(Array(items.enumerated()), id: \.element.id) { index, item in
+                    Toggle(isOn: Binding(
+                        get: { selectedChapters.contains(item.identifier) },
+                        set: { isOn in
+                            updateChapterSelection(for: item.identifier, isOn: isOn)
                         }
+                    )) {
+                        Text(item.title)
+                            .font(.subheadline)
+                            .foregroundColor(.themeTextPrimary)
+                    }
+                    .toggleStyle(CheckboxToggleStyle())
+                    .padding(.leading, 16)
+                    .padding(.vertical, 6)
+
+                    if index < items.count - 1 {
+                        Divider()
+                            .overlay(Color.white.opacity(0.15))
+                            .padding(.leading, 16)
                     }
                 }
             }
-            .contentShape(Rectangle())
         }
     }
 
-    func unitRow(for unit: ResetHierarchyLoader.Unit) -> some View {
-        VStack(alignment: .leading, spacing: 12) {
-            TriStateCheckbox(
-                state: unitCheckboxState(for: unit),
-                title: unit.title,
-                subtitle: unit.subtitle
-            ) {
-                toggleUnitSelection(unit)
-            }
-
-            if !unit.chapters.isEmpty {
-                VStack(alignment: .leading, spacing: 10) {
-                    ForEach(unit.chapters) { chapter in
-                        chapterRow(for: chapter, in: unit)
-                    }
-                }
-                .padding(.leading, 32)
-            }
-        }
-    }
-
-    func chapterRow(for chapter: ChapterMetadata, in unit: ResetHierarchyLoader.Unit) -> some View {
-        Toggle(isOn: Binding(
-            get: { isChapterSelected(chapter, in: unit) },
-            set: { isOn in
-                updateChapterSelection(for: unit, chapter: chapter, isOn: isOn)
-            }
-        )) {
-
-            VStack(alignment: .leading, spacing: 2) {
-                Text(chapter.title.isEmpty ? chapter.id : chapter.title)
-                    .font(.subheadline)
-                    .foregroundColor(.themeTextPrimary)
-            }
-        }
-        .toggleStyle(CheckboxToggleStyle())
-    }
-    func chapterCheckboxState(for chapter: ResetHierarchyLoader.Chapter) -> TriStateCheckbox.State {
-        let identifiers = Set(
-            chapter.units.flatMap { unit in
-                unit.chapters.map { ProgressChapterIdentifier(unitId: unit.id, chapterId: $0.id) }
-            }
-        )
-        let intersectionCount = identifiers.intersection(selectedChapters).count
-
-        if intersectionCount == 0 {
-            return .off
-        } else if intersectionCount == identifiers.count {
-            return .on
-        } else {
-            return .indeterminate
-        }
-    }
-
-    func unitCheckboxState(for unit: ResetHierarchyLoader.Unit) -> TriStateCheckbox.State {
-        let identifiers = Set(unit.chapters.map { ProgressChapterIdentifier(unitId: unit.id, chapterId: $0.id) })
-        let intersectionCount = identifiers.intersection(selectedChapters).count
-
-        if intersectionCount == 0 {
-            return .off
-        } else if intersectionCount == identifiers.count {
-            return .on
-        } else {
-            return .indeterminate
-        }
-    }
-    
-    func isChapterSelected(_ chapter: ChapterMetadata, in unit: ResetHierarchyLoader.Unit) -> Bool {
-        let identifier = ProgressChapterIdentifier(unitId: unit.id, chapterId: chapter.id)
-        return selectedChapters.contains(identifier)
-    }
-    
-    func toggleChapterSelection(_ chapter: ResetHierarchyLoader.Chapter) {
-        let identifiers = Set(
-            chapter.units.flatMap { unit in
-                unit.chapters.map { ProgressChapterIdentifier(unitId: unit.id, chapterId: $0.id) }
-            }
-        )
-        let currentCount = identifiers.intersection(selectedChapters).count
-
-        if currentCount == identifiers.count {
-            selectedChapters.subtract(identifiers)
-        } else {
-            selectedChapters.formUnion(identifiers)
-        }
-    }
-    func updateUnitSelection(_ unit: ResetHierarchyLoader.Unit, isOn: Bool) {
-        let identifiers = Set(unit.chapters.map { ProgressChapterIdentifier(unitId: unit.id, chapterId: $0.id) })
-        if isOn {
-            selectedChapters.formUnion(identifiers)
-        } else {
-            selectedChapters.subtract(identifiers)
-        }
-    }
-
-    func toggleUnitSelection(_ unit: ResetHierarchyLoader.Unit) {
-        let shouldSelectAll = unitCheckboxState(for: unit) != .on
-        updateUnitSelection(unit, isOn: shouldSelectAll)
-    }
-    func updateChapterSelection(for unit: ResetHierarchyLoader.Unit, chapter: ChapterMetadata, isOn: Bool) {
-        let identifier = ProgressChapterIdentifier(unitId: unit.id, chapterId: chapter.id)
+    func updateChapterSelection(for identifier: ProgressChapterIdentifier, isOn: Bool) {
         if isOn {
             selectedChapters.insert(identifier)
         } else {
@@ -505,12 +443,15 @@ private extension DataResetView {
         }
     }
     
-    func toggleProblemData() {
+    func setProblemDataEnabled(_ isOn: Bool) {
         withAnimation(.easeInOut) {
-            isProblemDataEnabled.toggle()
-            if isProblemDataEnabled {
+            isProblemDataEnabled = isOn
+            if isOn {
                 if selectedChapters.isEmpty {
                     selectedChapters = allChapterSelections
+                }
+                if !chapterSelectionItems.isEmpty {
+                    isProblemDataExpanded = true
                 }
             } else {
                 selectedChapters.removeAll()
@@ -553,11 +494,9 @@ private extension DataResetView {
 
     var allChapterSelections: Set<ProgressChapterIdentifier> {
         Set(
-            chapters.flatMap { chapter in
-                chapter.units.flatMap { unit in
-                    unit.chapters.map { lesson in
-                        ProgressChapterIdentifier(unitId: unit.id, chapterId: lesson.id)
-                    }
+            units.flatMap { unit in
+                unit.chapters.map { chapter in
+                    ProgressChapterIdentifier(unitId: unit.id, chapterId: chapter.id)
                 }
             }
         )
@@ -649,6 +588,12 @@ private extension DataResetView {
     }
 }
 // MARK: - Support Views
+private struct ChapterSelectionItem: Identifiable {
+    let identifier: ProgressChapterIdentifier
+    let title: String
+
+    var id: String { "\(identifier.unitId)#\(identifier.chapterId)" }
+}
 
 private struct CheckboxLabel: View {
     let isOn: Bool
@@ -706,64 +651,6 @@ private struct ChevronlessDisclosureGroupStyle: DisclosureGroupStyle {
             if configuration.isExpanded {
                 configuration.content
             }
-        }
-    }
-}
-private struct TriStateCheckbox: View {
-    enum State {
-        case on
-        case off
-        case indeterminate
-    }
-
-    let state: State
-    let title: String
-    let subtitle: String
-    let action: () -> Void
-
-    var body: some View {
-        Button(action: action) {
-            HStack(spacing: 12) {
-                Image(systemName: imageName)
-                    .font(.system(size: 22, weight: .semibold))
-                    .foregroundStyle(foregroundColor)
-
-                VStack(alignment: .leading, spacing: 2) {
-                    Text(title)
-                        .font(.subheadline.weight(.semibold))
-                        .foregroundColor(.themeTextPrimary)
-                    if !subtitle.isEmpty {
-                        Text(subtitle)
-                            .font(.caption)
-                            .foregroundColor(.themeTextSecondary)
-                    }
-                }
-            }
-            .contentShape(Rectangle())
-        }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .buttonStyle(.plain)
-    }
-
-    private var imageName: String {
-        switch state {
-        case .on:
-            return "checkmark.square.fill"
-        case .off:
-            return "square"
-        case .indeterminate:
-            return "minus.square.fill"
-        }
-    }
-
-    private var foregroundColor: Color {
-        switch state {
-        case .on:
-            return Color.themeMain
-        case .off:
-            return Color.themeTextSecondary.opacity(0.6)
-        case .indeterminate:
-            return Color.themeSecondary
         }
     }
 }
@@ -849,6 +736,10 @@ private struct ResetHierarchyLoader {
     }
     
     private static let decoder = JSONDecoder()
+    
+    static func loadUnits(bundle: Bundle = .main) -> [Unit] {
+        loadChapters(bundle: bundle).flatMap(\.units)
+    }
 
     static func loadChapters(bundle: Bundle = .main) -> [Chapter] {
         let rawUnits = loadRawUnits(bundle: bundle)

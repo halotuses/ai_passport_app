@@ -67,6 +67,8 @@
 		0CE6D5BD2EB25B3200D38241 /* ReviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CE6D5BC2EB25B0E00D38241 /* ReviewView.swift */; };
 		0CE6D5BF2EB25B8400D38241 /* DataResetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CE6D5BE2EB25B8200D38241 /* DataResetView.swift */; };
 		0CE6D5C12EB2658300D38241 /* QuestionStatus+Display.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CE6D5C02EB2658100D38241 /* QuestionStatus+Display.swift */; };
+		0CE6D5C32EB3A5C900D38241 /* QuizIdentifierParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CE6D5C22EB3A5B400D38241 /* QuizIdentifierParser.swift */; };
+		0CE6D5C52EB3A5E500D38241 /* CorrectReviewChapterSelectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CE6D5C42EB3A5E400D38241 /* CorrectReviewChapterSelectionView.swift */; };
 		0CF00B642EA91BF300B8A6D0 /* QuestionProgress.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF00B632EA91BEC00B8A6D0 /* QuestionProgress.swift */; };
 		0CF00B662EA91D2700B8A6D0 /* ChapterProgressViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF00B652EA91D1400B8A6D0 /* ChapterProgressViewModel.swift */; };
 		0CF00B682EA91D5800B8A6D0 /* HomeProgressViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF00B672EA91D5700B8A6D0 /* HomeProgressViewModel.swift */; };
@@ -161,6 +163,8 @@
 		0CE6D5BC2EB25B0E00D38241 /* ReviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewView.swift; sourceTree = "<group>"; };
 		0CE6D5BE2EB25B8200D38241 /* DataResetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataResetView.swift; sourceTree = "<group>"; };
 		0CE6D5C02EB2658100D38241 /* QuestionStatus+Display.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "QuestionStatus+Display.swift"; sourceTree = "<group>"; };
+		0CE6D5C22EB3A5B400D38241 /* QuizIdentifierParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuizIdentifierParser.swift; sourceTree = "<group>"; };
+		0CE6D5C42EB3A5E400D38241 /* CorrectReviewChapterSelectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CorrectReviewChapterSelectionView.swift; sourceTree = "<group>"; };
 		0CF00B632EA91BEC00B8A6D0 /* QuestionProgress.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuestionProgress.swift; sourceTree = "<group>"; };
 		0CF00B652EA91D1400B8A6D0 /* ChapterProgressViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChapterProgressViewModel.swift; sourceTree = "<group>"; };
 		0CF00B672EA91D5700B8A6D0 /* HomeProgressViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeProgressViewModel.swift; sourceTree = "<group>"; };
@@ -310,6 +314,7 @@
 		0C30DDCB2DFF13E800F25D02 /* Core */ = {
 			isa = PBXGroup;
 			children = (
+				0CE6D5C22EB3A5B400D38241 /* QuizIdentifierParser.swift */,
 				0CE6D5BA2EB0F8C100D38241 /* RealmManager.swift */,
 				0CE6D5A02EAF675C00D38241 /* AppSettings.swift */,
 				0CE6D5982EAE0C0F00D38241 /* ProgressManager.swift */,
@@ -336,6 +341,7 @@
 		0C30DDCE2DFF140C00F25D02 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				0CE6D5C42EB3A5E400D38241 /* CorrectReviewChapterSelectionView.swift */,
 				0CE6D5BE2EB25B8200D38241 /* DataResetView.swift */,
 				0CE6D5BC2EB25B0E00D38241 /* ReviewView.swift */,
 				0CE6D5B62EAFE7E000D38241 /* BookmarkListView.swift */,
@@ -709,6 +715,7 @@
 				0CE6D59D2EAE9C5500D38241 /* ExplanationRoute.swift in Sources */,
 				0CF00B6B2EA91FA900B8A6D0 /* CircularProgressView.swift in Sources */,
 				0C30DDDF2DFF1A9600F25D02 /* QuestionView.swift in Sources */,
+				0CE6D5C32EB3A5C900D38241 /* QuizIdentifierParser.swift in Sources */,
 				0C31AD7F2EA21882007500F7 /* HomeView.swift in Sources */,
 				0C30DDED2DFF1B8400F25D02 /* ChapterListViewModel.swift in Sources */,
 				0CCB45A22E8994E800C41D03 /* QuizList.swift in Sources */,
@@ -754,6 +761,7 @@
 				0CF00B742EAA83B100B8A6D0 /* AnswerHistoryView.swift in Sources */,
 				0C30DDE12DFF1AA000F25D02 /* ExplanationView.swift in Sources */,
 				0CE6D5A92EAFC11100D38241 /* RootContainerView.swift in Sources */,
+				0CE6D5C52EB3A5E500D38241 /* CorrectReviewChapterSelectionView.swift in Sources */,
 				0CE6D5B72EAFE7E200D38241 /* BookmarkListView.swift in Sources */,
 				0C30DDE92DFF1AC900F25D02 /* BottomTabBarView.swift in Sources */,
 				0C30DDF72DFF1CD800F25D02 /* Quiz.swift in Sources */,

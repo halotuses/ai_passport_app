@@ -27,7 +27,8 @@ struct ReviewView: View {
     @State private var chapterListCache: [String: [ChapterMetadata]] = [:]
     @State private var isNavigatingToQuiz = false
     @State private var navigationErrorMessage: String? = nil
-
+    @State private var isShowingCorrectChapterSelection = false
+    
     var body: some View {
         ScrollView(showsIndicators: false) {
             VStack(spacing: 28) {
@@ -108,15 +109,19 @@ private extension ReviewView {
                 onSelect: handleItemSelection
             )
 
-            ReviewCategorySection(
+            ReviewCategoryButtonSection(
                 title: "正解した問題",
                 subtitle: "正解できた問題も定期的に復習して定着させましょう。",
                 iconName: "checkmark.circle.fill",
                 tintColor: .themeCorrect,
-                items: correctProgresses.map { ReviewItem(progress: $0, context: .status(.correct)) },
+                count: correctProgresses.count,
                 emptyMessage: "まだ正解した問題はありません。",
                 isInteractionDisabled: isNavigatingToQuiz,
-                onSelect: handleItemSelection
+                action: {
+                    guard !correctProgresses.isEmpty else { return }
+                    SoundManager.shared.play(.tap)
+                    isShowingCorrectChapterSelection = true
+                }
             )
 
             ReviewCategorySection(
@@ -201,6 +206,18 @@ private extension ReviewView {
             RoundedRectangle(cornerRadius: 20, style: .continuous)
                 .fill(Color.themeSurface)
         )
+        .sheet(isPresented: $isShowingCorrectChapterSelection) {
+            CorrectReviewChapterSelectionView(
+                progresses: correctProgresses,
+                metadataProvider: { await fetchMetadataIfNeeded() },
+                chapterListProvider: { unitId, filePath in
+                    await fetchChaptersIfNeeded(for: unitId, filePath: filePath)
+                },
+                onSelect: { selection in
+                    handleCorrectChapterSelection(selection)
+                }
+            )
+        }
         .overlay(
             RoundedRectangle(cornerRadius: 20, style: .continuous)
                 .stroke(Color.black.opacity(0.04), lineWidth: 0.5)
@@ -226,6 +243,28 @@ private extension ReviewView {
         }
     }
 
+    func handleCorrectChapterSelection(_ selection: CorrectReviewChapterSelectionView.Selection) {
+        guard !isNavigatingToQuiz else { return }
+
+        SoundManager.shared.play(.tap)
+        isNavigatingToQuiz = true
+        navigationErrorMessage = nil
+        isShowingCorrectChapterSelection = false
+
+        let context = ReviewItem.NavigationContext(
+            unitId: selection.unitId,
+            chapterId: selection.chapter.id,
+            questionIndex: max(selection.initialQuestionIndex, 0)
+        )
+
+        Task {
+            await navigateToQuiz(context)
+            await MainActor.run {
+                isNavigatingToQuiz = false
+            }
+        }
+    }
+    
     func navigateToQuiz(_ context: ReviewItem.NavigationContext) async {
         guard let metadata = await fetchMetadataIfNeeded() else {
             await presentNavigationError("コンテンツ情報を取得できませんでした。")
@@ -339,7 +378,7 @@ private extension ReviewItem {
 
     func makeNavigationContext() -> NavigationContext? {
         let identifier = progress?.quizId ?? id
-        guard let parsed = Self.parseQuizIdentifier(identifier) else {
+        guard let parsed = QuizIdentifierParser.parse(identifier) else {
             return nil
         }
 
@@ -363,27 +402,6 @@ private extension ReviewItem {
             unitId: unitId,
             chapterId: chapterId,
             questionIndex: max(questionIndex, 0)
-        )
-    }
-
-    private static func parseQuizIdentifier(_ identifier: String) -> (unitId: String, chapterId: String, questionIndex: Int?)? {
-        let components = identifier.split(separator: "#", maxSplits: 1, omittingEmptySubsequences: false)
-        guard let pairComponent = components.first else { return nil }
-
-        let unitAndChapter = pairComponent.split(separator: "-", maxSplits: 1, omittingEmptySubsequences: false)
-        guard unitAndChapter.count == 2 else { return nil }
-
-        let questionIndex: Int?
-        if components.count > 1 {
-            questionIndex = Int(components[1])
-        } else {
-            questionIndex = nil
-        }
-
-        return (
-            unitId: String(unitAndChapter[0]),
-            chapterId: String(unitAndChapter[1]),
-            questionIndex: questionIndex
         )
     }
 }
@@ -451,6 +469,105 @@ private struct ReviewCategorySection: View {
                         .disabled(isInteractionDisabled)
                     }
                 }
+            }
+        }
+        .padding(24)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(
+            RoundedRectangle(cornerRadius: 24, style: .continuous)
+                .fill(Color.themeSurface)
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 24, style: .continuous)
+                .stroke(Color.black.opacity(0.05), lineWidth: 1)
+        )
+        .shadow(color: Color.themeShadowSoft, radius: 18, x: 0, y: 12)
+    }
+}
+private struct ReviewCategoryButtonSection: View {
+    let title: String
+    let subtitle: String
+    let iconName: String
+    let tintColor: Color
+    let count: Int
+    let emptyMessage: String
+    let isInteractionDisabled: Bool
+    let action: () -> Void
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 20) {
+            HStack(alignment: .center, spacing: 12) {
+                Image(systemName: iconName)
+                    .font(.title2.weight(.semibold))
+                    .foregroundColor(tintColor)
+                    .frame(width: 44, height: 44)
+                    .background(tintColor.opacity(0.15), in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(title)
+                        .font(.headline)
+                        .foregroundColor(.themeTextPrimary)
+                    Text(subtitle)
+                        .font(.subheadline)
+                        .foregroundColor(.themeTextSecondary)
+                }
+
+                Spacer()
+
+                Text("\(count)")
+                    .font(.headline)
+                    .foregroundColor(tintColor)
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 6)
+                    .background(tintColor.opacity(0.12), in: Capsule())
+            }
+
+            if count == 0 {
+                Text(emptyMessage)
+                    .font(.footnote)
+                    .foregroundColor(.themeTextSecondary)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(20)
+                    .background(
+                        RoundedRectangle(cornerRadius: 16, style: .continuous)
+                            .fill(Color.themeSurface)
+                    )
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 16, style: .continuous)
+                            .stroke(Color.black.opacity(0.04), lineWidth: 0.5)
+                    )
+            } else {
+                Button(action: action) {
+                    HStack(spacing: 12) {
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text("章を選択する")
+                                .font(.headline)
+                                .foregroundColor(.themeTextPrimary)
+                            Text("正解済み \(count) 問")
+                                .font(.subheadline)
+                                .foregroundColor(.themeTextSecondary)
+                        }
+
+                        Spacer(minLength: 12)
+
+                        Image(systemName: "chevron.right")
+                            .font(.headline.weight(.semibold))
+                            .foregroundColor(.themeTextSecondary)
+                    }
+                    .padding(20)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .background(
+                        RoundedRectangle(cornerRadius: 18, style: .continuous)
+                            .fill(Color.themeSurfaceElevated)
+                    )
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 18, style: .continuous)
+                            .stroke(Color.black.opacity(0.04), lineWidth: 0.5)
+                    )
+                }
+                .buttonStyle(.plain)
+                .disabled(isInteractionDisabled)
+                .opacity(isInteractionDisabled ? 0.6 : 1)
             }
         }
         .padding(24)
