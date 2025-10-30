@@ -9,7 +9,8 @@ struct DataResetView: View {
     @State private var errorMessage: String?
     @State private var showErrorAlert = false
 
-    @State private var units = ResetHierarchyLoader.loadUnits()
+    @State private var chapters = ResetHierarchyLoader.loadChapters()
+    @State private var expandedChapterIds: Set<String> = []
     @State private var expandedUnitIds: Set<String> = []
     @State private var isProblemSectionExpanded = true
     @State private var isProgressSectionExpanded = false
@@ -59,7 +60,7 @@ struct DataResetView: View {
         .onAppear {
             synchronizeSelectionsWithAvailableUnits()
         }
-        .onChange(of: units) { _ in
+        .onChange(of: chapters) { _ in
             synchronizeSelectionsWithAvailableUnits()
         }
         .onChange(of: selectedChapters) { _ in
@@ -190,8 +191,8 @@ private extension DataResetView {
           DisclosureGroup(isExpanded: $isProblemSectionExpanded) {
               VStack(alignment: .leading, spacing: 14) {
                   if isProblemDataEnabled {
-                      ForEach(units) { unit in
-                          unitSection(for: unit)
+                      ForEach(chapters) { chapter in
+                          chapterSection(for: chapter)
                       }
 
                       Toggle(isOn: selectAllBinding) {
@@ -402,15 +403,62 @@ private extension DataResetView {
         )
     }
 
-    func unitSection(for unit: ResetHierarchyLoader.Unit) -> some View {
+    func chapterSection(for chapter: ResetHierarchyLoader.Chapter) -> some View {
         DisclosureGroup(isExpanded: Binding(
-            get: { expandedUnitIds.contains(unit.id) },
+            get: { expandedChapterIds.contains(chapter.id) },
             set: { isExpanded in
                 withAnimation(.easeInOut) {
                     if isExpanded {
-                        expandedUnitIds.insert(unit.id)
+                        expandedChapterIds.insert(chapter.id)
                     } else {
-                        expandedUnitIds.remove(unit.id)
+                        expandedChapterIds.remove(chapter.id)
+                    }
+                }
+            }
+        )) {
+            VStack(alignment: .leading, spacing: 12) {
+                ForEach(chapter.units) { unit in
+                    unitSection(unit, in: chapter)
+                }
+            }
+            .padding(.top, 6)
+        } label: {
+            HStack(spacing: 12) {
+                TriStateCheckbox(
+                    state: chapterCheckboxState(for: chapter),
+                    title: chapter.title,
+                    subtitle: chapter.subtitle
+                ) {
+                    toggleChapterSelection(chapter)
+                }
+
+                Spacer(minLength: 8)
+
+                ChevronButton(isExpanded: expandedChapterIds.contains(chapter.id)) {
+                    let isExpanded = expandedChapterIds.contains(chapter.id)
+                    withAnimation(.easeInOut) {
+                        if isExpanded {
+                            expandedChapterIds.remove(chapter.id)
+                        } else {
+                            expandedChapterIds.insert(chapter.id)
+                        }
+                    }
+                }
+            }
+            .contentShape(Rectangle())
+        }
+    }
+
+    func unitSection(_ unit: ResetHierarchyLoader.Unit, in chapter: ResetHierarchyLoader.Chapter) -> some View {
+        let unitIdentifier = unitKey(forChapter: chapter.id, unitId: unit.id)
+        return DisclosureGroup(isExpanded: Binding(
+            get: { expandedUnitIds.contains(unitIdentifier) },
+            set: { isExpanded in
+                withAnimation(.easeInOut) {
+                    if isExpanded {
+                        expandedUnitIds.insert(unitIdentifier)
+                    } else {
+                        expandedUnitIds.remove(unitIdentifier)
                     }
                 }
             }
@@ -441,7 +489,7 @@ private extension DataResetView {
                         }
                     }
                     .toggleStyle(CheckboxToggleStyle())
-                    .padding(.leading, 32)
+                    .padding(.leading, 44)
                 }
             }
             .padding(.top, 6)
@@ -449,26 +497,42 @@ private extension DataResetView {
             HStack(spacing: 12) {
                 TriStateCheckbox(
                     state: unitCheckboxState(for: unit),
-                    title: unit.title.isEmpty ? unit.id : unit.title,
-                    subtitle: unit.id
+                    title: unit.title,
+                    subtitle: unit.subtitle
                 ) {
                     toggleUnitSelection(unit)
                 }
 
                 Spacer(minLength: 8)
 
-                ChevronButton(isExpanded: expandedUnitIds.contains(unit.id)) {
-                    let isExpanded = expandedUnitIds.contains(unit.id)
+                ChevronButton(isExpanded: expandedUnitIds.contains(unitIdentifier)) {
+                    let isExpanded = expandedUnitIds.contains(unitIdentifier)
                     withAnimation(.easeInOut) {
                         if isExpanded {
-                            expandedUnitIds.remove(unit.id)
+                            expandedUnitIds.remove(unitIdentifier)
                         } else {
-                            expandedUnitIds.insert(unit.id)
+                            expandedUnitIds.insert(unitIdentifier)
                         }
                     }
                 }
             }
             .contentShape(Rectangle())
+        }
+    }
+    func chapterCheckboxState(for chapter: ResetHierarchyLoader.Chapter) -> TriStateCheckbox.State {
+        let identifiers = Set(
+            chapter.units.flatMap { unit in
+                unit.chapters.map { ProgressChapterIdentifier(unitId: unit.id, chapterId: $0.id) }
+            }
+        )
+        let intersectionCount = identifiers.intersection(selectedChapters).count
+
+        if intersectionCount == 0 {
+            return .off
+        } else if intersectionCount == identifiers.count {
+            return .on
+        } else {
+            return .indeterminate
         }
     }
 
@@ -484,7 +548,20 @@ private extension DataResetView {
             return .indeterminate
         }
     }
+    func toggleChapterSelection(_ chapter: ResetHierarchyLoader.Chapter) {
+        let identifiers = Set(
+            chapter.units.flatMap { unit in
+                unit.chapters.map { ProgressChapterIdentifier(unitId: unit.id, chapterId: $0.id) }
+            }
+        )
+        let currentCount = identifiers.intersection(selectedChapters).count
 
+        if currentCount == identifiers.count {
+            selectedChapters.subtract(identifiers)
+        } else {
+            selectedChapters.formUnion(identifiers)
+        }
+    }
     func toggleUnitSelection(_ unit: ResetHierarchyLoader.Unit) {
         let identifiers = Set(unit.chapters.map { ProgressChapterIdentifier(unitId: unit.id, chapterId: $0.id) })
         let currentCount = identifiers.intersection(selectedChapters).count
@@ -521,6 +598,9 @@ private extension DataResetView {
             }
         }
     }
+    func unitKey(forChapter chapterId: String, unitId: String) -> String {
+        "\(chapterId)::\(unitId)"
+    }
 
     func updateStatusSelection(for status: QuestionStatus, isOn: Bool) {
         if isOn {
@@ -542,13 +622,16 @@ private extension DataResetView {
 
     var allChapterSelections: Set<ProgressChapterIdentifier> {
         Set(
-            units.flatMap { unit in
-                unit.chapters.map { chapter in
-                    ProgressChapterIdentifier(unitId: unit.id, chapterId: chapter.id)
+            chapters.flatMap { chapter in
+                chapter.units.flatMap { unit in
+                    unit.chapters.map { lesson in
+                        ProgressChapterIdentifier(unitId: unit.id, chapterId: lesson.id)
+                    }
                 }
             }
         )
     }
+            
 
     func synchronizeSelectionsWithAvailableUnits() {
         let available = allChapterSelections
@@ -696,9 +779,11 @@ private struct TriStateCheckbox: View {
                     Text(title)
                         .font(.subheadline.weight(.semibold))
                         .foregroundColor(.themeTextPrimary)
-                    Text(subtitle)
-                        .font(.caption)
-                        .foregroundColor(.themeTextSecondary)
+                    if !subtitle.isEmpty {
+                        Text(subtitle)
+                            .font(.caption)
+                            .foregroundColor(.themeTextSecondary)
+                    }
                 }
             }
             .contentShape(Rectangle())
@@ -772,15 +857,119 @@ private struct CheckboxToggleStyle: ToggleStyle {
 }
 
 private struct ResetHierarchyLoader {
+    struct Chapter: Identifiable, Equatable {
+        let id: String
+        let title: String
+        let subtitle: String
+        let units: [Unit]
+    }
     struct Unit: Identifiable, Equatable {
+        let id: String
+        let title: String
+        let subtitle: String
+        let chapters: [ChapterMetadata]
+    }
+
+    private struct RawUnit: Identifiable, Equatable {
         let id: String
         let title: String
         let chapters: [ChapterMetadata]
     }
 
+    private struct DecoratedUnit {
+        let raw: RawUnit
+        let chapterId: String
+        let chapterNumber: Int?
+        let unitNumber: Int?
+        let index: Int
+
+        var chapterSortOrder: Int {
+            guard let chapterNumber, chapterNumber > 0 else {
+                return index + 1
+            }
+            return chapterNumber
+        }
+
+        func unitSortOrder(fallback position: Int) -> Int {
+            guard let unitNumber, unitNumber > 0 else {
+                return position + 1
+            }
+            return unitNumber
+        }
+    }
+    
     private static let decoder = JSONDecoder()
 
-    static func loadUnits(bundle: Bundle = .main) -> [Unit] {
+    static func loadChapters(bundle: Bundle = .main) -> [Chapter] {
+        let rawUnits = loadRawUnits(bundle: bundle)
+        guard !rawUnits.isEmpty else { return [] }
+
+        let decorated = rawUnits.enumerated().map { index, unit -> DecoratedUnit in
+            let numbers = numericComponents(in: unit.id)
+            let chapterNumber = numbers.first
+            let unitNumber = numbers.dropFirst().first
+            let chapterId: String
+            if let chapterNumber, chapterNumber > 0 {
+                chapterId = "chapter\(chapterNumber)"
+            } else {
+                chapterId = "chapter_\(index)"
+            }
+            return DecoratedUnit(
+                raw: unit,
+                chapterId: chapterId,
+                chapterNumber: chapterNumber,
+                unitNumber: unitNumber,
+                index: index
+            )
+        }
+
+        let grouped = Dictionary(grouping: decorated, by: { $0.chapterId })
+        let sortedGroups = grouped.values.sorted { lhs, rhs in
+            let lhsOrder = lhs.first?.chapterSortOrder ?? Int.max
+            let rhsOrder = rhs.first?.chapterSortOrder ?? Int.max
+            if lhsOrder == rhsOrder {
+                return (lhs.first?.chapterId ?? "") < (rhs.first?.chapterId ?? "")
+            }
+            return lhsOrder < rhsOrder
+        }
+
+        return sortedGroups.enumerated().map { index, group in
+            let displayChapterNumber = group.first?.chapterNumber.map { max($0, 1) } ?? index + 1
+            let chapterTitle = "第\(displayChapterNumber)章"
+            let sortedUnits = group
+                .sorted { lhs, rhs in
+                    let lhsOrder = lhs.unitSortOrder(fallback: lhs.index)
+                    let rhsOrder = rhs.unitSortOrder(fallback: rhs.index)
+                    if lhsOrder == rhsOrder {
+                        return lhs.raw.id < rhs.raw.id
+                    }
+                    return lhsOrder < rhsOrder
+                }
+
+            let units: [Unit] = sortedUnits.enumerated().map { position, decoratedUnit in
+                let displayUnitNumber = decoratedUnit.unitNumber.map { max($0, 1) } ?? position + 1
+                let title = "第\(displayChapterNumber)章 第\(displayUnitNumber)単元"
+                let subtitle = decoratedUnit.raw.title.isEmpty ? decoratedUnit.raw.id : decoratedUnit.raw.title
+                return Unit(
+                    id: decoratedUnit.raw.id,
+                    title: title,
+                    subtitle: subtitle,
+                    chapters: decoratedUnit.raw.chapters
+                )
+            }
+
+            let chapterSubtitle = chapterSubtitleDescription(for: units)
+
+            return Chapter(
+                id: group.first?.chapterId ?? "chapter_\(index)",
+                title: chapterTitle,
+                subtitle: chapterSubtitle,
+                units: units
+            )
+        }
+    }
+
+    private static func loadRawUnits(bundle: Bundle) -> [RawUnit] {
         guard let metadataData = data(forResourcePath: "quizzes/metadata/quizzes_metadata.json", bundle: bundle),
               let metadata = try? decoder.decode(QuizMetadataMap.self, from: metadataData) else {
             return []
@@ -788,7 +977,7 @@ private struct ResetHierarchyLoader {
 
         return metadata
             .sorted { lhs, rhs in lhs.key < rhs.key }
-            .map { unitId, info -> Unit in
+            .map { unitId, info -> RawUnit in
                 let chapters: [ChapterMetadata]
                 if let chapterData = data(forResourcePath: info.file, bundle: bundle),
                    let chapterList = try? decoder.decode(ChapterList.self, from: chapterData) {
@@ -796,8 +985,35 @@ private struct ResetHierarchyLoader {
                 } else {
                     chapters = []
                 }
-                return Unit(id: unitId, title: info.title, chapters: chapters)
+                return RawUnit(id: unitId, title: info.title, chapters: chapters)
             }
+    }
+    private static func chapterSubtitleDescription(for units: [Unit]) -> String {
+        guard !units.isEmpty else { return "" }
+        if units.count == 1 {
+            return units[0].subtitle
+        }
+        return "全\(units.count)単元"
+    }
+
+    private static func numericComponents(in identifier: String) -> [Int] {
+        var results: [Int] = []
+        var buffer = ""
+
+        for character in identifier {
+            if character.isNumber {
+                buffer.append(character)
+            } else if !buffer.isEmpty {
+                results.append(Int(buffer) ?? 0)
+                buffer.removeAll(keepingCapacity: true)
+            }
+        }
+
+        if !buffer.isEmpty {
+            results.append(Int(buffer) ?? 0)
+        }
+
+        return results
     }
 
     private static func data(forResourcePath path: String, bundle: Bundle) -> Data? {
