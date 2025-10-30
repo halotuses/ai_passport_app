@@ -34,6 +34,7 @@ struct DataResetView: View {
             .padding(.horizontal, 24)
             .padding(.vertical, 32)
         }
+        .disclosureGroupStyle(ChevronlessDisclosureGroupStyle())
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(subtlePaperBackground.ignoresSafeArea())
         .navigationTitle("データリセット")
@@ -702,7 +703,17 @@ private struct ChevronButton: View {
         .buttonStyle(.plain)
     }
 }
+private struct ChevronlessDisclosureGroupStyle: DisclosureGroupStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        VStack(alignment: .leading, spacing: 0) {
+            configuration.label
 
+            if configuration.isExpanded {
+                configuration.content
+            }
+        }
+    }
+}
 private struct TriStateCheckbox: View {
     enum State {
         case on
