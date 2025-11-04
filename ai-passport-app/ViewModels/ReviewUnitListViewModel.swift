@@ -150,14 +150,14 @@ private extension ReviewUnitListViewModel {
             guard let components = QuizIdentifierParser.parse(progress.quizId) else { continue }
 
             let unitId = progress.unitId.isEmpty ? components.unitId : progress.unitId
-            let chapterId = progress.chapterIdentifier.isEmpty ? components.chapterId : progress.chapterId
-            guard !unitId.isEmpty, !chapterId.isEmpty else { continue }
+            let chapterIdentifier = progress.chapterIdentifier.isEmpty ? components.chapterId : progress.chapterIdentifier
+            guard !unitId.isEmpty, !chapterIdentifier.isEmpty else { continue }
 
             let questionIndex = components.questionIndex ?? 0
-            var summary = result[unitId, default: [:]][chapterId] ?? ChapterSummary(count: 0, initialQuestionIndex: questionIndex)
+            var summary = result[unitId, default: [:]][chapterIdentifier] ?? ChapterSummary(count: 0, initialQuestionIndex: questionIndex)
             summary.count += 1
             summary.initialQuestionIndex = min(summary.initialQuestionIndex, questionIndex)
-            result[unitId, default: [:]][chapterId] = summary
+            result[unitId, default: [:]][chapterIdentifier] = summary
         }
 
         return result
