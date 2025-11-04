@@ -214,7 +214,7 @@ private extension SettingsView {
 
 private struct SettingsSection<Content: View>: View {
     let title: String
-    @ViewBuilder let content: Content
+    private let content: Content
 
     init(title: String, @ViewBuilder content: () -> Content) {
         self.title = title
@@ -236,7 +236,7 @@ private struct SettingsSection<Content: View>: View {
 private struct SettingsRow<Content: View>: View {
     var alignment: HorizontalAlignment = .center
     var spacing: CGFloat = 12
-    @ViewBuilder let content: Content
+    private let content: Content
 
     init(alignment: HorizontalAlignment = .center, spacing: CGFloat = 12, @ViewBuilder content: () -> Content) {
         self.alignment = alignment

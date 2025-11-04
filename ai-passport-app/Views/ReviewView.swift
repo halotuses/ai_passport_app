@@ -151,22 +151,20 @@ private extension ReviewView {
     @ViewBuilder
     var correctReviewNavigationLink: some View {
         NavigationLink(
-            destination: {
-                CorrectReviewChapterSelectionView(
-                    progresses: correctProgresses,
-                    metadataProvider: { await fetchMetadataIfNeeded() },
-                    chapterListProvider: { unitId, filePath in
-                        await fetchChaptersIfNeeded(for: unitId, filePath: filePath)
-                    },
-                    onSelect: { selection in
-                        handleCorrectChapterSelection(selection)
-                    },
-                    onClose: {
-                        isShowingCorrectChapterSelection = false
-                        mainViewState.setHeader(title: "復習", backButton: .toHome)
-                    }
-                )
-            },
+            destination: CorrectReviewChapterSelectionView(
+                progresses: correctProgresses,
+                metadataProvider: { await fetchMetadataIfNeeded() },
+                chapterListProvider: { unitId, filePath in
+                    await fetchChaptersIfNeeded(for: unitId, filePath: filePath)
+                },
+                onSelect: { selection in
+                    handleCorrectChapterSelection(selection)
+                },
+                onClose: {
+                    isShowingCorrectChapterSelection = false
+                    mainViewState.setHeader(title: "復習", backButton: .toHome)
+                }
+            ),
             isActive: $isShowingCorrectChapterSelection,
             label: {
                 EmptyView()
