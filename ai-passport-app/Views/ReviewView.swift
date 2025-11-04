@@ -151,7 +151,7 @@ private extension ReviewView {
     @ViewBuilder
     var correctReviewNavigationLink: some View {
         NavigationLink(
-            destination: ReviewUnitListView(
+            destination: CorrectReviewChapterSelectionView(
                 progresses: correctProgresses,
                 metadataProvider: { await fetchMetadataIfNeeded() },
                 chapterListProvider: { unitId, filePath in
@@ -256,7 +256,7 @@ private extension ReviewView {
         }
     }
 
-    func handleCorrectChapterSelection(_ selection: ReviewUnitListView.Selection) {
+    func handleCorrectChapterSelection(_ selection: CorrectReviewChapterSelectionView.Selection) {
         guard !isNavigatingToQuiz else { return }
 
         SoundManager.shared.play(.tap)
