@@ -41,7 +41,7 @@ struct ReviewView: View {
             .padding(.vertical, 32)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(Color.themeBase.ignoresSafeArea())
+        .background(correctReviewNavigationLink)
         .onAppear {
             mainViewState.setHeader(title: "復習", backButton: .toHome)
         }
@@ -148,6 +148,33 @@ private extension ReviewView {
         }
     }
 
+    @ViewBuilder
+    var correctReviewNavigationLink: some View {
+        NavigationLink(
+            destination: {
+                CorrectReviewChapterSelectionView(
+                    progresses: correctProgresses,
+                    metadataProvider: { await fetchMetadataIfNeeded() },
+                    chapterListProvider: { unitId, filePath in
+                        await fetchChaptersIfNeeded(for: unitId, filePath: filePath)
+                    },
+                    onSelect: { selection in
+                        handleCorrectChapterSelection(selection)
+                    },
+                    onClose: {
+                        isShowingCorrectChapterSelection = false
+                        mainViewState.setHeader(title: "復習", backButton: .toHome)
+                    }
+                )
+            },
+            isActive: $isShowingCorrectChapterSelection,
+            label: {
+                EmptyView()
+            }
+        )
+        .hidden()
+    }
+    
      var bookmarkItems: [ReviewItem] {
          let progressLookup = Dictionary(uniqueKeysWithValues: progresses.map { ($0.quizId, QuestionProgress(object: $0)) })
          return bookmarks.map { bookmark in
@@ -206,18 +233,6 @@ private extension ReviewView {
             RoundedRectangle(cornerRadius: 20, style: .continuous)
                 .fill(Color.themeSurface)
         )
-        .sheet(isPresented: $isShowingCorrectChapterSelection) {
-            CorrectReviewChapterSelectionView(
-                progresses: correctProgresses,
-                metadataProvider: { await fetchMetadataIfNeeded() },
-                chapterListProvider: { unitId, filePath in
-                    await fetchChaptersIfNeeded(for: unitId, filePath: filePath)
-                },
-                onSelect: { selection in
-                    handleCorrectChapterSelection(selection)
-                }
-            )
-        }
         .overlay(
             RoundedRectangle(cornerRadius: 20, style: .continuous)
                 .stroke(Color.black.opacity(0.04), lineWidth: 0.5)

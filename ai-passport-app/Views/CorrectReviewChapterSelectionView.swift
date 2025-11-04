@@ -12,25 +12,30 @@ struct CorrectReviewChapterSelectionView: View {
     let metadataProvider: () async -> QuizMetadataMap?
     let chapterListProvider: (String, String) async -> [ChapterMetadata]?
     let onSelect: @Sendable (Selection) -> Void
+    let onClose: () -> Void
 
-    @Environment(\.dismiss) private var dismiss
+    @EnvironmentObject private var mainViewState: MainViewState
 
     @State private var isLoading = true
     @State private var units: [UnitEntry] = []
     @State private var hasError = false
 
     var body: some View {
-        NavigationStack {
+        ZStack {
+            Color.themeBase
+                .ignoresSafeArea()
             content
-                .navigationTitle("正解した問題")
-                .navigationBarTitleDisplayMode(.inline)
-                .toolbar {
-                    ToolbarItem(placement: .cancellationAction) {
-                        Button("閉じる") { dismiss() }
-                    }
-                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
         .task { await loadDataIfNeeded() }
+        .onAppear {
+            let backButton = MainViewState.HeaderBackButton(
+                title: "◀ 復習",
+                destination: .custom,
+                action: onClose
+            )
+            mainViewState.setHeader(title: "正解した問題", backButton: backButton)
+        }
     }
 }
 
@@ -40,7 +45,6 @@ private extension CorrectReviewChapterSelectionView {
         if isLoading {
             ProgressView("読み込み中…")
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .background(Color.themeBase.ignoresSafeArea())
         } else if hasError {
             VStack(spacing: 12) {
                 Image(systemName: "exclamationmark.triangle")
@@ -52,7 +56,6 @@ private extension CorrectReviewChapterSelectionView {
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .padding()
-            .background(Color.themeBase.ignoresSafeArea())
         } else if units.isEmpty {
             VStack(spacing: 12) {
                 Image(systemName: "checkmark.circle")
@@ -64,7 +67,6 @@ private extension CorrectReviewChapterSelectionView {
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .padding()
-            .background(Color.themeBase.ignoresSafeArea())
         } else {
             ScrollView {
                 LazyVStack(spacing: 16) {
@@ -82,7 +84,7 @@ private extension CorrectReviewChapterSelectionView {
                 .padding(.horizontal, 20)
             }
 
-            .background(Color.themeBase.ignoresSafeArea())
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
     }
 
@@ -236,12 +238,7 @@ private extension CorrectReviewChapterSelectionView {
             chapter: chapter.chapter,
             initialQuestionIndex: chapter.initialQuestionIndex
         )
-
-        dismiss()
-
-        DispatchQueue.main.async {
-            onSelect(selection)
-        }
+        onSelect(selection)
     }
 
     private func chapterComparator(_ lhs: ChapterEntry, _ rhs: ChapterEntry) -> Bool {
@@ -281,6 +278,8 @@ private extension CorrectReviewChapterSelectionView {
         progresses: [],
         metadataProvider: { [:] },
         chapterListProvider: { _, _ in [] },
-        onSelect: { _ in }
+        onSelect: { _ in },
+        onClose: {}
     )
+    .environmentObject(MainViewState())
 }
