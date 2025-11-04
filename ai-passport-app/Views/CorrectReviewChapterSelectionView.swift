@@ -27,6 +27,7 @@ struct CorrectReviewChapterSelectionView: View {
             content
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
+        .navigationBarBackButtonHidden(true)
         .task { await loadDataIfNeeded() }
         .onAppear {
             let backButton = MainViewState.HeaderBackButton(
