@@ -45,6 +45,9 @@
 		0C8786A12EA672D90052D2A8 /* RealmAnswerHistoryRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C8786A02EA672D90052D2A8 /* RealmAnswerHistoryRepository.swift */; };
 		0CC249AB2EBA3F3D0054EE3F /* ReviewUnitListViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CC249AA2EBA3F3B0054EE3F /* ReviewUnitListViewModel.swift */; };
 		0CC249AD2EBA3F5F0054EE3F /* ReviewQuestionListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CC249AC2EBA3F5D0054EE3F /* ReviewQuestionListView.swift */; };
+		0CC249B02EBB89AB0054EE3F /* CorrectAnswerChapterViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CC249AF2EBB89A90054EE3F /* CorrectAnswerChapterViewModel.swift */; };
+		0CC249B22EBB89C10054EE3F /* CorrectAnswerChapterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CC249B12EBB89C10054EE3F /* CorrectAnswerChapterView.swift */; };
+		0CC249B42EBB89DF0054EE3F /* CorrectAnswerQuestionListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CC249B32EBB89DD0054EE3F /* CorrectAnswerQuestionListView.swift */; };
 		0CCB45A02E89853900C41D03 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CCB459F2E89853900C41D03 /* Constants.swift */; };
 		0CCB45A22E8994E800C41D03 /* QuizList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CCB45A12E8994E800C41D03 /* QuizList.swift */; };
 		0CCB45A42E89951900C41D03 /* CapterList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CCB45A32E89951900C41D03 /* CapterList.swift */; };
@@ -70,7 +73,7 @@
 		0CE6D5BF2EB25B8400D38241 /* DataResetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CE6D5BE2EB25B8200D38241 /* DataResetView.swift */; };
 		0CE6D5C12EB2658300D38241 /* QuestionStatus+Display.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CE6D5C02EB2658100D38241 /* QuestionStatus+Display.swift */; };
 		0CE6D5C32EB3A5C900D38241 /* QuizIdentifierParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CE6D5C22EB3A5B400D38241 /* QuizIdentifierParser.swift */; };
-		0CE6D5C52EB3A5E500D38241 /* CorrectReviewChapterSelectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CE6D5C42EB3A5E400D38241 /* CorrectReviewChapterSelectionView.swift */; };
+		0CE6D5C52EB3A5E500D38241 /* CorrectAnswerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CE6D5C42EB3A5E400D38241 /* CorrectAnswerView.swift */; };
 		0CF00B642EA91BF300B8A6D0 /* QuestionProgress.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF00B632EA91BEC00B8A6D0 /* QuestionProgress.swift */; };
 		0CF00B662EA91D2700B8A6D0 /* ChapterProgressViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF00B652EA91D1400B8A6D0 /* ChapterProgressViewModel.swift */; };
 		0CF00B682EA91D5800B8A6D0 /* HomeProgressViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF00B672EA91D5700B8A6D0 /* HomeProgressViewModel.swift */; };
@@ -144,6 +147,9 @@
 		0CC249AA2EBA3F3B0054EE3F /* ReviewUnitListViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewUnitListViewModel.swift; sourceTree = "<group>"; };
 		0CC249AC2EBA3F5D0054EE3F /* ReviewQuestionListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewQuestionListView.swift; sourceTree = "<group>"; };
 		0CC249AE2EBA3F730054EE3F /* ReviewUnitListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewUnitListView.swift; sourceTree = "<group>"; };
+		0CC249AF2EBB89A90054EE3F /* CorrectAnswerChapterViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CorrectAnswerChapterViewModel.swift; sourceTree = "<group>"; };
+		0CC249B12EBB89C10054EE3F /* CorrectAnswerChapterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CorrectAnswerChapterView.swift; sourceTree = "<group>"; };
+		0CC249B32EBB89DD0054EE3F /* CorrectAnswerQuestionListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CorrectAnswerQuestionListView.swift; sourceTree = "<group>"; };
 		0CCB459F2E89853900C41D03 /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 		0CCB45A12E8994E800C41D03 /* QuizList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuizList.swift; sourceTree = "<group>"; };
 		0CCB45A32E89951900C41D03 /* CapterList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CapterList.swift; sourceTree = "<group>"; };
@@ -169,7 +175,7 @@
 		0CE6D5BE2EB25B8200D38241 /* DataResetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataResetView.swift; sourceTree = "<group>"; };
 		0CE6D5C02EB2658100D38241 /* QuestionStatus+Display.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "QuestionStatus+Display.swift"; sourceTree = "<group>"; };
 		0CE6D5C22EB3A5B400D38241 /* QuizIdentifierParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuizIdentifierParser.swift; sourceTree = "<group>"; };
-		0CE6D5C42EB3A5E400D38241 /* CorrectReviewChapterSelectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CorrectReviewChapterSelectionView.swift; sourceTree = "<group>"; };
+		0CE6D5C42EB3A5E400D38241 /* CorrectAnswerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CorrectAnswerView.swift; sourceTree = "<group>"; };
 		0CF00B632EA91BEC00B8A6D0 /* QuestionProgress.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuestionProgress.swift; sourceTree = "<group>"; };
 		0CF00B652EA91D1400B8A6D0 /* ChapterProgressViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChapterProgressViewModel.swift; sourceTree = "<group>"; };
 		0CF00B672EA91D5700B8A6D0 /* HomeProgressViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeProgressViewModel.swift; sourceTree = "<group>"; };
@@ -332,6 +338,7 @@
 		0C30DDCD2DFF13FD00F25D02 /* ViewModels */ = {
 			isa = PBXGroup;
 			children = (
+				0CC249AF2EBB89A90054EE3F /* CorrectAnswerChapterViewModel.swift */,
 				0CC249AA2EBA3F3B0054EE3F /* ReviewUnitListViewModel.swift */,
 				0CF00B712EAA830700B8A6D0 /* AnswerHistoryViewModel.swift */,
 				0CF00B672EA91D5700B8A6D0 /* HomeProgressViewModel.swift */,
@@ -347,9 +354,11 @@
 		0C30DDCE2DFF140C00F25D02 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				0CC249B32EBB89DD0054EE3F /* CorrectAnswerQuestionListView.swift */,
+				0CC249B12EBB89C10054EE3F /* CorrectAnswerChapterView.swift */,
 				0CC249AE2EBA3F730054EE3F /* ReviewUnitListView.swift */,
 				0CC249AC2EBA3F5D0054EE3F /* ReviewQuestionListView.swift */,
-				0CE6D5C42EB3A5E400D38241 /* CorrectReviewChapterSelectionView.swift */,
+				0CE6D5C42EB3A5E400D38241 /* CorrectAnswerView.swift */,
 				0CE6D5BE2EB25B8200D38241 /* DataResetView.swift */,
 				0CE6D5BC2EB25B0E00D38241 /* ReviewView.swift */,
 				0CE6D5B62EAFE7E000D38241 /* BookmarkListView.swift */,
@@ -750,7 +759,9 @@
 				0CF00B642EA91BF300B8A6D0 /* QuestionProgress.swift in Sources */,
 				0C8786A12EA672D90052D2A8 /* RealmAnswerHistoryRepository.swift in Sources */,
 				0CE6D5B92EB0DDD200D38241 /* BookmarkObject.swift in Sources */,
+				0CC249B02EBB89AB0054EE3F /* CorrectAnswerChapterViewModel.swift in Sources */,
 				0C30DDD52DFF16FE00F25D02 /* AppFrameView.swift in Sources */,
+				0CC249B42EBB89DF0054EE3F /* CorrectAnswerQuestionListView.swift in Sources */,
 				0CE6D5C12EB2658300D38241 /* QuestionStatus+Display.swift in Sources */,
 				0C30DDDB2DFF1A7F00F25D02 /* UnitListView.swift in Sources */,
 				0C87869E2EA6725F0052D2A8 /* QuestionProgressObject.swift in Sources */,
@@ -770,7 +781,7 @@
 				0CF00B742EAA83B100B8A6D0 /* AnswerHistoryView.swift in Sources */,
 				0C30DDE12DFF1AA000F25D02 /* ExplanationView.swift in Sources */,
 				0CE6D5A92EAFC11100D38241 /* RootContainerView.swift in Sources */,
-				0CE6D5C52EB3A5E500D38241 /* CorrectReviewChapterSelectionView.swift in Sources */,
+				0CE6D5C52EB3A5E500D38241 /* CorrectAnswerView.swift in Sources */,
 				0CE6D5B72EAFE7E200D38241 /* BookmarkListView.swift in Sources */,
 				0C30DDE92DFF1AC900F25D02 /* BottomTabBarView.swift in Sources */,
 				0CC249AD2EBA3F5F0054EE3F /* ReviewQuestionListView.swift in Sources */,
@@ -781,6 +792,7 @@
 				0CF00B702EA92B1700B8A6D0 /* ProgressBadgeView.swift in Sources */,
 				0C31AD812EA21897007500F7 /* HomeViewModel.swift in Sources */,
 				0C30DDFF2DFF1E9A00F25D02 /* PersistenceController.swift in Sources */,
+				0CC249B22EBB89C10054EE3F /* CorrectAnswerChapterView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -1,11 +1,11 @@
 import SwiftUI
 
-struct CorrectReviewChapterSelectionView: View {
+struct CorrectAnswerView: View {
     struct Selection: Sendable {
         let unitId: String
         let unit: QuizMetadata
         let chapter: ChapterMetadata
-        let initialQuestionIndex: Int
+        let questionIndex: Int
     }
 
     let progresses: [QuestionProgress]
@@ -21,26 +21,20 @@ struct CorrectReviewChapterSelectionView: View {
     @State private var hasError = false
 
     var body: some View {
-        ZStack {
-            Color.themeBase
-                .ignoresSafeArea()
-            content
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-        }
-        .navigationBarBackButtonHidden(true)
-        .task { await loadDataIfNeeded() }
-        .onAppear {
-            let backButton = MainViewState.HeaderBackButton(
-                title: "◀ 復習",
-                destination: .custom,
-                action: onClose
-            )
-            mainViewState.setHeader(title: "正解した問題", backButton: backButton)
+        NavigationStack {
+            ZStack {
+                Color.themeBase
+                    .ignoresSafeArea()
+                content
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+            }
+            .navigationBarBackButtonHidden(true)
+            .task { await loadDataIfNeeded() }
+            .onAppear { setRootHeader() }
         }
     }
 }
-
-private extension CorrectReviewChapterSelectionView {
+private extension CorrectAnswerView {
     @ViewBuilder
     var content: some View {
         if isLoading {
@@ -72,19 +66,34 @@ private extension CorrectReviewChapterSelectionView {
             ScrollView {
                 LazyVStack(spacing: 16) {
                     ForEach(units) { unit in
-                        Button {
-                            handleSelection(for: unit)
+                        NavigationLink {
+                            CorrectAnswerChapterView(
+                                unit: unit,
+                                onSelect: { chapter, question in
+                                    let selection = Selection(
+                                        unitId: unit.unitId,
+                                        unit: unit.unit,
+                                        chapter: chapter.chapter,
+                                        questionIndex: max(question.questionIndex, 0)
+                                    )
+                                    onSelect(selection)
+                                },
+                                onClose: { setRootHeader() }
+                            )
                         } label: {
                             unitCard(for: unit)
                         }
                         .buttonStyle(.plain)
+                        .simultaneousGesture(
+                            TapGesture().onEnded {
+                                SoundManager.shared.play(.tap)
+                            }
+                        )
                     }
                 }
-                
                 .padding(.vertical, 24)
                 .padding(.horizontal, 20)
             }
-
             .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
     }
@@ -132,7 +141,15 @@ private extension CorrectReviewChapterSelectionView {
         )
         .shadow(color: Color.themeShadowSoft, radius: 12, x: 0, y: 8)
     }
-
+    func setRootHeader() {
+        let backButton = MainViewState.HeaderBackButton(
+            title: "◀ 復習",
+            destination: .custom,
+            action: onClose
+        )
+        mainViewState.setHeader(title: "正解した問題", backButton: backButton)
+    }
+    
     func loadDataIfNeeded() async {
         guard isLoading else { return }
 
@@ -176,13 +193,29 @@ private extension CorrectReviewChapterSelectionView {
                     encounteredError = true
                     continue
                 }
+                let questions = summary.entries
+                    .compactMap { entry -> ChapterEntry.QuestionEntry? in
+                        let progress = entry.progress
+                        return ChapterEntry.QuestionEntry(
+                            id: progress.quizId,
+                            quizId: progress.quizId,
+                            questionIndex: entry.questionIndex,
+                            progress: progress
+                        )
+                    }
+                    .sorted { lhs, rhs in
+                        if lhs.questionIndex == rhs.questionIndex {
+                            return lhs.quizId.localizedCompare(rhs.quizId) == .orderedAscending
+                        }
+                        return lhs.questionIndex < rhs.questionIndex
+                    }
 
+                guard !questions.isEmpty else { continue }
                 entries.append(
                     ChapterEntry(
                         id: chapterId,
                         chapter: metadata,
-                        correctCount: summary.count,
-                        initialQuestionIndex: summary.initialQuestionIndex
+                        questions: questions
                     )
                 )
             }
@@ -222,27 +255,15 @@ private extension CorrectReviewChapterSelectionView {
 
             let questionIndex = components.questionIndex ?? 0
 
-            var summary = result[unitId, default: [:]][chapterId] ?? ChapterSummary(count: 0, initialQuestionIndex: questionIndex)
-            summary.count += 1
-            summary.initialQuestionIndex = min(summary.initialQuestionIndex, questionIndex)
+            var summary = result[unitId, default: [:]][chapterId] ?? ChapterSummary(entries: [])
+            summary.entries.append(.init(progress: progress, questionIndex: questionIndex))
             result[unitId, default: [:]][chapterId] = summary
         }
 
         return result
     }
-    func handleSelection(for unit: UnitEntry) {
-        guard let chapter = unit.chapters.min(by: chapterComparator) else { return }
 
-        let selection = Selection(
-            unitId: unit.unitId,
-            unit: unit.unit,
-            chapter: chapter.chapter,
-            initialQuestionIndex: chapter.initialQuestionIndex
-        )
-        onSelect(selection)
-    }
-
-    private func chapterComparator(_ lhs: ChapterEntry, _ rhs: ChapterEntry) -> Bool {
+    func chapterComparator(_ lhs: ChapterEntry, _ rhs: ChapterEntry) -> Bool {
         if lhs.initialQuestionIndex == rhs.initialQuestionIndex {
             return lhs.chapter.title.localizedCompare(rhs.chapter.title) == .orderedAscending
         }
@@ -250,8 +271,19 @@ private extension CorrectReviewChapterSelectionView {
     }
 }
 
-private extension CorrectReviewChapterSelectionView {
-    struct UnitEntry: Identifiable {
+private extension CorrectAnswerView {
+    struct ChapterSummary {
+        struct Entry {
+            let progress: QuestionProgress
+            let questionIndex: Int
+        }
+
+        var entries: [Entry]
+    }
+}
+
+extension CorrectAnswerView {
+    struct UnitEntry: Identifiable, Hashable {
         let id: String
         let unitId: String
         let unit: QuizMetadata
@@ -261,21 +293,33 @@ private extension CorrectReviewChapterSelectionView {
         }
     }
 
-    struct ChapterEntry: Identifiable {
+    struct ChapterEntry: Identifiable, Hashable {
+        struct QuestionEntry: Identifiable, Hashable {
+            let id: String
+            let quizId: String
+            let questionIndex: Int
+            let progress: QuestionProgress
+
+            var questionText: String {
+                if let text = progress.questionText, !text.isEmpty {
+                    return text
+                }
+                return "問題ID: \(quizId)"
+            }
+        }
         let id: String
         let chapter: ChapterMetadata
-        let correctCount: Int
-        let initialQuestionIndex: Int
-    }
+        let questions: [QuestionEntry]
+        var correctCount: Int { questions.count }
 
-    struct ChapterSummary {
-        var count: Int
-        var initialQuestionIndex: Int
+        var initialQuestionIndex: Int {
+            questions.map(\.questionIndex).min() ?? 0
+        }
     }
 }
 
 #Preview {
-    CorrectReviewChapterSelectionView(
+    CorrectAnswerView(
         progresses: [],
         metadataProvider: { [:] },
         chapterListProvider: { _, _ in [] },
