@@ -60,6 +60,9 @@ final class MainViewState: ObservableObject {
         selectedChapter = nil
         selectedUnit = nil
         selectedUnitKey = nil
+        isShowingAnswerHistory = false
+        isShowingBookmarks = false
+        isShowingReview = false
         router.reset()
         navigationResetToken = UUID()
         showResultView = false
