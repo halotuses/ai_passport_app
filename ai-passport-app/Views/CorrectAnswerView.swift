@@ -291,6 +291,14 @@ extension CorrectAnswerView {
         var totalCorrectCount: Int {
             chapters.reduce(into: 0) { $0 += $1.correctCount }
         }
+        
+        static func == (lhs: UnitEntry, rhs: UnitEntry) -> Bool {
+            lhs.id == rhs.id
+        }
+
+        func hash(into hasher: inout Hasher) {
+            hasher.combine(id)
+        }
     }
 
     struct ChapterEntry: Identifiable, Hashable {
@@ -306,6 +314,13 @@ extension CorrectAnswerView {
                 }
                 return "問題ID: \(quizId)"
             }
+            static func == (lhs: QuestionEntry, rhs: QuestionEntry) -> Bool {
+                lhs.id == rhs.id
+            }
+
+            func hash(into hasher: inout Hasher) {
+                hasher.combine(id)
+            }
         }
         let id: String
         let chapter: ChapterMetadata
@@ -314,6 +329,13 @@ extension CorrectAnswerView {
 
         var initialQuestionIndex: Int {
             questions.map(\.questionIndex).min() ?? 0
+        }
+        static func == (lhs: ChapterEntry, rhs: ChapterEntry) -> Bool {
+            lhs.id == rhs.id
+        }
+
+        func hash(into hasher: inout Hasher) {
+            hasher.combine(id)
         }
     }
 }

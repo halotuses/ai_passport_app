@@ -29,7 +29,6 @@ struct CorrectAnswerChapterView: View {
                     ForEach(viewModel.correctChapters) { chapter in
                         NavigationLink {
                             CorrectAnswerQuestionListView(
-                                unit: unit,
                                 chapter: chapter.entry,
                                 onSelect: { question in
                                     onSelect(chapter.entry, question)
