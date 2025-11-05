@@ -45,6 +45,19 @@ struct ReviewView: View {
         .onAppear {
             mainViewState.setHeader(title: "復習", backButton: .toHome)
         }
+        .onChange(of: mainViewState.isShowingReview) { isShowing in
+            if !isShowing {
+                isShowingCorrectChapterSelection = false
+                isNavigatingToQuiz = false
+            }
+        }
+        .onChange(of: mainViewState.navigationResetToken) { _ in
+            isShowingCorrectChapterSelection = false
+        }
+        .onDisappear {
+            isShowingCorrectChapterSelection = false
+            isNavigatingToQuiz = false
+        }
         .alert(
             "復習を開始できませんでした",
             isPresented: Binding(
