@@ -2,7 +2,6 @@ import SwiftUI
 
 struct CorrectAnswerChapterView: View {
     let unit: CorrectAnswerView.UnitEntry
-    let onSelect: @Sendable (CorrectAnswerView.ChapterEntry, CorrectAnswerView.ChapterEntry.QuestionEntry) -> Void
     let onClose: () -> Void
 
     @StateObject private var viewModel: CorrectAnswerChapterViewModel
@@ -11,11 +10,9 @@ struct CorrectAnswerChapterView: View {
 
     init(
         unit: CorrectAnswerView.UnitEntry,
-        onSelect: @escaping @Sendable (CorrectAnswerView.ChapterEntry, CorrectAnswerView.ChapterEntry.QuestionEntry) -> Void,
         onClose: @escaping () -> Void
     ) {
         self.unit = unit
-        self.onSelect = onSelect
         self.onClose = onClose
         _viewModel = StateObject(wrappedValue: CorrectAnswerChapterViewModel(unit: unit))
     }
@@ -28,11 +25,10 @@ struct CorrectAnswerChapterView: View {
                 } else {
                     ForEach(viewModel.correctChapters) { chapter in
                         NavigationLink {
-                            CorrectAnswerQuestionListView(
+                            CorrectAnswerPlayView(
+                                unit: unit,
                                 chapter: chapter.entry,
                                 onSelect: { question in
-                                    onSelect(chapter.entry, question)
-                                },
                                 onClose: { setHeader() }
                             )
                         } label: {
@@ -128,7 +124,6 @@ private extension CorrectAnswerChapterView {
             unit: QuizMetadata(version: "1", file: "", title: "サンプル単元", subtitle: "Sample", total: 0),
             chapters: []
         ),
-        onSelect: { _, _ in },
         onClose: {}
     )
     .environmentObject(MainViewState())

@@ -158,9 +158,6 @@ private extension ReviewView {
                 chapterListProvider: { unitId, filePath in
                     await fetchChaptersIfNeeded(for: unitId, filePath: filePath)
                 },
-                onSelect: { selection in
-                    handleCorrectChapterSelection(selection)
-                },
                 onClose: {
                     isShowingCorrectChapterSelection = false
                     mainViewState.setHeader(title: "復習", backButton: .toHome)
@@ -248,28 +245,6 @@ private extension ReviewView {
         SoundManager.shared.play(.tap)
         isNavigatingToQuiz = true
         navigationErrorMessage = nil
-
-        Task {
-            await navigateToQuiz(context)
-            await MainActor.run {
-                isNavigatingToQuiz = false
-            }
-        }
-    }
-
-    func handleCorrectChapterSelection(_ selection: CorrectAnswerView.Selection) {
-        guard !isNavigatingToQuiz else { return }
-
-        SoundManager.shared.play(.tap)
-        isNavigatingToQuiz = true
-        navigationErrorMessage = nil
-        isShowingCorrectChapterSelection = false
-
-        let context = ReviewItem.NavigationContext(
-            unitId: selection.unitId,
-            chapterId: selection.chapter.id,
-            questionIndex: max(selection.questionIndex, 0)
-        )
 
         Task {
             await navigateToQuiz(context)

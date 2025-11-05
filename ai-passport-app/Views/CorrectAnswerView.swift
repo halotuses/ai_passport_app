@@ -1,17 +1,11 @@
 import SwiftUI
 
 struct CorrectAnswerView: View {
-    struct Selection: Sendable {
-        let unitId: String
-        let unit: QuizMetadata
-        let chapter: ChapterMetadata
-        let questionIndex: Int
-    }
+
 
     let progresses: [QuestionProgress]
     let metadataProvider: () async -> QuizMetadataMap?
     let chapterListProvider: (String, String) async -> [ChapterMetadata]?
-    let onSelect: @Sendable (Selection) -> Void
     let onClose: () -> Void
 
     @EnvironmentObject private var mainViewState: MainViewState
@@ -69,15 +63,6 @@ private extension CorrectAnswerView {
                         NavigationLink {
                             CorrectAnswerChapterView(
                                 unit: unit,
-                                onSelect: { chapter, question in
-                                    let selection = Selection(
-                                        unitId: unit.unitId,
-                                        unit: unit.unit,
-                                        chapter: chapter.chapter,
-                                        questionIndex: max(question.questionIndex, 0)
-                                    )
-                                    onSelect(selection)
-                                },
                                 onClose: { setRootHeader() }
                             )
                         } label: {
@@ -345,7 +330,6 @@ extension CorrectAnswerView {
         progresses: [],
         metadataProvider: { [:] },
         chapterListProvider: { _, _ in [] },
-        onSelect: { _ in },
         onClose: {}
     )
     .environmentObject(MainViewState())
