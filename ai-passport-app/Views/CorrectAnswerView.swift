@@ -143,7 +143,7 @@ private extension CorrectAnswerView {
     }
     func setRootHeader() {
         let backButton = MainViewState.HeaderBackButton(
-            title: "◀ 復習",
+            title: "戻る",
             destination: .custom,
             action: onClose
         )

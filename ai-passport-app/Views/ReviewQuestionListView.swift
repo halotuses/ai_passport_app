@@ -26,7 +26,7 @@ struct ReviewQuestionListView: View {
         .background(Color.themeBase)
         .onAppear {
             let backButton = MainViewState.HeaderBackButton(
-                title: "◀ 復習",
+                title: "戻る",
                 destination: .custom,
                 action: {
                     dismiss()

@@ -67,7 +67,7 @@ struct ReviewUnitListView: View {
         .task { await viewModel.loadIfNeeded() }
         .onAppear {
             let backButton = MainViewState.HeaderBackButton(
-                title: "◀ 復習",
+                title: "戻る",
                 destination: .custom,
                 action: onClose
             )
@@ -174,7 +174,7 @@ private extension ReviewUnitListView {
 
     func handleBackToList() {
         let backButton = MainViewState.HeaderBackButton(
-            title: "◀ 復習",
+            title: "戻る",
             destination: .custom,
             action: onClose
         )
