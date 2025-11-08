@@ -46,7 +46,6 @@ struct CorrectAnswerPlayView: View {
         .onAppear(perform: handleOnAppear)
         .onChange(of: viewModel.currentQuestionIndex) { _ in updateHeader() }
         .onChange(of: viewModel.quizzes.count) { _ in updateHeader() }
-        .onChange(of: activeExplanationRoute) { _ in updateHeader() }
         .onDisappear(perform: handleOnDisappear)
     }
 }

@@ -50,6 +50,7 @@
 		0CC249B42EBB89DF0054EE3F /* CorrectAnswerQuestionListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CC249B32EBB89DD0054EE3F /* CorrectAnswerQuestionListView.swift */; };
 		0CC249B62EBB99480054EE3F /* CorrectAnswerPlayViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CC249B52EBB99470054EE3F /* CorrectAnswerPlayViewModel.swift */; };
 		0CC249B82EBB99A90054EE3F /* CorrectAnswerPlayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CC249B72EBB99A90054EE3F /* CorrectAnswerPlayView.swift */; };
+		0CC249BA2EBB9B9B0054EE3F /* ChapterCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CC249B92EBB9B9A0054EE3F /* ChapterCardView.swift */; };
 		0CCB45A02E89853900C41D03 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CCB459F2E89853900C41D03 /* Constants.swift */; };
 		0CCB45A22E8994E800C41D03 /* QuizList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CCB45A12E8994E800C41D03 /* QuizList.swift */; };
 		0CCB45A42E89951900C41D03 /* CapterList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CCB45A32E89951900C41D03 /* CapterList.swift */; };
@@ -154,6 +155,7 @@
 		0CC249B32EBB89DD0054EE3F /* CorrectAnswerQuestionListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CorrectAnswerQuestionListView.swift; sourceTree = "<group>"; };
 		0CC249B52EBB99470054EE3F /* CorrectAnswerPlayViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CorrectAnswerPlayViewModel.swift; sourceTree = "<group>"; };
 		0CC249B72EBB99A90054EE3F /* CorrectAnswerPlayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CorrectAnswerPlayView.swift; sourceTree = "<group>"; };
+		0CC249B92EBB9B9A0054EE3F /* ChapterCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChapterCardView.swift; sourceTree = "<group>"; };
 		0CCB459F2E89853900C41D03 /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 		0CCB45A12E8994E800C41D03 /* QuizList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuizList.swift; sourceTree = "<group>"; };
 		0CCB45A32E89951900C41D03 /* CapterList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CapterList.swift; sourceTree = "<group>"; };
@@ -446,6 +448,7 @@
 		0CF00B692EA91F8900B8A6D0 /* Components */ = {
 			isa = PBXGroup;
 			children = (
+				0CC249B92EBB9B9A0054EE3F /* ChapterCardView.swift */,
 				0CF00B6F2EA92B1600B8A6D0 /* ProgressBadgeView.swift */,
 				0CF00B6A2EA91F9B00B8A6D0 /* CircularProgressView.swift */,
 			);
@@ -758,6 +761,7 @@
 				0CC249B62EBB99480054EE3F /* CorrectAnswerPlayViewModel.swift in Sources */,
 				0CF00B662EA91D2700B8A6D0 /* ChapterProgressViewModel.swift in Sources */,
 				0C30DDA62DFF117200F25D02 /* ai_passport_app.xcdatamodeld in Sources */,
+				0CC249BA2EBB9B9B0054EE3F /* ChapterCardView.swift in Sources */,
 				0CF00B722EAA830A00B8A6D0 /* AnswerHistoryViewModel.swift in Sources */,
 				0CE6D5AB2EAFC11C00D38241 /* SplashView.swift in Sources */,
 				0C30DDD72DFF183F00F25D02 /* NavigationRouter.swift in Sources */,

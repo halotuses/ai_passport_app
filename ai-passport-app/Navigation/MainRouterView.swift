@@ -23,6 +23,7 @@ struct MainRouterView: View {
                     onBackToChapterSelection: { mainViewState.backToChapterSelection(router: router) },
                     onBackToUnitSelection: { mainViewState.backToUnitSelection(router: router) }
                 )
+                .id(mainViewState.navigationResetToken)
             }
         }
         .toolbar(.hidden, for: .navigationBar)

@@ -32,7 +32,7 @@ struct ChapterListView: View {
                         SoundManager.shared.play(.tap)
                         selectedChapter = progressVM.chapter
                     }) {
-                        ChapterRowItem(viewModel: progressVM)
+                        ChapterCardView(viewModel: progressVM)
                     }
                 }
             }
@@ -43,53 +43,5 @@ struct ChapterListView: View {
             mainViewState.setHeader(title: unit.title, backButton: .toUnitList)
             viewModel.fetchChapters(forUnitId: unitKey, filePath: unit.file)
         }
-    }
-    
-}
-
-private struct ChapterRowItem: View {
-    @ObservedObject var viewModel: ChapterProgressViewModel
-
-    var body: some View {
-        HStack(spacing: 16) {            Image(systemName: "book.closed")
-                .font(.system(size: 20, weight: .semibold))
-                .foregroundStyle(
-                    LinearGradient(
-                        colors: [Color.themeMain, Color.themeSecondary],
-                        startPoint: .top,
-                        endPoint: .bottom
-                    )
-                )
-            VStack(alignment: .leading, spacing: 4) {
-                Text(viewModel.chapter.title)
-                    .font(.system(size: 16, weight: .bold))
-                    .foregroundColor(.themeTextPrimary)
-
-            }
-            Spacer()
-            ProgressBadgeView(
-                correctCount: viewModel.correctCount,
-                answeredCount: viewModel.answeredCount,
-                totalCount: viewModel.totalQuestions,
-                accuracy: viewModel.accuracyRate
-            )
-        }
-        .padding(14)
-        .background(
-            RoundedRectangle(cornerRadius: 18)
-                .fill(
-                    LinearGradient(
-                        colors: [Color.themeSurfaceElevated, Color.themeSurfaceAlt],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    )
-                )
-        )
-        .cornerRadius(18)
-        .overlay(
-            RoundedRectangle(cornerRadius: 18)
-                .stroke(Color.themeMain.opacity(0.12), lineWidth: 1)
-        )
-        .shadow(color: Color.themeShadowSoft, radius: 12, x: 0, y: 6)
     }
 }

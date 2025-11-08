@@ -22,8 +22,13 @@ struct ProgressBadgeView: View {
     }
 
     private var correctSummaryText: String {
-        guard answeredCount > 0 else { return "正答数 0/0" }
-        return "正答数 \(correctCount)/\(answeredCount)"
+        if answeredCount > 0 {
+            return "正答数 \(correctCount)/\(answeredCount)"
+        }
+        if totalCount > 0 {
+            return "正答数 \(correctCount)/\(totalCount)"
+        }
+        return "正答数 0/0"
     }
 
     private var badgeGradient: LinearGradient {
