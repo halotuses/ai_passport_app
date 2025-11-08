@@ -136,25 +136,18 @@ private extension CorrectAnswerPlayView {
     }
 
     func updateHeader() {
-        let backButton = MainViewState.HeaderBackButton(
-            title: "戻る",
-            destination: .custom
-        ) {
-            finishReview()
-        }
-
         let baseTitle = "正解復習（\(unit.unit.title)・\(chapter.chapter.title)）"
 
         if let _ = activeExplanationRoute, viewModel.totalCount > 0 {
             let questionNumber = min(viewModel.currentQuestionIndex + 1, viewModel.totalCount)
             let title = "\(baseTitle) 第\(questionNumber)問 解説"
-            mainViewState.setHeader(title: title, backButton: backButton)
+            mainViewState.setHeader(title: title)
         } else if viewModel.totalCount > 0 {
             let questionNumber = min(viewModel.currentQuestionIndex + 1, viewModel.totalCount)
             let title = "\(baseTitle) 第\(questionNumber)問"
-            mainViewState.setHeader(title: title, backButton: backButton)
+            mainViewState.setHeader(title: title)
         } else {
-            mainViewState.setHeader(title: baseTitle, backButton: backButton)
+            mainViewState.setHeader(title: baseTitle)
         }
     }
 }
