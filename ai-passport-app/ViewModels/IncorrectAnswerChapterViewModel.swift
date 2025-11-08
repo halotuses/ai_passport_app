@@ -1,149 +1,95 @@
 import Foundation
 
 @MainActor
-final class IncorrectAnswerPlayViewModel: ObservableObject {
-    @Published private(set) var quizzes: [Quiz] = []
-    @Published var currentQuestionIndex: Int = 0
-    @Published var selectedAnswerIndex: Int? = nil
-    @Published var isLoading: Bool = false
-    @Published var hasError: Bool = false
-    private(set) var isLoaded: Bool = false
+final class IncorrectAnswerChapterViewModel: ObservableObject {
+    struct ChapterItem: Identifiable {
+        let id: String
+        let chapter: ChapterMetadata
+        let entry: IncorrectAnswerView.ChapterEntry?
+        let progressViewModel: ChapterProgressViewModel
 
-    let chapter: IncorrectAnswerView.ChapterEntry
-    private var initialQuestionId: String?
-    private var questionIndexMap: [String: Int] = [:]
+        var incorrectCount: Int { entry?.incorrectCount ?? 0 }
+    }
 
+    @Published private(set) var chapterItems: [ChapterItem] = []
+
+    private let unit: IncorrectAnswerView.UnitEntry
+    private let repository: RealmAnswerHistoryRepository
+    private var progressLookup: [String: ChapterProgressViewModel] = [:]
     init(
-        chapter: IncorrectAnswerView.ChapterEntry,
-        initialQuestionId: String? = nil
+        unit: IncorrectAnswerView.UnitEntry,
+        repository: RealmAnswerHistoryRepository = RealmAnswerHistoryRepository()
     ) {
-        self.chapter = chapter
-        self.initialQuestionId = initialQuestionId
+        self.unit = unit
+        self.repository = repository
+        load()
     }
 
-    var currentQuiz: Quiz? {
-        guard quizzes.indices.contains(currentQuestionIndex) else { return nil }
-        return quizzes[currentQuestionIndex]
-    }
-
-    var totalCount: Int { quizzes.count }
-
-    var hasNextQuestion: Bool {
-        (currentQuestionIndex + 1) < quizzes.count
-    }
-
-    func loadIfNeeded() {
-        guard !isLoaded else { return }
-        loadQuizzes()
-    }
-
-    func reload() {
-        loadQuizzes()
-    }
-
-    func selectAnswer(_ index: Int) {
-        selectedAnswerIndex = index
-    }
-
-    @discardableResult
-    func advanceToNextQuestion() -> Bool {
-        guard !quizzes.isEmpty else { return false }
-        if currentQuestionIndex < quizzes.count - 1 {
-            currentQuestionIndex += 1
-            selectedAnswerIndex = nil
-            return true
-        } else {
-            selectedAnswerIndex = nil
-            return false
-        }
-    }
-
-    private func loadQuizzes() {
-        isLoading = true
-        hasError = false
-        isLoaded = false
-        currentQuestionIndex = 0
-        selectedAnswerIndex = nil
-        questionIndexMap = [:]
-
-        let normalizedPath = normalizedFilePath(chapter.chapter.file)
-        let url = Constants.url(normalizedPath)
-
-        NetworkManager.fetchQuizList(from: url) { [weak self] response in
+    private func load() {
+         let chapterListURL = Constants.url(unit.unit.file)
+         NetworkManager.fetchChapterList(from: chapterListURL) { [weak self] chapterList in
             guard let self else { return }
-            let result = self.makeQuizzes(from: response)
-            self.quizzes = result.quizzes
-            self.questionIndexMap = result.indexMap
-            self.isLoading = false
-            self.hasError = result.quizzes.isEmpty
-            self.isLoaded = true
-            if let initialQuestionId,
-               let index = self.questionIndexMap[initialQuestionId],
-               self.quizzes.indices.contains(index) {
-                self.currentQuestionIndex = index
+             let fetchedChapters = chapterList?.chapters ?? []
+
+             Task { @MainActor [weak self] in
+                 guard let self else { return }
+                 if fetchedChapters.isEmpty {
+                     let fallbackChapters = unit.chapters.map { $0.chapter }
+                     buildChapterItems(from: fallbackChapters)
+                     fetchQuizCounts(for: fallbackChapters)
+                 } else {
+                     buildChapterItems(from: fetchedChapters)
+                     fetchQuizCounts(for: fetchedChapters)
+                 }
             }
-            self.initialQuestionId = nil
         }
     }
 
-    private func makeQuizzes(from response: QuizList?) -> (quizzes: [Quiz], indexMap: [String: Int]) {
-        let fetchedQuizzes = response?.questions ?? []
-        var quizzes: [Quiz] = []
-        var indexMap: [String: Int] = [:]
+    @MainActor
+    private func buildChapterItems(from chapters: [ChapterMetadata]) {
+        let entriesMap = Dictionary(uniqueKeysWithValues: unit.chapters.map { ($0.id, $0) })
+        progressLookup.removeAll()
 
-        for entry in chapter.questions {
-            let quiz: Quiz?
-            if fetchedQuizzes.indices.contains(entry.questionIndex) {
-                quiz = fetchedQuizzes[entry.questionIndex]
-            } else {
-                quiz = fallbackQuiz(from: entry)
-            }
-
-            if let quiz {
-                indexMap[entry.id] = quizzes.count
-                quizzes.append(quiz)
-            }
+        let items: [ChapterItem] = chapters.map { chapter in
+            let progressViewModel = ChapterProgressViewModel(
+                unitId: unit.unitId,
+                chapter: chapter,
+                repository: repository
+            )
+            progressLookup[chapter.id] = progressViewModel
+            return ChapterItem(
+                id: chapter.id,
+                chapter: chapter,
+                entry: entriesMap[chapter.id],
+                progressViewModel: progressViewModel
+            )
         }
-        return (quizzes, indexMap)
+
+        chapterItems = items
     }
 
-    private func fallbackQuiz(from entry: IncorrectAnswerView.ChapterEntry.QuestionEntry) -> Quiz? {
-        let progress = entry.progress
-        let questionText: String
-        if let stored = progress.questionText, !stored.isEmpty {
-            questionText = stored
-        } else {
-            questionText = entry.questionText
+        private func fetchQuizCounts(for chapters: [ChapterMetadata]) {
+            for chapter in chapters {
+                let quizPath = normalizedQuizPath(from: chapter.file)
+                let quizURL = Constants.url(quizPath)
+                NetworkManager.fetchQuizList(from: quizURL) { [weak self] quizList in
+                    guard let self else { return }
+                    let count = quizList?.questions.count ?? 0
+                    DispatchQueue.main.async {
+                        self.progressLookup[chapter.id]?.updateTotalQuestions(count)
+                    }
+                }
         }
-
-        let choices = progress.choiceTexts
-        guard !choices.isEmpty else { return nil }
-
-        let resolvedAnswerIndex: Int
-        if let index = progress.correctAnswerIndex, choices.indices.contains(index) {
-            resolvedAnswerIndex = index
-        } else if let selected = progress.selectedAnswerIndex, choices.indices.contains(selected) {
-            resolvedAnswerIndex = selected
-        } else {
-            resolvedAnswerIndex = 0
-        }
-
-        return Quiz(
-            question: questionText,
-            choices: choices,
-            answerIndex: resolvedAnswerIndex,
-            explanation: nil
-        )
     }
 
-    private func normalizedFilePath(_ original: String) -> String {
-        var path = original
-        if path.hasPrefix("/") {
-            path.removeFirst()
+        private func normalizedQuizPath(from path: String) -> String {
+            var normalizedPath = path
+            if normalizedPath.hasPrefix("/") {
+                normalizedPath.removeFirst()
         }
-        if !path.hasPrefix("quizzes/") {
-            path = "quizzes/" + path
+            if !normalizedPath.hasPrefix("quizzes/") {
+                normalizedPath = "quizzes/" + normalizedPath
         }
-        return path
+            return normalizedPath
     }
 }
