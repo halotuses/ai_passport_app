@@ -144,7 +144,10 @@ final class BookmarkPlayViewModel: ObservableObject {
     }
 
     private func normalizedFilePath(_ original: String) -> String {
-        var path = original
+        var path = original.trimmingCharacters(in: .whitespacesAndNewlines)
+        if path.lowercased().hasPrefix("http") {
+            return path
+        }
         if path.hasPrefix("/") {
             path.removeFirst()
         }
