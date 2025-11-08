@@ -93,7 +93,6 @@ private extension ReviewView {
                 summaryCard(title: "ブックマーク", value: bookmarks.count, icon: "bookmark.fill", tint: .themeAccent)
                 summaryCard(title: "正解", value: correctProgresses.count, icon: "checkmark.circle.fill", tint: .themeCorrect)
                 summaryCard(title: "不正解", value: incorrectProgresses.count, icon: "xmark.circle.fill", tint: .themeIncorrect)
-                summaryCard(title: "未回答", value: unansweredProgresses.count, icon: "questionmark.circle.fill", tint: .themeTextSecondary)
             }
         }
     }
@@ -135,17 +134,6 @@ private extension ReviewView {
                 isInteractionDisabled: isNavigatingToQuiz,
                 onSelect: handleItemSelection
             )
-
-            ReviewCategorySection(
-                title: "未回答の問題",
-                subtitle: "まだ挑戦できていない問題を確認してみましょう。",
-                iconName: "questionmark.circle.fill",
-                tintColor: .themeTextSecondary,
-                items: unansweredProgresses.map { ReviewItem(progress: $0, context: .status(.unanswered)) },
-                emptyMessage: "未回答の問題はありません。",
-                isInteractionDisabled: isNavigatingToQuiz,
-                onSelect: handleItemSelection
-            )
         }
     }
 
@@ -171,54 +159,48 @@ private extension ReviewView {
         .hidden()
     }
     
-     var bookmarkItems: [ReviewItem] {
-         let progressLookup = Dictionary(uniqueKeysWithValues: progresses.map { ($0.quizId, QuestionProgress(object: $0)) })
-         return bookmarks.map { bookmark in
-             let progress = progressLookup[bookmark.quizId]
-             return ReviewItem(
-                 id: bookmark.quizId,
-                 progress: progress,
-                 context: .bookmark,
-                 timestamp: bookmark.updatedAt
-             )
-         }
-     }
+    var bookmarkItems: [ReviewItem] {
+        let progressLookup = Dictionary(uniqueKeysWithValues: progresses.map { ($0.quizId, QuestionProgress(object: $0)) })
+        return bookmarks.map { bookmark in
+            let progress = progressLookup[bookmark.quizId]
+            return ReviewItem(
+                id: bookmark.quizId,
+                progress: progress,
+                context: .bookmark,
+                timestamp: bookmark.updatedAt
+            )
+        }
+    }
 
-     var correctProgresses: [QuestionProgress] {
-         progresses
-             .filter { $0.status == .correct }
-             .map(QuestionProgress.init(object:))
-     }
+    var correctProgresses: [QuestionProgress] {
+        progresses
+            .filter { $0.status == .correct }
+            .map(QuestionProgress.init(object:))
+    }
 
-     var incorrectProgresses: [QuestionProgress] {
-         progresses
-             .filter { $0.status == .incorrect }
-             .map(QuestionProgress.init(object:))
-     }
+    var incorrectProgresses: [QuestionProgress] {
+        progresses
+            .filter { $0.status == .incorrect }
+            .map(QuestionProgress.init(object:))
+    }
 
-     var unansweredProgresses: [QuestionProgress] {
-         progresses
-             .filter { $0.status == .unanswered }
-             .map(QuestionProgress.init(object:))
-     }
+    func summaryCard(title: String, value: Int, icon: String, tint: Color) -> some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack(spacing: 12) {
+                Image(systemName: icon)
+                    .font(.title3.weight(.semibold))
+                    .foregroundColor(tint)
+                    .frame(width: 36, height: 36)
+                    .background(tint.opacity(0.15), in: Circle())
 
-     func summaryCard(title: String, value: Int, icon: String, tint: Color) -> some View {
-         VStack(alignment: .leading, spacing: 12) {
-             HStack(spacing: 12) {
-                 Image(systemName: icon)
-                     .font(.title3.weight(.semibold))
-                     .foregroundColor(tint)
-                     .frame(width: 36, height: 36)
-                     .background(tint.opacity(0.15), in: Circle())
+                Spacer()
 
-                 Spacer()
+                Text("\(value)")
+                    .font(.title3.weight(.bold))
+                    .foregroundColor(.themeTextPrimary)
+            }
 
-                 Text("\(value)")
-                     .font(.title3.weight(.bold))
-                     .foregroundColor(.themeTextPrimary)
-             }
-
-             Text(title)
+            Text(title)
                 .font(.footnote)
                 .foregroundColor(.themeTextSecondary)
 
