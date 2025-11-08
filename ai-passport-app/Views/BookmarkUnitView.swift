@@ -60,7 +60,7 @@ private extension BookmarkUnitView {
                 LazyVStack(spacing: 16) {
                     ForEach(units) { unit in
                         NavigationLink {
-                            BookmarkChapterView(
+                            BookmarkedChapterView(
                                 unit: unit,
                                 onClose: { setRootHeader() }
                             )

@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct BookmarkChapterView: View {
+struct BookmarkedChapterView: View {
     let unit: BookmarkUnitView.UnitEntry
     let onClose: () -> Void
 
@@ -30,7 +30,7 @@ struct BookmarkChapterView: View {
     }
 }
 
-private extension BookmarkChapterView {
+private extension BookmarkedChapterView {
     func setHeader() {
         let backButton = MainViewState.HeaderBackButton(
             title: "◀ ブックマーク一覧",
@@ -114,7 +114,7 @@ private extension BookmarkChapterView {
 }
 
 #Preview {
-    BookmarkChapterView(
+    BookmarkedChapterView(
         unit: BookmarkUnitView.UnitEntry(
             id: "unit1",
             unitId: "unit1",
