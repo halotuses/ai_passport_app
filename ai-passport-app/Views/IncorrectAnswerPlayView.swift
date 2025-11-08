@@ -1,25 +1,25 @@
 import SwiftUI
 
-struct CorrectAnswerPlayView: View {
+struct IncorrectAnswerPlayView: View {
     struct ExplanationRoute: Identifiable {
         let id = UUID()
         let quiz: Quiz
         let selectedAnswerIndex: Int
     }
 
-    let unit: CorrectAnswerView.UnitEntry
-    let chapter: CorrectAnswerView.ChapterEntry
+    let unit: IncorrectAnswerView.UnitEntry
+    let chapter: IncorrectAnswerView.ChapterEntry
     let onClose: () -> Void
 
-    @StateObject private var viewModel: CorrectAnswerPlayViewModel
+    @StateObject private var viewModel: IncorrectAnswerPlayViewModel
     @State private var activeExplanationRoute: ExplanationRoute?
 
     @Environment(\.dismiss) private var dismiss
     @EnvironmentObject private var mainViewState: MainViewState
 
     init(
-        unit: CorrectAnswerView.UnitEntry,
-        chapter: CorrectAnswerView.ChapterEntry,
+        unit: IncorrectAnswerView.UnitEntry,
+        chapter: IncorrectAnswerView.ChapterEntry,
         initialQuestionId: String? = nil,
         onClose: @escaping () -> Void
     ) {
@@ -27,7 +27,7 @@ struct CorrectAnswerPlayView: View {
         self.chapter = chapter
         self.onClose = onClose
         _viewModel = StateObject(
-            wrappedValue: CorrectAnswerPlayViewModel(
+            wrappedValue: IncorrectAnswerPlayViewModel(
                 chapter: chapter,
                 initialQuestionId: initialQuestionId
             )
@@ -37,7 +37,7 @@ struct CorrectAnswerPlayView: View {
     var body: some View {
         VStack(spacing: 0) {
             if let route = activeExplanationRoute {
-                CorrectAnswerExplanationView(
+                IncorrectAnswerExplanationView(
                     viewModel: viewModel,
                     quiz: route.quiz,
                     selectedAnswerIndex: route.selectedAnswerIndex,
@@ -56,7 +56,7 @@ struct CorrectAnswerPlayView: View {
     }
 }
 
-private extension CorrectAnswerPlayView {
+private extension IncorrectAnswerPlayView {
     @ViewBuilder
     var contentBody: some View {
         if viewModel.isLoading {
@@ -83,7 +83,7 @@ private extension CorrectAnswerPlayView {
             .padding()
         } else {
             VStack(spacing: 0) {
-                CorrectAnswerQuestionView(viewModel: viewModel)
+                IncorrectAnswerQuestionView(viewModel: viewModel)
                     .padding(.top, 12)
                 Spacer(minLength: 0)
             }
@@ -143,7 +143,7 @@ private extension CorrectAnswerPlayView {
             finishReview()
         }
 
-        let baseTitle = "正解復習（\(unit.unit.title)・\(chapter.chapter.title)）"
+        let baseTitle = "不正解復習（\(unit.unit.title)・\(chapter.chapter.title)）"
 
         if let _ = activeExplanationRoute, viewModel.totalCount > 0 {
             let questionNumber = min(viewModel.currentQuestionIndex + 1, viewModel.totalCount)
@@ -159,8 +159,8 @@ private extension CorrectAnswerPlayView {
     }
 }
 
-private struct CorrectAnswerQuestionView: View {
-    @ObservedObject var viewModel: CorrectAnswerPlayViewModel
+private struct IncorrectAnswerQuestionView: View {
+    @ObservedObject var viewModel: IncorrectAnswerPlayViewModel
     @State private var handledQuestionIndex: Int?
 
     var body: some View {
@@ -228,9 +228,6 @@ private struct CorrectAnswerQuestionView: View {
         .onChange(of: viewModel.currentQuestionIndex) { _ in
             handledQuestionIndex = nil
         }
-        .navigationBarBackButtonHidden(true)
-        .toolbar(.hidden, for: .navigationBar)
-
     }
 
     private func choiceLabel(for index: Int) -> String {
@@ -239,8 +236,8 @@ private struct CorrectAnswerQuestionView: View {
     }
 }
 
-private struct CorrectAnswerExplanationView: View {
-    @ObservedObject var viewModel: CorrectAnswerPlayViewModel
+private struct IncorrectAnswerExplanationView: View {
+    @ObservedObject var viewModel: IncorrectAnswerPlayViewModel
     let quiz: Quiz
     let selectedAnswerIndex: Int
     let onNext: () -> Void
@@ -341,7 +338,7 @@ private struct CorrectAnswerExplanationView: View {
     }
 }
 
-private extension CorrectAnswerExplanationView {
+private extension IncorrectAnswerExplanationView {
     var explanationText: String? {
         guard let text = quiz.explanation?.trimmingCharacters(in: .whitespacesAndNewlines), !text.isEmpty else {
             return nil

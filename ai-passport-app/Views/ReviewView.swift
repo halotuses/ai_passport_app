@@ -28,6 +28,7 @@ struct ReviewView: View {
     @State private var isNavigatingToQuiz = false
     @State private var navigationErrorMessage: String? = nil
     @State private var isShowingCorrectChapterSelection = false
+    @State private var isShowingIncorrectChapterSelection = false
     
     var body: some View {
         ScrollView(showsIndicators: false) {
@@ -41,7 +42,7 @@ struct ReviewView: View {
             .padding(.vertical, 32)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(correctReviewNavigationLink)
+        .background(reviewNavigationLinks)
         .onAppear {
             mainViewState.setHeader(title: "復習", backButton: .toHome)
         }
@@ -116,6 +117,8 @@ private extension ReviewView {
                 tintColor: .themeCorrect,
                 count: correctProgresses.count,
                 emptyMessage: "まだ正解した問題はありません。",
+                buttonTitle: "単元を選択する",
+                buttonSubtitle: "正解済み \(correctProgresses.count) 問",
                 isInteractionDisabled: isNavigatingToQuiz,
                 action: {
                     guard !correctProgresses.isEmpty else { return }
@@ -124,19 +127,34 @@ private extension ReviewView {
                 }
             )
 
-            ReviewCategorySection(
+            ReviewCategoryButtonSection(
                 title: "不正解だった問題",
                 subtitle: "苦手な問題を重点的に振り返りましょう。",
                 iconName: "xmark.circle.fill",
                 tintColor: .themeIncorrect,
-                items: incorrectProgresses.map { ReviewItem(progress: $0, context: .status(.incorrect)) },
+                count: incorrectProgresses.count,
                 emptyMessage: "不正解の問題はありません。",
+                buttonTitle: "単元を選択する",
+                buttonSubtitle: "不正解 \(incorrectProgresses.count) 問",
                 isInteractionDisabled: isNavigatingToQuiz,
-                onSelect: handleItemSelection
+                action: {
+                    guard !incorrectProgresses.isEmpty else { return }
+                    SoundManager.shared.play(.tap)
+                    isShowingIncorrectChapterSelection = true
+                }
             )
         }
     }
+    
+    @ViewBuilder
+     var reviewNavigationLinks: some View {
+         ZStack {
+             correctReviewNavigationLink
+             incorrectReviewNavigationLink
+         }
+     }
 
+    
     @ViewBuilder
     var correctReviewNavigationLink: some View {
         NavigationLink(
@@ -152,6 +170,28 @@ private extension ReviewView {
                 }
             ),
             isActive: $isShowingCorrectChapterSelection,
+            label: {
+                EmptyView()
+            }
+        )
+        .hidden()
+    }
+    
+    @ViewBuilder
+    var incorrectReviewNavigationLink: some View {
+        NavigationLink(
+            destination: IncorrectAnswerView(
+                progresses: incorrectProgresses,
+                metadataProvider: { await fetchMetadataIfNeeded() },
+                chapterListProvider: { unitId, filePath in
+                    await fetchChaptersIfNeeded(for: unitId, filePath: filePath)
+                },
+                onClose: {
+                    isShowingIncorrectChapterSelection = false
+                    mainViewState.setHeader(title: "復習", backButton: .toHome)
+                }
+            ),
+            isActive: $isShowingIncorrectChapterSelection,
             label: {
                 EmptyView()
             }
@@ -462,6 +502,8 @@ private struct ReviewCategoryButtonSection: View {
     let tintColor: Color
     let count: Int
     let emptyMessage: String
+    let buttonTitle: String
+    let buttonSubtitle: String
     let isInteractionDisabled: Bool
     let action: () -> Void
 
@@ -511,10 +553,10 @@ private struct ReviewCategoryButtonSection: View {
                 Button(action: action) {
                     HStack(spacing: 12) {
                         VStack(alignment: .leading, spacing: 4) {
-                            Text("単元を選択する")
+                            Text(buttonTitle)
                                 .font(.headline)
                                 .foregroundColor(.themeTextPrimary)
-                            Text("正解済み \(count) 問")
+                            Text(buttonSubtitle)
                                 .font(.subheadline)
                                 .foregroundColor(.themeTextSecondary)
                         }
