@@ -20,12 +20,18 @@ struct CorrectAnswerPlayView: View {
     init(
         unit: CorrectAnswerView.UnitEntry,
         chapter: CorrectAnswerView.ChapterEntry,
+        initialQuestionId: String? = nil,
         onClose: @escaping () -> Void
     ) {
         self.unit = unit
         self.chapter = chapter
         self.onClose = onClose
-        _viewModel = StateObject(wrappedValue: CorrectAnswerPlayViewModel(chapter: chapter))
+        _viewModel = StateObject(
+            wrappedValue: CorrectAnswerPlayViewModel(
+                chapter: chapter,
+                initialQuestionId: initialQuestionId
+            )
+        )
     }
 
     var body: some View {

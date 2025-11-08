@@ -27,10 +27,8 @@ struct CorrectAnswerChapterView: View {
                         if let entry = chapter.entry, chapter.correctCount > 0 {
                             NavigationLink {
                                 CorrectAnswerQuestionListView(
+                                    unit: unit,
                                     chapter: entry,
-                                    onSelect: { question in
-
-                                    },
                                     onClose: { setHeader() }
                                 )
                             } label: {

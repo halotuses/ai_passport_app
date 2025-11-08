@@ -1,12 +1,13 @@
 import SwiftUI
 
 struct CorrectAnswerQuestionListView: View {
+    let unit: CorrectAnswerView.UnitEntry
     let chapter: CorrectAnswerView.ChapterEntry
-    let onSelect: @Sendable (CorrectAnswerView.ChapterEntry.QuestionEntry) -> Void
     let onClose: () -> Void
 
     @EnvironmentObject private var mainViewState: MainViewState
     @Environment(\.dismiss) private var dismiss
+    @State private var activeQuestion: CorrectAnswerView.ChapterEntry.QuestionEntry?
 
     var body: some View {
         ScrollView {
@@ -17,7 +18,7 @@ struct CorrectAnswerQuestionListView: View {
                     ForEach(chapter.questions) { question in
                         Button {
                             SoundManager.shared.play(.tap)
-                            onSelect(question)
+                            activeQuestion = question
                         } label: {
                             questionRow(for: question)
                         }
@@ -33,12 +34,42 @@ struct CorrectAnswerQuestionListView: View {
             Color.themeBase
                 .ignoresSafeArea()
         )
+        .background(playNavigationLink)
         .navigationBarBackButtonHidden(true)
         .onAppear { setHeader() }
     }
 }
 
 private extension CorrectAnswerQuestionListView {
+    @ViewBuilder
+    var playNavigationLink: some View {
+        NavigationLink(
+            destination: {
+                if let activeQuestion {
+                    CorrectAnswerPlayView(
+                        unit: unit,
+                        chapter: chapter,
+                        initialQuestionId: activeQuestion.id,
+                        onClose: handlePlayViewClose
+                    )
+                } else {
+                    EmptyView()
+                }
+            },
+            isActive: Binding(
+                get: { activeQuestion != nil },
+                set: { value in
+                    if !value {
+                        activeQuestion = nil
+                    }
+                }
+            ),
+            label: {
+                EmptyView()
+            }
+        )
+        .hidden()
+    }
     func setHeader() {
         let backButton = MainViewState.HeaderBackButton(
             title: "◀ 正解した問題",
@@ -51,6 +82,10 @@ private extension CorrectAnswerQuestionListView {
         mainViewState.setHeader(title: title, backButton: backButton)
     }
 
+    func handlePlayViewClose() {
+        setHeader()
+    }
+    
     var emptyState: some View {
         VStack(spacing: 12) {
             Image(systemName: "questionmark.circle")
@@ -118,14 +153,20 @@ private extension CorrectAnswerQuestionListView {
             choiceTexts: ["A", "B", "C", "D"]
         )
     )
-
+    let unit = CorrectAnswerView.UnitEntry(
+         id: "unit1",
+         unitId: "unit1",
+         unit: QuizMetadata(version: "1", file: "", title: "サンプル単元", subtitle: "Sample", total: 0),
+         chapters: []
+     )
+    
     CorrectAnswerQuestionListView(
+        unit: unit,
         chapter: CorrectAnswerView.ChapterEntry(
             id: "chapter1",
             chapter: ChapterMetadata(id: "chapter1", title: "サンプル章", file: ""),
             questions: [question]
         ),
-        onSelect: { _ in },
         onClose: {}
     )
     .environmentObject(MainViewState())

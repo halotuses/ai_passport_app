@@ -10,9 +10,15 @@ final class CorrectAnswerPlayViewModel: ObservableObject {
     private(set) var isLoaded: Bool = false
 
     let chapter: CorrectAnswerView.ChapterEntry
+    private var initialQuestionId: String?
+    private var questionIndexMap: [String: Int] = [:]
 
-    init(chapter: CorrectAnswerView.ChapterEntry) {
+    init(
+        chapter: CorrectAnswerView.ChapterEntry,
+        initialQuestionId: String? = nil
+    ) {
         self.chapter = chapter
+        self.initialQuestionId = initialQuestionId
     }
 
     var currentQuiz: Quiz? {
@@ -58,29 +64,47 @@ final class CorrectAnswerPlayViewModel: ObservableObject {
         isLoaded = false
         currentQuestionIndex = 0
         selectedAnswerIndex = nil
+        questionIndexMap = [:]
 
         let normalizedPath = normalizedFilePath(chapter.chapter.file)
         let url = Constants.url(normalizedPath)
 
         NetworkManager.fetchQuizList(from: url) { [weak self] response in
             guard let self else { return }
-            let quizzes = self.makeQuizzes(from: response)
-            self.quizzes = quizzes
+            let result = self.makeQuizzes(from: response)
+            self.quizzes = result.quizzes
+            self.questionIndexMap = result.indexMap
             self.isLoading = false
-            self.hasError = quizzes.isEmpty
+            self.hasError = result.quizzes.isEmpty
             self.isLoaded = true
+            if let initialQuestionId,
+               let index = self.questionIndexMap[initialQuestionId],
+               self.quizzes.indices.contains(index) {
+                self.currentQuestionIndex = index
+            }
+            self.initialQuestionId = nil
         }
     }
 
-    private func makeQuizzes(from response: QuizList?) -> [Quiz] {
+    private func makeQuizzes(from response: QuizList?) -> (quizzes: [Quiz], indexMap: [String: Int]) {
         let fetchedQuizzes = response?.questions ?? []
+        var quizzes: [Quiz] = []
+        var indexMap: [String: Int] = [:]
 
-        return chapter.questions.compactMap { entry in
+        for entry in chapter.questions {
+            let quiz: Quiz?
             if fetchedQuizzes.indices.contains(entry.questionIndex) {
-                return fetchedQuizzes[entry.questionIndex]
+                quiz = fetchedQuizzes[entry.questionIndex]
+            } else {
+                quiz = fallbackQuiz(from: entry)
             }
-            return fallbackQuiz(from: entry)
+
+            if let quiz {
+                indexMap[entry.id] = quizzes.count
+                quizzes.append(quiz)
+            }
         }
+        return (quizzes, indexMap)
     }
 
     private func fallbackQuiz(from entry: CorrectAnswerView.ChapterEntry.QuestionEntry) -> Quiz? {
