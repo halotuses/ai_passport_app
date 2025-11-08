@@ -12,11 +12,7 @@ struct BookmarkChapterView: View {
             VStack(spacing: 12) {
                 ForEach(unit.chapters) { chapter in
                     NavigationLink {
-                        BookmarkPlayView(
-                            unit: unit,
-                            chapter: chapter,
-                            onClose: { setHeader() }
-                        )
+                        chapterDestination(for: chapter)
                     } label: {
                         chapterRow(chapter)
                     }
@@ -45,6 +41,14 @@ private extension BookmarkChapterView {
         }
         let title = "ブックマーク復習（\(unit.unit.title)）"
         mainViewState.setHeader(title: title, backButton: backButton)
+    }
+    @ViewBuilder
+    func chapterDestination(for chapter: BookmarkUnitView.ChapterEntry) -> some View {
+        BookmarkPlayView(
+            unit: unit,
+            chapter: chapter,
+            onClose: { setHeader() }
+        )
     }
 
     func chapterRow(_ chapter: BookmarkUnitView.ChapterEntry) -> some View {
