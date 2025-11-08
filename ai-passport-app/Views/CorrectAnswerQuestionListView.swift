@@ -44,18 +44,7 @@ private extension CorrectAnswerQuestionListView {
     @ViewBuilder
     var playNavigationLink: some View {
         NavigationLink(
-            destination: {
-                if let activeQuestion {
-                    CorrectAnswerPlayView(
-                        unit: unit,
-                        chapter: chapter,
-                        initialQuestionId: activeQuestion.id,
-                        onClose: handlePlayViewClose
-                    )
-                } else {
-                    EmptyView()
-                }
-            },
+
             isActive: Binding(
                 get: { activeQuestion != nil },
                 set: { value in
@@ -63,11 +52,21 @@ private extension CorrectAnswerQuestionListView {
                         activeQuestion = nil
                     }
                 }
-            ),
-            label: {
+            )
+        ) {
+            if let activeQuestion {
+                CorrectAnswerPlayView(
+                    unit: unit,
+                    chapter: chapter,
+                    initialQuestionId: activeQuestion.id,
+                    onClose: handlePlayViewClose
+                )
+            } else {
                 EmptyView()
             }
-        )
+        } label: {
+            EmptyView()
+        }
         .hidden()
     }
     func setHeader() {
