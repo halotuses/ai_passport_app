@@ -228,6 +228,8 @@ private struct IncorrectAnswerQuestionView: View {
         .onChange(of: viewModel.currentQuestionIndex) { _ in
             handledQuestionIndex = nil
         }
+        .navigationBarBackButtonHidden(true)
+        .toolbar(.hidden, for: .navigationBar)
     }
 
     private func choiceLabel(for index: Int) -> String {
