@@ -52,64 +52,7 @@ private extension BookmarkedChapterView {
     }
 
     func chapterRow(_ chapter: BookmarkUnitView.ChapterEntry) -> some View {
-        HStack(spacing: 16) {
-            Image(systemName: "book.closed")
-                .font(.system(size: 20, weight: .semibold))
-                .foregroundStyle(
-                    LinearGradient(
-                        colors: [Color.themeMain, Color.themeSecondary],
-                        startPoint: .top,
-                        endPoint: .bottom
-                    )
-                )
-
-            VStack(alignment: .leading, spacing: 4) {
-                Text(chapter.chapter.title)
-                    .font(.system(size: 16, weight: .bold))
-                    .foregroundColor(.themeTextPrimary)
-                Text("ブックマーク \(chapter.bookmarkCount) 問")
-                    .font(.system(size: 13))
-                    .foregroundColor(.themeTextSecondary)
-            }
-
-            Spacer()
-
-            countBubble(total: chapter.bookmarkCount)
-        }
-        .padding(14)
-        .background(
-            RoundedRectangle(cornerRadius: 18)
-                .fill(
-                    LinearGradient(
-                        colors: [Color.themeSurfaceElevated, Color.themeSurfaceAlt],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    )
-                )
-        )
-        .cornerRadius(18)
-        .overlay(
-            RoundedRectangle(cornerRadius: 18)
-                .stroke(Color.themeMain.opacity(0.12), lineWidth: 1)
-        )
-        .shadow(color: Color.themeShadowSoft, radius: 12, x: 0, y: 6)
-    }
-
-    func countBubble(total: Int) -> some View {
-        ZStack {
-            Circle()
-                .fill(
-                    LinearGradient(
-                        colors: [Color.themeSecondary.opacity(0.3), Color.themeMain.opacity(0.3)],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    )
-                )
-                .frame(width: 44, height: 44)
-            Text("\(total)")
-                .font(.system(size: 12, weight: .semibold))
-                .foregroundColor(.themeTextPrimary)
-        }
+        BookmarkCardView(chapter: chapter)
     }
 }
 
