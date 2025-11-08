@@ -1,4 +1,5 @@
 import SwiftUI
+typealias BookmarkView = BookmarkPlayView
 
 struct BookmarkPlayView: View {
     struct ExplanationRoute: Identifiable {
