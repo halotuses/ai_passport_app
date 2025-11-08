@@ -27,6 +27,7 @@ struct ReviewView: View {
     @State private var chapterListCache: [String: [ChapterMetadata]] = [:]
     @State private var isNavigatingToQuiz = false
     @State private var navigationErrorMessage: String? = nil
+    @State private var isShowingBookmarkUnitSelection = false
     @State private var isShowingCorrectChapterSelection = false
     @State private var isShowingIncorrectChapterSelection = false
     
@@ -108,6 +109,8 @@ private extension ReviewView {
                 emptyMessage: "ブックマークした問題はまだありません。",
                 isInteractionDisabled: isNavigatingToQuiz,
                 onSelect: handleItemSelection
+                onSelect: handleItemSelection,
+                footer: bookmarkSectionFooter
             )
 
             ReviewCategoryButtonSection(
@@ -149,11 +152,33 @@ private extension ReviewView {
     @ViewBuilder
      var reviewNavigationLinks: some View {
          ZStack {
+             bookmarkReviewNavigationLink
              correctReviewNavigationLink
              incorrectReviewNavigationLink
          }
      }
 
+    @ViewBuilder
+    var bookmarkReviewNavigationLink: some View {
+        NavigationLink(
+            destination: BookmarkUnitView(
+                bookmarks: bookmarkUnitItems,
+                metadataProvider: { await fetchMetadataIfNeeded() },
+                chapterListProvider: { unitId, filePath in
+                    await fetchChaptersIfNeeded(for: unitId, filePath: filePath)
+                },
+                onClose: {
+                    isShowingBookmarkUnitSelection = false
+                    mainViewState.setHeader(title: "復習", backButton: .toHome)
+                }
+            ),
+            isActive: $isShowingBookmarkUnitSelection,
+            label: {
+                EmptyView()
+            }
+        )
+        .hidden()
+    }
     
     @ViewBuilder
     var correctReviewNavigationLink: some View {
@@ -211,7 +236,64 @@ private extension ReviewView {
             )
         }
     }
+    var bookmarkUnitItems: [BookmarkUnitView.BookmarkItem] {
+           let progressLookup = Dictionary(uniqueKeysWithValues: progresses.map { ($0.quizId, QuestionProgress(object: $0)) })
+           return bookmarks.map { bookmark in
+               BookmarkUnitView.BookmarkItem(
+                   id: bookmark.quizId,
+                   quizId: bookmark.quizId,
+                   questionText: bookmark.questionText,
+                   updatedAt: bookmark.updatedAt,
+                   progress: progressLookup[bookmark.quizId]
+               )
+           }
+       }
 
+       var bookmarkSectionFooter: AnyView? {
+           guard !bookmarks.isEmpty else { return nil }
+           let button = Button {
+               guard !isNavigatingToQuiz else { return }
+               SoundManager.shared.play(.tap)
+               isShowingBookmarkUnitSelection = true
+           } label: {
+               HStack(alignment: .center, spacing: 12) {
+                   Image(systemName: "arrowshape.turn.up.right.fill")
+                       .font(.title3.weight(.semibold))
+                       .foregroundColor(.themeAccent)
+                       .frame(width: 44, height: 44)
+                       .background(Color.themeAccent.opacity(0.15), in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+
+                   VStack(alignment: .leading, spacing: 4) {
+                       Text("単元を選択する")
+                           .font(.headline)
+                           .foregroundColor(.themeTextPrimary)
+                       Text("ブックマーク \(bookmarks.count) 問")
+                           .font(.subheadline)
+                           .foregroundColor(.themeTextSecondary)
+                   }
+
+                   Spacer()
+
+                   Image(systemName: "chevron.right")
+                       .font(.headline.weight(.semibold))
+                       .foregroundColor(.themeTextSecondary)
+               }
+               .padding(.horizontal, 16)
+               .padding(.vertical, 14)
+               .background(
+                   RoundedRectangle(cornerRadius: 18, style: .continuous)
+                       .fill(Color.themeSurfaceElevated)
+               )
+               .overlay(
+                   RoundedRectangle(cornerRadius: 18, style: .continuous)
+                       .stroke(Color.themeAccent.opacity(0.12), lineWidth: 1)
+               )
+           }
+           .buttonStyle(.plain)
+           .disabled(isNavigatingToQuiz)
+
+           return AnyView(button)
+       }
     var correctProgresses: [QuestionProgress] {
         progresses
             .filter { $0.status == .correct }
@@ -425,6 +507,29 @@ private struct ReviewCategorySection: View {
     let emptyMessage: String
     let isInteractionDisabled: Bool
     let onSelect: (ReviewItem) -> Void
+    let footer: AnyView?
+
+      init(
+          title: String,
+          subtitle: String,
+          iconName: String,
+          tintColor: Color,
+          items: [ReviewItem],
+          emptyMessage: String,
+          isInteractionDisabled: Bool,
+          onSelect: @escaping (ReviewItem) -> Void,
+          footer: AnyView? = nil
+      ) {
+          self.title = title
+          self.subtitle = subtitle
+          self.iconName = iconName
+          self.tintColor = tintColor
+          self.items = items
+          self.emptyMessage = emptyMessage
+          self.isInteractionDisabled = isInteractionDisabled
+          self.onSelect = onSelect
+          self.footer = footer
+      }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 20) {
@@ -480,6 +585,10 @@ private struct ReviewCategorySection: View {
                         .disabled(isInteractionDisabled)
                     }
                 }
+            }
+            if let footer {
+                footer
+                    .padding(.top, 8)
             }
         }
         .padding(24)

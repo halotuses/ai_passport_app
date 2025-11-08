@@ -114,12 +114,6 @@ private extension IncorrectAnswerQuestionListView {
                 .font(.headline)
                 .foregroundColor(.themeTextPrimary)
                 .multilineTextAlignment(.leading)
-
-            if let selectedText = question.progress.selectedChoiceText {
-                Text("あなたの回答: \(selectedText)")
-                    .font(.footnote)
-                    .foregroundColor(.themeIncorrect)
-            }
         }
         .padding(20)
         .frame(maxWidth: .infinity, alignment: .leading)
