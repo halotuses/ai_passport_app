@@ -288,6 +288,10 @@ extension BookmarkUnitView {
         let questionText: String
         let updatedAt: Date
         let progress: QuestionProgress?
+        
+        static func == (lhs: BookmarkItem, rhs: BookmarkItem) -> Bool {
+            lhs.id == rhs.id
+        }
 
         func hash(into hasher: inout Hasher) {
             hasher.combine(id)
@@ -302,6 +306,9 @@ extension BookmarkUnitView {
 
         var totalBookmarkCount: Int {
             chapters.reduce(into: 0) { $0 += $1.bookmarkCount }
+        }
+        static func == (lhs: UnitEntry, rhs: UnitEntry) -> Bool {
+            lhs.id == rhs.id
         }
 
         func hash(into hasher: inout Hasher) {
@@ -328,6 +335,10 @@ extension BookmarkUnitView {
 
             var progress: QuestionProgress? { item.progress }
             var updatedAt: Date { item.updatedAt }
+            
+            static func == (lhs: QuestionEntry, rhs: QuestionEntry) -> Bool {
+                lhs.id == rhs.id
+            }
 
             func hash(into hasher: inout Hasher) {
                 hasher.combine(id)
@@ -344,6 +355,10 @@ extension BookmarkUnitView {
             questions.map(\.questionIndex).min() ?? 0
         }
 
+        static func == (lhs: ChapterEntry, rhs: ChapterEntry) -> Bool {
+               lhs.id == rhs.id
+           }
+        
         func hash(into hasher: inout Hasher) {
             hasher.combine(id)
         }

@@ -108,7 +108,6 @@ private extension ReviewView {
                 items: bookmarkItems,
                 emptyMessage: "ブックマークした問題はまだありません。",
                 isInteractionDisabled: isNavigatingToQuiz,
-                onSelect: handleItemSelection
                 onSelect: handleItemSelection,
                 footer: bookmarkSectionFooter
             )
