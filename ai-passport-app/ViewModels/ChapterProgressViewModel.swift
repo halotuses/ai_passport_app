@@ -1,6 +1,14 @@
 import Foundation
 @preconcurrency import RealmSwift
 
+protocol ChapterProgressDisplayable: ObservableObject, Identifiable {
+    var chapter: ChapterMetadata { get }
+    var correctCount: Int { get }
+    var answeredCount: Int { get }
+    var totalQuestions: Int { get }
+    var accuracyRate: Double { get }
+}
+
 @MainActor
 final class ChapterProgressViewModel: ObservableObject, Identifiable {
     let id: String
@@ -123,3 +131,4 @@ final class ChapterProgressViewModel: ObservableObject, Identifiable {
         progressToken?.invalidate()
     }
 }
+extension ChapterProgressViewModel: ChapterProgressDisplayable {}

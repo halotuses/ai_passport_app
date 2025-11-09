@@ -69,38 +69,7 @@ private extension ReviewView {
             Text("学習サマリー")
                 .font(.headline)
                 .foregroundColor(.themeTextPrimary)
-            
-            VStack(alignment: .leading, spacing: 20) {
-                VStack(alignment: .leading, spacing: 6) {
-                    Text("最近の学習状況")
-                        .font(.subheadline.weight(.semibold))
-                        .foregroundColor(.themeTextPrimary)
-
-                    Text("復習に向けてチェックしておきたい最新のサマリーです。")
-                        .font(.footnote)
-                        .foregroundColor(.themeTextSecondary)
-                        .fixedSize(horizontal: false, vertical: true)
-                }
-
-                summaryStatsRow
-            }
-            .padding(24)
-            .frame(maxWidth: .infinity)
-            .background(
-                RoundedRectangle(cornerRadius: 28, style: .continuous)
-                    .fill(
-                        LinearGradient(
-                            colors: [Color.themeSurfaceElevated, Color.themeSurfaceAlt.opacity(0.92)],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        )
-                    )
-            )
-            .overlay(
-                RoundedRectangle(cornerRadius: 28, style: .continuous)
-                    .stroke(Color.white.opacity(0.4), lineWidth: 0.5)
-            )
-            .shadow(color: Color.themeShadowSoft.opacity(0.4), radius: 18, x: 0, y: 14)
+            summaryStatsRow
         }
     }
     var reviewSections: some View {
@@ -290,13 +259,10 @@ private extension ReviewView {
     }
     
     var summaryStatsRow: some View {
-        let items = summaryItems
-
-        let columns = [GridItem(.adaptive(minimum: 160, maximum: 220), spacing: 16)]
-
-        return LazyVGrid(columns: columns, alignment: .leading, spacing: 16) {
-            ForEach(items) { item in
+        HStack(alignment: .top, spacing: 12) {
+            ForEach(summaryItems) { item in
                 summaryStat(item)
+                    .frame(maxWidth: .infinity)
             }
         }
     }
@@ -310,85 +276,40 @@ private extension ReviewView {
     }
 
     private func summaryStat(_ item: ReviewSummaryItem) -> some View {
-        VStack(alignment: .leading, spacing: 16) {
-            HStack(alignment: .center, spacing: 14) {
-                ZStack {
-                    Circle()
-                        .fill(
-                            LinearGradient(
-                                colors: [item.tint.opacity(0.26), item.tint.opacity(0.12)],
-                                startPoint: .topLeading,
-                                endPoint: .bottomTrailing
-                            )
-                        )
-                        .frame(width: 44, height: 44)
-                    Image(systemName: item.icon)
-                        .font(.headline.weight(.semibold))
-                        .foregroundColor(.white)
-                        .shadow(color: item.tint.opacity(0.4), radius: 4, x: 0, y: 3)
-                }
-
-                Text(item.title)
+        VStack(spacing: 12) {
+            ZStack {
+                Circle()
+                    .fill(item.tint.opacity(0.18))
+                    .frame(width: 42, height: 42)
+                Image(systemName: item.icon)
                     .font(.subheadline.weight(.semibold))
-                    .foregroundColor(.themeTextPrimary)
-                    .lineLimit(2)
-                    .fixedSize(horizontal: false, vertical: true)
-
-
-                HStack(alignment: .firstTextBaseline, spacing: 8) {
-                    Text("\(item.value)")
-                        .font(.system(size: 28, weight: .bold, design: .rounded))
-                        .monospacedDigit()
-                        .foregroundColor(.themeTextPrimary)
-                    Text(item.unit)
-                        .font(.callout.weight(.medium))
-                        .foregroundColor(item.tint)
-                        .padding(.horizontal, 10)
-                        .padding(.vertical, 4)
-                        .background(item.tint.opacity(0.14), in: Capsule())
-                }
+                    .foregroundColor(item.tint)
             }
-            .frame(maxWidth: .infinity, alignment: .leading)
+            Text(item.title)
+                .font(.subheadline.weight(.semibold))
+                .foregroundColor(.themeTextPrimary)
 
-            Divider()
-                .background(item.tint.opacity(0.1))
-
-            Text(summaryDescription(for: item))
-                .font(.footnote)
-                .foregroundColor(.themeTextSecondary)
-                .frame(maxWidth: .infinity, alignment: .leading)
+            HStack(alignment: .firstTextBaseline, spacing: 4) {
+                Text("\(item.value)")
+                    .font(.title3.weight(.bold))
+                    .monospacedDigit()
+                    .foregroundColor(.themeTextPrimary)
+                Text(item.unit)
+                    .font(.footnote.weight(.medium))
+                    .foregroundColor(.themeTextSecondary)
+            }
         }
-        .padding(.horizontal, 18)
         .padding(.vertical, 18)
-        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(.horizontal, 16)
+        .frame(maxWidth: .infinity)
         .background(
-            RoundedRectangle(cornerRadius: 24, style: .continuous)
-                .fill(
-                    LinearGradient(
-                        colors: [Color.white.opacity(0.95), item.tint.opacity(0.12)],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    )
-                )
+            RoundedRectangle(cornerRadius: 20, style: .continuous)
+                .fill(Color.themeSurfaceElevated)
         )
         .overlay(
-            RoundedRectangle(cornerRadius: 24, style: .continuous)
-                .stroke(item.tint.opacity(0.18), lineWidth: 1)
+            RoundedRectangle(cornerRadius: 20, style: .continuous)
+                .stroke(Color.white.opacity(0.5), lineWidth: 0.5)
         )
-        .shadow(color: item.tint.opacity(0.15), radius: 16, x: 0, y: 10)
-    }
-
-    private func summaryDescription(for item: ReviewSummaryItem) -> String {
-        switch item.title {
-        case "ブックマーク":
-            return "後で振り返りたい問題の保存数です。"
-        case "正解":
-            return "これまでに正解した問題の合計です。"
-        case "不正解":
-            return "復習したい不正解の問題数です。"
-        default:
-            return ""
-        }
     }
     
     private struct ReviewSummaryItem: Identifiable, Equatable {

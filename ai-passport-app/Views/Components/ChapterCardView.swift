@@ -1,8 +1,8 @@
 import SwiftUI
 
 /// 共通の章カードビュー。章タイトルと進捗バッジを表示する。
-struct ChapterCardView: View {
-    @ObservedObject var viewModel: ChapterProgressViewModel
+struct ChapterCardView<ViewModel: ChapterProgressDisplayable>: View {
+    @ObservedObject var viewModel: ViewModel
     var isDisabled: Bool = false
 
     private var iconGradient: LinearGradient {
