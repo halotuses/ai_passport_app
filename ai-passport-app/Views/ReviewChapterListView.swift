@@ -41,13 +41,18 @@ struct ReviewChapterListView: View {
                 } else {
                     ForEach(chapterItems) { item in
                         Button {
+                            guard item.chapter.hasReviewTargets else { return }
                             SoundManager.shared.play(.tap)
                             activeChapter = item.chapter
                             isShowingQuestionList = true
                         } label: {
-                            ChapterCardView(viewModel: item.progressViewModel)
+                            ChapterCardView(
+                                viewModel: item.progressViewModel,
+                                isDisabled: !item.chapter.hasReviewTargets
+                            )
                         }
                         .buttonStyle(.plain)
+                        .disabled(!item.chapter.hasReviewTargets)
                     }
                 }
             }

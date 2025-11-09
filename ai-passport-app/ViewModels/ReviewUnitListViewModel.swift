@@ -82,6 +82,7 @@ final class ReviewUnitListViewModel: ObservableObject {
         let reviewCount: Int
         let initialQuestionIndex: Int
         let questions: [ReviewQuestion]
+        var hasReviewTargets: Bool { reviewCount > 0 }
         
         func hash(into hasher: inout Hasher) {
             hasher.combine(id)
@@ -154,14 +155,15 @@ final class ReviewUnitListViewModel: ObservableObject {
                     continue
                 }
                 
-                let chapterMap = Dictionary(uniqueKeysWithValues: chapters.map { ($0.id, $0) })
+                let chapterIdSet = Set(chapters.map(\.id))
+                let missingChapterIds = Set(chapterInfo.keys).subtracting(chapterIdSet)
+                if !missingChapterIds.isEmpty {
+                    encounteredError = true
+                }
 
-                for (chapterId, summary) in chapterInfo {
-                    guard let metadata = chapterMap[chapterId] else {
-                        encounteredError = true
-                        continue
-                    }
-                    let questions = summary.entries
+                entries = chapters.enumerated().map { index, metadata in
+                    let summary = chapterInfo[metadata.id]
+                    let questions = summary?.entries
                         .map { entry -> ReviewChapter.ReviewQuestion in
                             ReviewChapter.ReviewQuestion(
                                 id: entry.progress.quizId,
@@ -176,17 +178,16 @@ final class ReviewUnitListViewModel: ObservableObject {
                                 return lhs.quizId.localizedCompare(rhs.quizId) == .orderedAscending
                             }
                             return lhs.questionIndex < rhs.questionIndex
-                        }
-                    guard !questions.isEmpty else { continue }
+                        } ?? []
 
-                    let entry = ReviewChapter(
-                        id: chapterId,
+                    return ReviewChapter(
+                        id: metadata.id,
                         chapter: metadata,
                         reviewCount: questions.count,
-                        initialQuestionIndex: questions.first?.questionIndex ?? 0,
+                        initialQuestionIndex: summary?.initialQuestionIndex ?? Int.max,
+                        sortOrder: index,
                         questions: questions
                     )
-                    entries.append(entry)
                 }
 
                 entries.sort(by: chapterSortComparator)
@@ -251,6 +252,9 @@ private extension ReviewUnitListViewModel {
     
     func chapterSortComparator(_ lhs: ReviewChapter, _ rhs: ReviewChapter) -> Bool {
         if lhs.initialQuestionIndex == rhs.initialQuestionIndex {
+            if lhs.initialQuestionIndex == Int.max {
+                return lhs.sortOrder < rhs.sortOrder
+            }
             return lhs.chapter.title.localizedCompare(rhs.chapter.title) == .orderedAscending
         }
         return lhs.initialQuestionIndex < rhs.initialQuestionIndex
