@@ -6,11 +6,13 @@ struct ReviewUnitListView: View {
         let unit: QuizMetadata
         let chapter: ChapterMetadata
         let initialQuestionIndex: Int
+        let questions: [ReviewUnitListViewModel.ReviewChapter.ReviewQuestion]
     }
 
     @StateObject private var viewModel: ReviewUnitListViewModel
     private let onSelect: @Sendable (Selection) -> Void
     private let onClose: () -> Void
+    private let headerTitle: String
 
     @EnvironmentObject private var mainViewState: MainViewState
 
@@ -18,6 +20,8 @@ struct ReviewUnitListView: View {
         progresses: [QuestionProgress],
         metadataProvider: @escaping () async -> QuizMetadataMap?,
         chapterListProvider: @escaping (String, String) async -> [ChapterMetadata]?,
+        shouldInclude: @escaping (QuestionProgress) -> Bool = { _ in true },
+        headerTitle: String = "復習用章選択",
         onSelect: @escaping @Sendable (Selection) -> Void,
         onClose: @escaping () -> Void
     ) {
@@ -25,11 +29,13 @@ struct ReviewUnitListView: View {
             wrappedValue: ReviewUnitListViewModel(
                 progresses: progresses,
                 metadataProvider: metadataProvider,
-                chapterListProvider: chapterListProvider
+                chapterListProvider: chapterListProvider,
+                      shouldInclude: shouldInclude
             )
         )
         self.onSelect = onSelect
         self.onClose = onClose
+        self.headerTitle = headerTitle
     }
 
     var body: some View {
@@ -71,7 +77,7 @@ struct ReviewUnitListView: View {
                 destination: .custom,
                 action: onClose
             )
-            mainViewState.setHeader(title: "復習用章選択", backButton: backButton)
+            mainViewState.setHeader(title: headerTitle, backButton: backButton)
         }
     }
 }
@@ -167,7 +173,8 @@ private extension ReviewUnitListView {
             unitId: unit.unitId,
             unit: unit.unit,
             chapter: chapter.chapter,
-            initialQuestionIndex: chapter.initialQuestionIndex
+            initialQuestionIndex: chapter.initialQuestionIndex,
+                questions: chapter.questions
         )
         onSelect(selection)
     }
@@ -178,6 +185,6 @@ private extension ReviewUnitListView {
             destination: .custom,
             action: onClose
         )
-        mainViewState.setHeader(title: "復習用章選択", backButton: backButton)
+        mainViewState.setHeader(title: headerTitle, backButton: backButton)
     }
 }

@@ -208,6 +208,66 @@ final class RealmAnswerHistoryRepository {
             return []
         }
     }
+    
+    func bookmarkedProgresses(for userId: String) -> [QuestionProgress] {
+          do {
+              let realm = try realm()
+              let bookmarks = realm.objects(BookmarkObject.self)
+                  .filter("userId == %@ AND isBookmarked == true", userId)
+                  .sorted(byKeyPath: "updatedAt", ascending: false)
+
+              var progresses: [QuestionProgress] = []
+              progresses.reserveCapacity(bookmarks.count)
+
+              for bookmark in bookmarks {
+                  let quizId = bookmark.quizId
+                  let progressObject = realm.object(ofType: QuestionProgressObject.self, forPrimaryKey: quizId)
+
+                  let progress: QuestionProgress
+                  if let progressObject {
+                      var converted = QuestionProgress(object: progressObject)
+                      converted.updatedAt = bookmark.updatedAt
+                      if converted.questionText?.isEmpty ?? true {
+                          converted.questionText = bookmark.questionText
+                      }
+                      progress = converted
+                  } else {
+                      let chapterId = IdentifierGenerator.chapterNumericId(fromQuizIdentifier: quizId) ?? 0
+                      let parsed = QuizIdentifierParser.parse(quizId)
+                      progress = QuestionProgress(
+                          quizId: quizId,
+                          chapterId: chapterId,
+                          status: .unanswered,
+                          updatedAt: bookmark.updatedAt,
+                          unitId: parsed?.unitId ?? "",
+                          chapterIdentifier: parsed?.chapterId ?? "",
+                          questionText: bookmark.questionText,
+                          choiceTexts: []
+                      )
+                  }
+
+                  progresses.append(progress)
+              }
+
+              return progresses
+          } catch {
+              print("❌ Failed to fetch bookmarks: \(error)")
+              return []
+          }
+      }
+
+      func removeBookmark(with quizId: String) {
+          do {
+              let realm = try realm()
+              guard let bookmark = realm.object(ofType: BookmarkObject.self, forPrimaryKey: quizId) else { return }
+              try realm.write {
+                  realm.delete(bookmark)
+              }
+          } catch {
+              print("❌ Failed to remove bookmark: \(error)")
+          }
+      }
+
 
     func observeAnswerHistory(
         limit: Int? = nil,

@@ -23,10 +23,26 @@ final class ReviewUnitListViewModel: ObservableObject {
     }
 
     struct ReviewChapter: Identifiable, Hashable {
+        struct ReviewQuestion: Identifiable, Hashable {
+             let id: String
+             let quizId: String
+             let questionIndex: Int
+             let progress: QuestionProgress
+             let updatedAt: Date
+
+             func hash(into hasher: inout Hasher) {
+                 hasher.combine(id)
+             }
+
+             static func == (lhs: ReviewQuestion, rhs: ReviewQuestion) -> Bool {
+                 lhs.id == rhs.id
+             }
+         }
         let id: String
         let chapter: ChapterMetadata
         let reviewCount: Int
         let initialQuestionIndex: Int
+        let questions: [ReviewQuestion]
 
         func hash(into hasher: inout Hasher) {
             hasher.combine(id)
@@ -44,16 +60,19 @@ final class ReviewUnitListViewModel: ObservableObject {
     private let progresses: [QuestionProgress]
     private let metadataProvider: () async -> QuizMetadataMap?
     private let chapterListProvider: (String, String) async -> [ChapterMetadata]?
+    private let shouldInclude: (QuestionProgress) -> Bool
     private var hasLoaded = false
 
     init(
         progresses: [QuestionProgress],
         metadataProvider: @escaping () async -> QuizMetadataMap?,
-        chapterListProvider: @escaping (String, String) async -> [ChapterMetadata]?
+        chapterListProvider: @escaping (String, String) async -> [ChapterMetadata]?,
+        shouldInclude: @escaping (QuestionProgress) -> Bool = { _ in true }
     ) {
         self.progresses = progresses
         self.metadataProvider = metadataProvider
         self.chapterListProvider = chapterListProvider
+        self.shouldInclude = shouldInclude
     }
 
     func loadIfNeeded() async {
@@ -102,12 +121,33 @@ final class ReviewUnitListViewModel: ObservableObject {
                     encounteredError = true
                     continue
                 }
+                
+                let questions = summary.entries
+                        .map { entry -> ReviewChapter.ReviewQuestion in
+                            ReviewChapter.ReviewQuestion(
+                                id: entry.progress.quizId,
+                                quizId: entry.progress.quizId,
+                                questionIndex: entry.questionIndex,
+                                progress: entry.progress,
+                                updatedAt: entry.progress.updatedAt
+                            )
+                        }
+                        .sorted { lhs, rhs in
+                            if lhs.questionIndex == rhs.questionIndex {
+                                return lhs.quizId.localizedCompare(rhs.quizId) == .orderedAscending
+                            }
+                            return lhs.questionIndex < rhs.questionIndex
+                        }
+
+                    guard !questions.isEmpty else { continue }
+
 
                 let entry = ReviewChapter(
                     id: chapterId,
                     chapter: metadata,
-                    reviewCount: summary.count,
-                    initialQuestionIndex: summary.initialQuestionIndex
+                    reviewCount: questions.count,
+                     initialQuestionIndex: questions.first?.questionIndex ?? 0,
+                     questions: questions
                 )
                 entries.append(entry)
             }
@@ -139,14 +179,23 @@ final class ReviewUnitListViewModel: ObservableObject {
 
 private extension ReviewUnitListViewModel {
     struct ChapterSummary {
-        var count: Int
-        var initialQuestionIndex: Int
+        struct Entry {
+               let progress: QuestionProgress
+               let questionIndex: Int
+           }
+
+           var entries: [Entry]
+
+           var count: Int { entries.count }
+
+           var initialQuestionIndex: Int {
+               entries.map(\.questionIndex).min() ?? 0
+           }
     }
 
     func aggregateProgresses() -> [String: [String: ChapterSummary]] {
         var result: [String: [String: ChapterSummary]] = [:]
-
-        for progress in progresses where progress.status != .unanswered {
+        for progress in progresses where shouldInclude(progress) {
             guard let components = QuizIdentifierParser.parse(progress.quizId) else { continue }
 
             let unitId = progress.unitId.isEmpty ? components.unitId : progress.unitId
@@ -154,9 +203,8 @@ private extension ReviewUnitListViewModel {
             guard !unitId.isEmpty, !chapterIdentifier.isEmpty else { continue }
 
             let questionIndex = components.questionIndex ?? 0
-            var summary = result[unitId, default: [:]][chapterIdentifier] ?? ChapterSummary(count: 0, initialQuestionIndex: questionIndex)
-            summary.count += 1
-            summary.initialQuestionIndex = min(summary.initialQuestionIndex, questionIndex)
+            var summary = result[unitId, default: [:]][chapterIdentifier] ?? ChapterSummary(entries: [])
+                 summary.entries.append(.init(progress: progress, questionIndex: questionIndex))
             result[unitId, default: [:]][chapterIdentifier] = summary
         }
 

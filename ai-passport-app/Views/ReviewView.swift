@@ -27,9 +27,11 @@ struct ReviewView: View {
     @State private var chapterListCache: [String: [ChapterMetadata]] = [:]
     @State private var isNavigatingToQuiz = false
     @State private var navigationErrorMessage: String? = nil
-    @State private var isShowingBookmarkUnitSelection = false
-    @State private var isShowingCorrectChapterSelection = false
-    @State private var isShowingIncorrectChapterSelection = false
+    @State private var activeUnitSelectionCategory: ReviewCategory? = nil
+    @State private var isShowingUnitSelection = false
+    @State private var activePlayCategory: ReviewCategory? = nil
+    @State private var activePlaySelection: ReviewUnitListView.Selection? = nil
+    @State private var isShowingPlayView = false
     
     var body: some View {
         ScrollView(showsIndicators: false) {
@@ -125,7 +127,8 @@ private extension ReviewView {
                 action: {
                     guard !correctProgresses.isEmpty else { return }
                     SoundManager.shared.play(.tap)
-                    isShowingCorrectChapterSelection = true
+                    activeUnitSelectionCategory = .correct
+                    isShowingUnitSelection = true
                 }
             )
 
@@ -142,36 +145,61 @@ private extension ReviewView {
                 action: {
                     guard !incorrectProgresses.isEmpty else { return }
                     SoundManager.shared.play(.tap)
-                    isShowingIncorrectChapterSelection = true
+                    activeUnitSelectionCategory = .incorrect
+                    isShowingUnitSelection = true
                 }
             )
         }
     }
     
     @ViewBuilder
-     var reviewNavigationLinks: some View {
-         ZStack {
-             bookmarkReviewNavigationLink
-             correctReviewNavigationLink
-             incorrectReviewNavigationLink
-         }
-     }
+    var reviewNavigationLinks: some View {
+        ZStack {
+            unitSelectionNavigationLink
+            playNavigationLink
+        }
+    }
+
 
     @ViewBuilder
-    var bookmarkReviewNavigationLink: some View {
+    var unitSelectionNavigationLink: some View {
         NavigationLink(
-            destination: BookmarkUnitView(
-                bookmarks: bookmarkUnitItems,
-                metadataProvider: { await fetchMetadataIfNeeded() },
-                chapterListProvider: { unitId, filePath in
-                    await fetchChaptersIfNeeded(for: unitId, filePath: filePath)
-                },
-                onClose: {
-                    isShowingBookmarkUnitSelection = false
-                    mainViewState.setHeader(title: "復習", backButton: .toHome)
+            isActive: Binding(
+                get: { isShowingUnitSelection },
+                set: { newValue in
+                    if !newValue {
+                        isShowingUnitSelection = false
+                        activeUnitSelectionCategory = nil
+                    }
                 }
             ),
-            isActive: $isShowingBookmarkUnitSelection,
+            destination: {
+                     if let category = activeUnitSelectionCategory {
+                         ReviewUnitListView(
+                             progresses: progresses(for: category),
+                             metadataProvider: { await fetchMetadataIfNeeded() },
+                             chapterListProvider: { unitId, filePath in
+                                 await fetchChaptersIfNeeded(for: unitId, filePath: filePath)
+                             },
+                             shouldInclude: { progress in
+                                 shouldInclude(progress, for: category)
+                             },
+                             headerTitle: category.unitSelectionHeader,
+                             onSelect: { selection in
+                                 activePlayCategory = category
+                                 activePlaySelection = selection
+                                 isShowingPlayView = true
+                             },
+                             onClose: {
+                                 isShowingUnitSelection = false
+                                 activeUnitSelectionCategory = nil
+                                 mainViewState.setHeader(title: "復習", backButton: .toHome)
+                             }
+                         )
+                     } else {
+                         EmptyView()
+                }
+            ),
             label: {
                 EmptyView()
             }
@@ -180,42 +208,32 @@ private extension ReviewView {
     }
     
     @ViewBuilder
-    var correctReviewNavigationLink: some View {
+            var playNavigationLink: some View {
         NavigationLink(
-            destination: CorrectAnswerView(
-                progresses: correctProgresses,
-                metadataProvider: { await fetchMetadataIfNeeded() },
-                chapterListProvider: { unitId, filePath in
-                    await fetchChaptersIfNeeded(for: unitId, filePath: filePath)
-                },
-                onClose: {
-                    isShowingCorrectChapterSelection = false
-                    mainViewState.setHeader(title: "復習", backButton: .toHome)
+            isActive: Binding(
+                  get: { isShowingPlayView },
+                  set: { newValue in
+                      if !newValue {
+                          isShowingPlayView = false
+                          activePlayCategory = nil
+                          activePlaySelection = nil
+                      }
                 }
             ),
-            isActive: $isShowingCorrectChapterSelection,
-            label: {
-                EmptyView()
-            }
-        )
-        .hidden()
-    }
-    
-    @ViewBuilder
-    var incorrectReviewNavigationLink: some View {
-        NavigationLink(
-            destination: IncorrectAnswerView(
-                progresses: incorrectProgresses,
-                metadataProvider: { await fetchMetadataIfNeeded() },
-                chapterListProvider: { unitId, filePath in
-                    await fetchChaptersIfNeeded(for: unitId, filePath: filePath)
-                },
-                onClose: {
-                    isShowingIncorrectChapterSelection = false
-                    mainViewState.setHeader(title: "復習", backButton: .toHome)
-                }
-            ),
-            isActive: $isShowingIncorrectChapterSelection,
+            destination: {
+                        if let category = activePlayCategory, let selection = activePlaySelection {
+                            ReviewPlayView(category: category, selection: selection) {
+                                isShowingPlayView = false
+                                activePlayCategory = nil
+                                activePlaySelection = nil
+                                isShowingUnitSelection = false
+                                activeUnitSelectionCategory = nil
+                                mainViewState.setHeader(title: "復習", backButton: .toHome)
+                            }
+                        } else {
+                            EmptyView()
+                        }
+                    },
             label: {
                 EmptyView()
             }
@@ -235,25 +253,15 @@ private extension ReviewView {
             )
         }
     }
-    var bookmarkUnitItems: [BookmarkUnitView.BookmarkItem] {
-           let progressLookup = Dictionary(uniqueKeysWithValues: progresses.map { ($0.quizId, QuestionProgress(object: $0)) })
-           return bookmarks.map { bookmark in
-               BookmarkUnitView.BookmarkItem(
-                   id: bookmark.quizId,
-                   quizId: bookmark.quizId,
-                   questionText: bookmark.questionText,
-                   updatedAt: bookmark.updatedAt,
-                   progress: progressLookup[bookmark.quizId]
-               )
-           }
-       }
+
 
        var bookmarkSectionFooter: AnyView? {
            guard !bookmarks.isEmpty else { return nil }
            let button = Button {
                guard !isNavigatingToQuiz else { return }
                SoundManager.shared.play(.tap)
-               isShowingBookmarkUnitSelection = true
+               activeUnitSelectionCategory = .bookmark
+                      isShowingUnitSelection = true
            } label: {
                HStack(alignment: .center, spacing: 12) {
                    Image(systemName: "arrowshape.turn.up.right.fill")
@@ -304,6 +312,27 @@ private extension ReviewView {
             .filter { $0.status == .incorrect }
             .map(QuestionProgress.init(object:))
     }
+            func progresses(for category: ReviewCategory) -> [QuestionProgress] {
+                 switch category {
+                 case .bookmark:
+                     return progressManager.bookmarkedProgresses(for: ReviewView.userId)
+                 case .correct:
+                     return correctProgresses
+                 case .incorrect:
+                     return incorrectProgresses
+                 }
+             }
+
+             func shouldInclude(_ progress: QuestionProgress, for category: ReviewCategory) -> Bool {
+                 switch category {
+                 case .bookmark:
+                     return true
+                 case .correct:
+                     return progress.status == .correct
+                 case .incorrect:
+                     return progress.status == .incorrect
+                 }
+             }
 
     func summaryCard(title: String, value: Int, icon: String, tint: Color) -> some View {
         VStack(alignment: .leading, spacing: 12) {

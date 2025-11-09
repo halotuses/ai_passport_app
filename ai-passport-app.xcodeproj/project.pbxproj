@@ -51,6 +51,9 @@
 		0C395FA52EBF9FC8007AF119 /* BookmarkedChapterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C395FA42EBF9FC6007AF119 /* BookmarkedChapterView.swift */; };
 		0C395FA82EBFA010007AF119 /* BookmarkUnitView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C395FA72EBFA00E007AF119 /* BookmarkUnitView.swift */; };
 		0C395FAA2EBFB350007AF119 /* BookmarkCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C395FA92EBFB34F007AF119 /* BookmarkCardView.swift */; };
+		0C395FAC2EC0496F007AF119 /* ReviewCategory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C395FAB2EC0496E007AF119 /* ReviewCategory.swift */; };
+		0C395FAF2EC049E8007AF119 /* ReviewPlayViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C395FAE2EC049E7007AF119 /* ReviewPlayViewModel.swift */; };
+		0C395FB12EC04AA3007AF119 /* ReviewPlayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C395FB02EC04AA2007AF119 /* ReviewPlayView.swift */; };
 		0C87869E2EA6725F0052D2A8 /* QuestionProgressObject.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C87869D2EA6725F0052D2A8 /* QuestionProgressObject.swift */; };
 		0C8786A12EA672D90052D2A8 /* RealmAnswerHistoryRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C8786A02EA672D90052D2A8 /* RealmAnswerHistoryRepository.swift */; };
 		0CC249AB2EBA3F3D0054EE3F /* ReviewUnitListViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CC249AA2EBA3F3B0054EE3F /* ReviewUnitListViewModel.swift */; };
@@ -166,6 +169,9 @@
 		0C395FA62EBF9FDE007AF119 /* BookmarkPlayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarkPlayView.swift; sourceTree = "<group>"; };
 		0C395FA72EBFA00E007AF119 /* BookmarkUnitView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarkUnitView.swift; sourceTree = "<group>"; };
 		0C395FA92EBFB34F007AF119 /* BookmarkCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarkCardView.swift; sourceTree = "<group>"; };
+		0C395FAB2EC0496E007AF119 /* ReviewCategory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewCategory.swift; sourceTree = "<group>"; };
+		0C395FAE2EC049E7007AF119 /* ReviewPlayViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewPlayViewModel.swift; sourceTree = "<group>"; };
+		0C395FB02EC04AA2007AF119 /* ReviewPlayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewPlayView.swift; sourceTree = "<group>"; };
 		0C87869D2EA6725F0052D2A8 /* QuestionProgressObject.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuestionProgressObject.swift; sourceTree = "<group>"; };
 		0C8786A02EA672D90052D2A8 /* RealmAnswerHistoryRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RealmAnswerHistoryRepository.swift; sourceTree = "<group>"; };
 		0CC249AA2EBA3F3B0054EE3F /* ReviewUnitListViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewUnitListViewModel.swift; sourceTree = "<group>"; };
@@ -352,6 +358,7 @@
 		0C30DDCB2DFF13E800F25D02 /* Core */ = {
 			isa = PBXGroup;
 			children = (
+				0C395FAB2EC0496E007AF119 /* ReviewCategory.swift */,
 				0CE6D5C22EB3A5B400D38241 /* QuizIdentifierParser.swift */,
 				0CE6D5BA2EB0F8C100D38241 /* RealmManager.swift */,
 				0CE6D5A02EAF675C00D38241 /* AppSettings.swift */,
@@ -365,6 +372,7 @@
 		0C30DDCD2DFF13FD00F25D02 /* ViewModels */ = {
 			isa = PBXGroup;
 			children = (
+				0C395FAE2EC049E7007AF119 /* ReviewPlayViewModel.swift */,
 				0C395FA22EBF9FA9007AF119 /* BookmarkPlayViewModel.swift */,
 				0C395FA02EBF9B27007AF119 /* IncorrectAnswerPlayViewModel.swift */,
 				0C395F942EBF9606007AF119 /* IncorrectAnswerChapterViewModel.swift */,
@@ -385,6 +393,7 @@
 		0C30DDCE2DFF140C00F25D02 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				0C395FB02EC04AA2007AF119 /* ReviewPlayView.swift */,
 				0C395FA72EBFA00E007AF119 /* BookmarkUnitView.swift */,
 				0C395FA62EBF9FDE007AF119 /* BookmarkPlayView.swift */,
 				0C395FA42EBF9FC6007AF119 /* BookmarkedChapterView.swift */,
@@ -776,6 +785,7 @@
 				0CE6D5C32EB3A5C900D38241 /* QuizIdentifierParser.swift in Sources */,
 				0C31AD7F2EA21882007500F7 /* HomeView.swift in Sources */,
 				0C30DDED2DFF1B8400F25D02 /* ChapterListViewModel.swift in Sources */,
+				0C395FAC2EC0496F007AF119 /* ReviewCategory.swift in Sources */,
 				0CC249AB2EBA3F3D0054EE3F /* ReviewUnitListViewModel.swift in Sources */,
 				0CCB45A22E8994E800C41D03 /* QuizList.swift in Sources */,
 				0C30DDDD2DFF1A8B00F25D02 /* ChapterListView.swift in Sources */,
@@ -784,6 +794,7 @@
 				0CE6D5BB2EB0F8C300D38241 /* RealmManager.swift in Sources */,
 				0C31AD832EA51B97007500F7 /* LegacyAnswerHistoryMigrator.swift in Sources */,
 				0C395FA12EBF9B28007AF119 /* IncorrectAnswerPlayViewModel.swift in Sources */,
+				0C395FAF2EC049E8007AF119 /* ReviewPlayViewModel.swift in Sources */,
 				0CE6D5992EAE0C1900D38241 /* ProgressManager.swift in Sources */,
 				0C30DDF92DFF1CE300F25D02 /* QuizMetadata.swift in Sources */,
 				0CF00B682EA91D5800B8A6D0 /* HomeProgressViewModel.swift in Sources */,
@@ -819,6 +830,7 @@
 				0C31AD7B2EA2184A007500F7 /* MainViewState.swift in Sources */,
 				0CCB45A42E89951900C41D03 /* CapterList.swift in Sources */,
 				0C30DD9C2DFF116F00F25D02 /* ContentView.swift in Sources */,
+				0C395FB12EC04AA3007AF119 /* ReviewPlayView.swift in Sources */,
 				0C30DDFD2DFF1CFB00F25D02 /* SelectedAnswer.swift in Sources */,
 				0CF00B6E2EA924FD00B8A6D0 /* CreatePageView.swift in Sources */,
 				0C30DDEB2DFF1B7A00F25D02 /* UnitListViewModel.swift in Sources */,
