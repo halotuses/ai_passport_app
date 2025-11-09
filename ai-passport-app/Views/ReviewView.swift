@@ -321,7 +321,7 @@ private extension ReviewView {
         }
     }
 
-    var summaryItems: [ReviewSummaryItem] {
+    private var summaryItems: [ReviewSummaryItem] {
         [
             .init(title: "ブックマーク", value: bookmarks.count, unit: "問", icon: "bookmark.fill", tint: .themeAccent),
             .init(title: "正解", value: correctProgresses.count, unit: "問", icon: "checkmark.circle.fill", tint: .themeCorrect),
@@ -329,7 +329,7 @@ private extension ReviewView {
         ]
     }
 
-    func summaryStat(_ item: ReviewSummaryItem) -> some View {
+    private func summaryStat(_ item: ReviewSummaryItem) -> some View {
         VStack(alignment: .leading, spacing: 10) {
             HStack(alignment: .center, spacing: 10) {
                 Image(systemName: item.icon)
