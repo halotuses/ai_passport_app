@@ -18,7 +18,8 @@ struct ReviewUnitListView: View {
         chapterListProvider: @escaping (String, String) async -> [ChapterMetadata]?,
         shouldInclude: @escaping (QuestionProgress) -> Bool = { _ in true },
         headerTitle: String = "復習用単元選択",
-        onSelect: @escaping @Sendable (ReviewUnitSelection) -> Void,        onClose: @escaping () -> Void
+        onSelect: @escaping @Sendable (ReviewUnitSelection) -> Void,
+        onClose: @escaping () -> Void
     ) {
         _viewModel = StateObject(
             wrappedValue: ReviewUnitListViewModel(
@@ -35,7 +36,7 @@ struct ReviewUnitListView: View {
     
     var body: some View {
         ScrollView(showsIndicators: false) {
-            VStack(spacing: 20) {
+            VStack(spacing: 8) {
                 if viewModel.isLoading {
                     ProgressView("読み込み中…")
                         .frame(maxWidth: .infinity, alignment: .center)
@@ -45,15 +46,14 @@ struct ReviewUnitListView: View {
                 } else if viewModel.units.isEmpty {
                     emptyState
                 } else {
-                    LazyVStack(spacing: 16) {
+                    VStack(spacing: 8) {
                         ForEach(viewModel.units) { unit in
-                            unitSection(unit)
+                            unitSelectionButton(unit)
                         }
                     }
                 }
             }
-            .padding(.horizontal, 20)
-            .padding(.vertical, 24)
+            .padding()
         }
         .background(Color.themeBase)
         .navigationBarBackButtonHidden(true)
@@ -112,18 +112,100 @@ private extension ReviewUnitListView {
         )
     }
     
-    func unitSection(_ unit: ReviewUnitListViewModel.ReviewUnit) -> some View {
+    func unitSelectionButton(_ unit: ReviewUnitListViewModel.ReviewUnit) -> some View {
         let isDisabled = !unit.hasReviewTargets
-
+        
         return Button {
             SoundManager.shared.play(.tap)
             selectedUnit = unit
             isShowingChapterList = true
         } label: {
-            ReviewUnitCardView(unit: unit, isDisabled: isDisabled)
+            unitRowView(unit: unit, isDisabled: isDisabled)
         }
         .buttonStyle(.plain)
         .disabled(isDisabled)
+    }
+    
+    func unitRowView(unit: ReviewUnitListViewModel.ReviewUnit, isDisabled: Bool) -> some View {
+        let total = unit.reviewCount
+        
+        return HStack(spacing: 16) {
+            Image(systemName: "chevron.right")
+                .font(.system(size: 16, weight: .semibold))
+                .foregroundStyle(
+                    LinearGradient(
+                        colors: [Color.themeMain, Color.themeSecondary],
+                        startPoint: .top,
+                        endPoint: .bottom
+                    )
+                )
+                .opacity(isDisabled ? 0.4 : 1.0)
+            
+            VStack(alignment: .leading, spacing: 4) {
+                Text("\(unit.unitId). \(unit.unit.title)")
+                    .font(.system(size: 16, weight: .bold))
+                    .foregroundColor(.themeTextPrimary)
+                    .opacity(isDisabled ? 0.65 : 1.0)
+                
+                if !unit.unit.subtitle.isEmpty {
+                    Text(unit.unit.subtitle)
+                        .font(.system(size: 13))
+                        .italic()
+                        .foregroundColor(.themeTextSecondary)
+                        .opacity(isDisabled ? 0.5 : 1.0)
+                }
+            }
+            
+            Spacer()
+            
+            ZStack {
+                Circle()
+                    .fill(
+                        LinearGradient(
+                            colors: [
+                                Color.themeSecondary.opacity(0.3),
+                                Color.themeMain.opacity(0.3)
+                            ],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                    )
+                    .frame(width: 44, height: 44)
+                
+                Text("\(total)")
+                    .font(.system(size: 12, weight: .semibold))
+                    .foregroundColor(.themeTextPrimary)
+            }
+            .opacity(isDisabled ? 0.6 : 1.0)
+        }
+        .padding(14)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(
+            RoundedRectangle(cornerRadius: 18)
+                .fill(
+                    LinearGradient(
+                        colors: [Color.themeSurfaceElevated, Color.themeSurfaceAlt],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                )
+        )
+        .cornerRadius(18)
+        .overlay(
+            RoundedRectangle(cornerRadius: 18)
+                .stroke(Color.themeMain.opacity(0.12), lineWidth: 1)
+        )
+        .shadow(color: Color.themeShadowSoft, radius: 12, x: 0, y: 6)
+        .overlay(disabledOverlay(cornerRadius: 18, isDisabled: isDisabled))
+        .opacity(isDisabled ? 0.55 : 1.0)
+    }
+    
+    @ViewBuilder
+    private func disabledOverlay(cornerRadius: CGFloat, isDisabled: Bool) -> some View {
+        if isDisabled {
+            RoundedRectangle(cornerRadius: cornerRadius)
+                .fill(Color.black.opacity(0.04))
+        }
     }
     
     @ViewBuilder
@@ -168,115 +250,5 @@ private extension ReviewUnitListView {
         } else {
             EmptyView()
         }
-    }
-    
-}
-
-private struct ReviewUnitCardView: View {
-    let unit: ReviewUnitListViewModel.ReviewUnit
-    var isDisabled: Bool
-
-    private var iconGradient: LinearGradient {
-        LinearGradient(
-            colors: [Color.themeMain, Color.themeSecondary],
-            startPoint: .top,
-            endPoint: .bottom
-        )
-    }
-
-    private var backgroundGradient: LinearGradient {
-        LinearGradient(
-            colors: [Color.themeSurfaceElevated, Color.themeSurfaceAlt],
-            startPoint: .topLeading,
-            endPoint: .bottomTrailing
-        )
-    }
-
-    var body: some View {
-        let statistics = unit.statistics
-
-        VStack(alignment: .leading, spacing: 18) {
-            HStack(alignment: .top, spacing: 16) {
-                Image(systemName: "book.closed")
-                    .font(.system(size: 22, weight: .semibold))
-                    .foregroundStyle(iconGradient)
-                    .opacity(isDisabled ? 0.4 : 1.0)
-
-                VStack(alignment: .leading, spacing: 6) {
-                    Text("\(unit.unitId). \(unit.unit.title)")
-                        .font(.system(size: 17, weight: .semibold))
-                        .foregroundColor(.themeTextPrimary)
-                        .opacity(isDisabled ? 0.65 : 1.0)
-
-                    if !unit.unit.subtitle.isEmpty {
-                        Text(unit.unit.subtitle)
-                            .font(.system(size: 13))
-                            .foregroundColor(.themeTextSecondary)
-                            .opacity(isDisabled ? 0.5 : 1.0)
-                    }
-
-                    HStack(spacing: 10) {
-                        detailChip(text: "復習対象 \(unit.reviewCount) 問", systemImage: "doc.text")
-                        detailChip(text: "章 \(unit.chapterCount)", systemImage: "list.number")
-                    }
-                }
-
-                Spacer(minLength: 12)
-
-                Image(systemName: "chevron.right")
-                    .font(.system(size: 16, weight: .semibold))
-                    .foregroundColor(.themeTextSecondary.opacity(isDisabled ? 0.6 : 1.0))
-            }
-
-            ProgressBadgeView(
-                correctCount: statistics.correctCount,
-                answeredCount: statistics.answeredCount,
-                totalCount: statistics.totalCount,
-                accuracy: statistics.accuracy
-            )
-            .allowsHitTesting(false)
-        }
-        .padding(.vertical, 20)
-        .padding(.horizontal, 20)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background(
-            RoundedRectangle(cornerRadius: 24, style: .continuous)
-                .fill(backgroundGradient)
-        )
-        .overlay(
-            RoundedRectangle(cornerRadius: 24, style: .continuous)
-                .stroke(Color.themeMain.opacity(0.12), lineWidth: 1)
-        )
-        .shadow(color: Color.themeShadowSoft, radius: 14, x: 0, y: 10)
-        .overlay(disabledOverlay)
-        .opacity(isDisabled ? 0.55 : 1.0)
-    }
-
-    @ViewBuilder
-    private var disabledOverlay: some View {
-        if isDisabled {
-            RoundedRectangle(cornerRadius: 24, style: .continuous)
-                .fill(Color.black.opacity(0.04))
-        }
-    }
-
-    private func detailChip(text: String, systemImage: String) -> some View {
-        HStack(spacing: 6) {
-            Image(systemName: systemImage)
-                .font(.system(size: 12, weight: .semibold))
-            Text(text)
-                .font(.system(size: 12, weight: .semibold))
-        }
-        .foregroundColor(.themeTextSecondary.opacity(isDisabled ? 0.6 : 1.0))
-        .padding(.vertical, 6)
-        .padding(.horizontal, 12)
-        .background(
-            Capsule()
-                .fill(Color.themeSurface)
-                .overlay(
-                    Capsule()
-                        .stroke(Color.themeMain.opacity(0.1), lineWidth: 1)
-                )
-        )
     }
 }

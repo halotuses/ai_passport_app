@@ -288,6 +288,8 @@ private extension ReviewView {
             Text(item.title)
                 .font(.subheadline.weight(.semibold))
                 .foregroundColor(.themeTextPrimary)
+                .lineLimit(1)
+                .minimumScaleFactor(0.85)
 
             HStack(alignment: .firstTextBaseline, spacing: 4) {
                 Text("\(item.value)")
