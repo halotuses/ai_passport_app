@@ -209,9 +209,6 @@ private extension ReviewView {
                         isShowingPlayView = false
                         activePlayCategory = nil
                         activePlaySelection = nil
-                        isShowingUnitSelection = false
-                        activeUnitSelectionCategory = nil
-                        mainViewState.setHeader(title: "復習", backButton: .toHome)
                     }
                 } else {
                     EmptyView()
