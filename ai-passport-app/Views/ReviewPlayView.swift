@@ -8,7 +8,7 @@ struct ReviewPlayView: View {
     }
 
     let category: ReviewCategory
-    let selection: ReviewUnitListView.Selection
+    let selection: ReviewUnitSelection
     let onClose: () -> Void
 
     @StateObject private var viewModel: ReviewPlayViewModel
@@ -18,7 +18,7 @@ struct ReviewPlayView: View {
     @EnvironmentObject private var mainViewState: MainViewState
     @EnvironmentObject private var progressManager: ProgressManager
 
-    init(category: ReviewCategory, selection: ReviewUnitListView.Selection, onClose: @escaping () -> Void) {
+    init(category: ReviewCategory, selection: ReviewUnitSelection, onClose: @escaping () -> Void) {
         self.category = category
         self.selection = selection
         self.onClose = onClose

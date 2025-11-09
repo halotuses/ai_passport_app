@@ -1,16 +1,17 @@
 import SwiftUI
 
+struct ReviewUnitSelection: Sendable {
+    let unitId: String
+    let unit: QuizMetadata
+    let chapter: ChapterMetadata
+    let initialQuestionIndex: Int
+    let questions: [ReviewUnitListViewModel.ReviewChapter.ReviewQuestion]
+}
+
 struct ReviewUnitListView: View {
-    struct Selection: Sendable {
-        let unitId: String
-        let unit: QuizMetadata
-        let chapter: ChapterMetadata
-        let initialQuestionIndex: Int
-        let questions: [ReviewUnitListViewModel.ReviewChapter.ReviewQuestion]
-    }
 
     @StateObject private var viewModel: ReviewUnitListViewModel
-    private let onSelect: @Sendable (Selection) -> Void
+    private let onSelect: @Sendable (ReviewUnitSelection) -> Void
     private let onClose: () -> Void
     private let headerTitle: String
 
@@ -22,7 +23,7 @@ struct ReviewUnitListView: View {
         chapterListProvider: @escaping (String, String) async -> [ChapterMetadata]?,
         shouldInclude: @escaping (QuestionProgress) -> Bool = { _ in true },
         headerTitle: String = "復習用章選択",
-        onSelect: @escaping @Sendable (Selection) -> Void,
+        onSelect: @escaping @Sendable (ReviewUnitSelection) -> Void,
         onClose: @escaping () -> Void
     ) {
         _viewModel = StateObject(
@@ -30,7 +31,7 @@ struct ReviewUnitListView: View {
                 progresses: progresses,
                 metadataProvider: metadataProvider,
                 chapterListProvider: chapterListProvider,
-                      shouldInclude: shouldInclude
+                shouldInclude: shouldInclude
             )
         )
         self.onSelect = onSelect
@@ -169,12 +170,12 @@ private extension ReviewUnitListView {
     }
 
     func handleSelection(_ chapter: ReviewUnitListViewModel.ReviewChapter, in unit: ReviewUnitListViewModel.ReviewUnit) {
-        let selection = Selection(
+        let selection = ReviewUnitSelection(
             unitId: unit.unitId,
             unit: unit.unit,
             chapter: chapter.chapter,
             initialQuestionIndex: chapter.initialQuestionIndex,
-                questions: chapter.questions
+            questions: chapter.questions
         )
         onSelect(selection)
     }
