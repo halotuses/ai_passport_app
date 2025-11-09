@@ -33,6 +33,14 @@ struct ChapterCardView<ViewModel: ChapterProgressDisplayable>: View {
                     .font(.system(size: 16, weight: .bold))
                     .foregroundColor(.themeTextPrimary)
                     .opacity(isDisabled ? 0.6 : 1.0)
+                if let pair = viewModel.wordPair, !pair.isEffectivelyEmpty {
+                    Text(pair.displayText)
+                        .font(.system(size: 13, weight: .medium))
+                        .foregroundColor(.themeTextSecondary)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.85)
+                        .opacity(isDisabled ? 0.6 : 1.0)
+                }
             }
 
             Spacer()

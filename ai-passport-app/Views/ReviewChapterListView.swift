@@ -26,7 +26,8 @@ struct ReviewChapterListView: View {
         let items = unit.chapters.map { chapter -> ReviewChapterItem in
             let progressViewModel = ReviewChapterProgressViewModel(
                 chapter: chapter.chapter,
-                questions: chapter.questions
+                questions: chapter.questions,
+                wordPair: chapter.chapter.wordPair
             )
             return ReviewChapterItem(chapter: chapter, progressViewModel: progressViewModel)
         }
@@ -149,6 +150,7 @@ private extension ReviewChapterListView {
 final class ReviewChapterProgressViewModel: ObservableObject, Identifiable, ChapterProgressDisplayable {
     let id: String
     let chapter: ChapterMetadata
+    let wordPair: ChapterMetadata.WordPair?
 
     @Published private(set) var correctCount: Int
     @Published private(set) var answeredCount: Int
@@ -157,10 +159,12 @@ final class ReviewChapterProgressViewModel: ObservableObject, Identifiable, Chap
 
     init(
         chapter: ChapterMetadata,
-        questions: [ReviewUnitListViewModel.ReviewChapter.ReviewQuestion]
+        questions: [ReviewUnitListViewModel.ReviewChapter.ReviewQuestion],
+        wordPair: ChapterMetadata.WordPair? = nil
     ) {
         self.id = chapter.id
         self.chapter = chapter
+        self.wordPair = wordPair ?? chapter.wordPair
 
         let correct = questions.filter { $0.progress.status == .correct }.count
         let answered = questions.filter { $0.progress.status.isAnswered }.count

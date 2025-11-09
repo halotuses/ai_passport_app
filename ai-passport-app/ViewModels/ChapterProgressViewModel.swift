@@ -3,6 +3,7 @@ import Foundation
 
 protocol ChapterProgressDisplayable: ObservableObject, Identifiable {
     var chapter: ChapterMetadata { get }
+    var wordPair: ChapterMetadata.WordPair? { get }
     var correctCount: Int { get }
     var answeredCount: Int { get }
     var totalQuestions: Int { get }
@@ -131,4 +132,6 @@ final class ChapterProgressViewModel: ObservableObject, Identifiable {
         progressToken?.invalidate()
     }
 }
-extension ChapterProgressViewModel: ChapterProgressDisplayable {}
+extension ChapterProgressViewModel: ChapterProgressDisplayable {
+    var wordPair: ChapterMetadata.WordPair? { chapter.wordPair }
+}
