@@ -3,7 +3,7 @@ import SwiftUI
 struct ReviewUnitListView: View {
 
     @StateObject private var viewModel: ReviewUnitListViewModel
-    private let onSelect: @Sendable (ReviewUnitSelection) -> Void
+    private let onSelectUnit: @Sendable (ReviewUnitListViewModel.ReviewUnit) -> Void
     private let onClose: () -> Void
     private let headerTitle: String
 
@@ -15,8 +15,8 @@ struct ReviewUnitListView: View {
         metadataProvider: @escaping () async -> QuizMetadataMap?,
         chapterListProvider: @escaping (String, String) async -> [ChapterMetadata]?,
         shouldInclude: @escaping (QuestionProgress) -> Bool = { _ in true },
-        headerTitle: String = "復習用章選択",
-        onSelect: @escaping @Sendable (ReviewUnitSelection) -> Void,
+        headerTitle: String = "復習用単元選択",
+        onSelectUnit: @escaping @Sendable (ReviewUnitListViewModel.ReviewUnit) -> Void,
         onClose: @escaping () -> Void
     ) {
         _viewModel = StateObject(
@@ -27,7 +27,7 @@ struct ReviewUnitListView: View {
                 shouldInclude: shouldInclude
             )
         )
-        self.onSelect = onSelect
+        self.onSelectUnit = onSelectUnit
         self.onClose = onClose
         self.headerTitle = headerTitle
     }
@@ -45,8 +45,10 @@ struct ReviewUnitListView: View {
                     } else if viewModel.units.isEmpty {
                         emptyState
                     } else {
-                        ForEach(viewModel.units) { unit in
-                            unitSection(unit)
+                        VStack(spacing: 16) {
+                            ForEach(viewModel.units) { unit in
+                                unitSection(unit)
+                            }
                         }
                     }
                 }
@@ -109,34 +111,33 @@ private extension ReviewUnitListView {
         )
     }
 
-    func unitSection(_ unit: ReviewUnitListViewModel.ReviewUnit) -> some View {
+    func unitSection(_ unit: ReviewUnitListViewModel.ReviewUnit) -> some View {        Button {
+        SoundManager.shared.play(.tap)
+        onSelectUnit(unit)
+    } label: {
         VStack(alignment: .leading, spacing: 16) {
             VStack(alignment: .leading, spacing: 4) {
                 Text("\(unit.unitId). \(unit.unit.title)")
                     .font(.headline)
                     .foregroundColor(.themeTextPrimary)
+                    .frame(maxWidth: .infinity, alignment: .leading)
                 if !unit.unit.subtitle.isEmpty {
                     Text(unit.unit.subtitle)
                         .font(.subheadline)
                         .foregroundColor(.themeTextSecondary)
+                        .frame(maxWidth: .infinity, alignment: .leading)
                 }
-                Text("復習対象 \(unit.reviewCount) 問")
-                    .font(.caption)
-                    .foregroundColor(.themeTextSecondary)
             }
 
-            VStack(spacing: 12) {
-                ForEach(unit.chapters) { chapter in
-                    Button {
-                        SoundManager.shared.play(.tap)
-                        handleSelection(chapter, in: unit)
-                    } label: {
-                        chapterRow(chapter)
-                    }
-                    .buttonStyle(.plain)
+            HStack(spacing: 12) {
+                labelCapsule(text: "復習対象 \(unit.reviewCount) 問", systemImage: "doc.text")
+                labelCapsule(text: "章 \(unit.chapterCount)", systemImage: "list.number")
+                Spacer(minLength: 0)
+                Image(systemName: "chevron.right")
+                    .font(.system(size: 16, weight: .semibold))
+                    .foregroundColor(.themeTextSecondary)
                 }
             }
-        }
         .padding(20)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(
@@ -147,81 +148,34 @@ private extension ReviewUnitListView {
                         startPoint: .topLeading,
                         endPoint: .bottomTrailing
                     )
-                )
+                    )
         )
         .overlay(
             RoundedRectangle(cornerRadius: 24, style: .continuous)
                 .stroke(Color.themeMain.opacity(0.12), lineWidth: 1)
         )
         .shadow(color: Color.themeShadowSoft, radius: 14, x: 0, y: 10)
-    }
-
-    func chapterRow(_ chapter: ReviewUnitListViewModel.ReviewChapter) -> some View {
-        HStack(spacing: 16) {
-            Image(systemName: "book.closed")
-                .font(.system(size: 20, weight: .semibold))
-                .foregroundStyle(
-                    LinearGradient(
-                        colors: [Color.themeMain, Color.themeSecondary],
-                        startPoint: .top,
-                        endPoint: .bottom
-                    )
-                )
-            VStack(alignment: .leading, spacing: 4) {
-                Text(chapter.chapter.title)
-                    .font(.system(size: 16, weight: .bold))
-                    .foregroundColor(.themeTextPrimary)
-                Text("復習対象 \(chapter.reviewCount) 問")
-                    .font(.system(size: 13))
-                    .foregroundColor(.themeTextSecondary)
-            }
-            Spacer()
-            countBubble(total: chapter.reviewCount)
         }
-        .padding(14)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background(
-            RoundedRectangle(cornerRadius: 18)
-                .fill(
-                    LinearGradient(
-                        colors: [Color.themeSurface, Color.themeSurfaceAlt.opacity(0.8)],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    )
-                )
-        )
-        .overlay(
-            RoundedRectangle(cornerRadius: 18)
-                .stroke(Color.themeMain.opacity(0.1), lineWidth: 1)
-        )
-        .shadow(color: Color.themeShadowSoft.opacity(0.8), radius: 10, x: 0, y: 6)
+    .buttonStyle(.plain)
     }
 
-    func countBubble(total: Int) -> some View {
-        ZStack {
-            Circle()
-                .fill(
-                    LinearGradient(
-                        colors: [Color.themeSecondary.opacity(0.3), Color.themeMain.opacity(0.3)],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    )
-                )
-                .frame(width: 44, height: 44)
-            Text("\(total)")
+    func labelCapsule(text: String, systemImage: String) -> some View {
+        HStack(spacing: 6) {
+            Image(systemName: systemImage)
                 .font(.system(size: 12, weight: .semibold))
-                .foregroundColor(.themeTextPrimary)
+            Text(text)
+                .font(.system(size: 12, weight: .semibold))
         }
-    }
-
-    func handleSelection(_ chapter: ReviewUnitListViewModel.ReviewChapter, in unit: ReviewUnitListViewModel.ReviewUnit) {
-        let selection = ReviewUnitSelection(
-            unitId: unit.unitId,
-            unit: unit.unit,
-            chapter: chapter.chapter,
-            initialQuestionIndex: chapter.initialQuestionIndex,
-            questions: chapter.questions
+        .foregroundColor(.themeTextSecondary)
+        .padding(.vertical, 6)
+        .padding(.horizontal, 12)
+        .background(
+            Capsule()
+                .fill(Color.themeSurface)
+                .overlay(
+                    Capsule()
+                        .stroke(Color.themeMain.opacity(0.1), lineWidth: 1)
+                )
         )
-        onSelect(selection)
     }
 }

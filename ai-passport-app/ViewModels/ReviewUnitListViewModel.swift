@@ -13,6 +13,10 @@ final class ReviewUnitListViewModel: ObservableObject {
             chapters.reduce(into: 0) { $0 += $1.reviewCount }
         }
         
+        var chapterCount: Int {
+            chapters.count
+        }
+        
         func hash(into hasher: inout Hasher) {
             hasher.combine(id)
         }
