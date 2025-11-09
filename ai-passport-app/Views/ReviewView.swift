@@ -292,31 +292,11 @@ private extension ReviewView {
     var summaryStatsRow: some View {
         let items = summaryItems
 
-        return ViewThatFits(in: .horizontal) {
-            HStack(spacing: 0) {
-                ForEach(Array(items.enumerated()), id: \.offset) { index, item in
-                    summaryStat(item)
-                        .frame(maxWidth: .infinity, alignment: .leading)
+        let columns = [GridItem(.adaptive(minimum: 160, maximum: 220), spacing: 16)]
 
-                    if index < items.count - 1 {
-                        Rectangle()
-                            .fill(Color.themeTextPrimary.opacity(0.08))
-                            .frame(width: 1)
-                            .padding(.vertical, 6)
-                    }
-                }
-            }
-
-            VStack(alignment: .leading, spacing: 18) {
-                ForEach(Array(items.enumerated()), id: \.element.id) { index, item in
-                    summaryStat(item)
-
-                    if index < items.count - 1 {
-                        Rectangle()
-                            .fill(Color.themeTextPrimary.opacity(0.08))
-                            .frame(height: 1)
-                    }
-                }
+        return LazyVGrid(columns: columns, alignment: .leading, spacing: 16) {
+            ForEach(items) { item in
+                summaryStat(item)
             }
         }
     }
@@ -330,31 +310,65 @@ private extension ReviewView {
     }
 
     private func summaryStat(_ item: ReviewSummaryItem) -> some View {
-        VStack(alignment: .leading, spacing: 10) {
-            HStack(alignment: .center, spacing: 10) {
-                Image(systemName: item.icon)
-                    .font(.headline.weight(.semibold))
-                    .foregroundColor(item.tint)
-                    .frame(width: 32, height: 32)
-                    .background(item.tint.opacity(0.18), in: Circle())
+        VStack(alignment: .leading, spacing: 14) {
+            HStack(spacing: 12) {
+                ZStack {
+                    Circle()
+                        .fill(
+                            LinearGradient(
+                                colors: [item.tint.opacity(0.26), item.tint.opacity(0.12)],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            )
+                        )
+                        .frame(width: 44, height: 44)
+                    Image(systemName: item.icon)
+                        .font(.headline.weight(.semibold))
+                        .foregroundColor(.white)
+                        .shadow(color: item.tint.opacity(0.4), radius: 4, x: 0, y: 3)
+                }
 
-                Text(item.title)
-                    .font(.footnote.weight(.medium))
-                    .foregroundColor(.themeTextSecondary)
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(item.title)
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundColor(.themeTextPrimary)
+
+                    Text("直近の復習状況")
+                        .font(.caption)
+                        .foregroundColor(.themeTextSecondary.opacity(0.9))
+                }
             }
-
-            VStack(alignment: .leading, spacing: 2) {
+            HStack(alignment: .firstTextBaseline, spacing: 8) {
                 Text("\(item.value)")
-                    .font(.title2.weight(.bold))
+                    .font(.system(size: 32, weight: .bold, design: .rounded))
                     .monospacedDigit()
                     .foregroundColor(.themeTextPrimary)
                 Text(item.unit)
-                    .font(.caption)
-                    .foregroundColor(.themeTextSecondary.opacity(0.8))
+                    .font(.callout.weight(.medium))
+                    .foregroundColor(item.tint)
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 4)
+                    .background(item.tint.opacity(0.14), in: Capsule())
             }
         }
-        .padding(.trailing, 12)
-        .padding(.vertical, 4)
+        .padding(.horizontal, 18)
+        .padding(.vertical, 20)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(
+            RoundedRectangle(cornerRadius: 24, style: .continuous)
+                .fill(
+                    LinearGradient(
+                        colors: [Color.white.opacity(0.95), item.tint.opacity(0.12)],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                )
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 24, style: .continuous)
+                .stroke(item.tint.opacity(0.18), lineWidth: 1)
+        )
+        .shadow(color: item.tint.opacity(0.15), radius: 16, x: 0, y: 10)
     }
 
     private struct ReviewSummaryItem: Identifiable, Equatable {
