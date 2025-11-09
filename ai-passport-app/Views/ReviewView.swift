@@ -173,33 +173,7 @@ private extension ReviewView {
                     }
                 }
             ),
-            destination: {
-                if let category = activeUnitSelectionCategory {
-                    ReviewUnitListView(
-                        progresses: progresses(for: category),
-                        metadataProvider: { await fetchMetadataIfNeeded() },
-                        chapterListProvider: { unitId, filePath in
-                            await fetchChaptersIfNeeded(for: unitId, filePath: filePath)
-                        },
-                        shouldInclude: { progress in
-                            shouldInclude(progress, for: category)
-                        },
-                        headerTitle: category.unitSelectionHeader,
-                        onSelect: { selection in
-                            activePlayCategory = category
-                            activePlaySelection = selection
-                            isShowingPlayView = true
-                        },
-                        onClose: {
-                            isShowingUnitSelection = false
-                            activeUnitSelectionCategory = nil
-                            mainViewState.setHeader(title: "復習", backButton: .toHome)
-                        }
-                    )
-                } else {
-                    EmptyView()
-                }
-            },
+            destination: { selectedUnitView },
             label: {
                 EmptyView()
             }
@@ -208,6 +182,35 @@ private extension ReviewView {
         .hidden()
     }
 
+    @ViewBuilder
+      var selectedUnitView: some View {
+          if let category = activeUnitSelectionCategory {
+              ReviewUnitListView(
+                  progresses: progresses(for: category),
+                  metadataProvider: { await fetchMetadataIfNeeded() },
+                  chapterListProvider: { unitId, filePath in
+                      await fetchChaptersIfNeeded(for: unitId, filePath: filePath)
+                  },
+                  shouldInclude: { progress in
+                      shouldInclude(progress, for: category)
+                  },
+                  headerTitle: category.unitSelectionHeader,
+                  onSelect: { selection in
+                      activePlayCategory = category
+                      activePlaySelection = selection
+                      isShowingPlayView = true
+                  },
+                  onClose: {
+                      isShowingUnitSelection = false
+                      activeUnitSelectionCategory = nil
+                      mainViewState.setHeader(title: "復習", backButton: .toHome)
+                  }
+              )
+          } else {
+              EmptyView()
+          }
+      }
+    
     @ViewBuilder
     var playNavigationLink: some View {
         NavigationLink(
