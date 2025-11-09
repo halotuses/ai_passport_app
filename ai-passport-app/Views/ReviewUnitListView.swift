@@ -1,13 +1,5 @@
 import SwiftUI
 
-struct ReviewUnitSelection: Sendable {
-    let unitId: String
-    let unit: QuizMetadata
-    let chapter: ChapterMetadata
-    let initialQuestionIndex: Int
-    let questions: [ReviewUnitListViewModel.ReviewChapter.ReviewQuestion]
-}
-
 struct ReviewUnitListView: View {
 
     @StateObject private var viewModel: ReviewUnitListViewModel

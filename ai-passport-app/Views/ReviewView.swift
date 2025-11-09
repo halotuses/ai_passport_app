@@ -30,7 +30,7 @@ struct ReviewView: View {
     @State private var activeUnitSelectionCategory: ReviewCategory? = nil
     @State private var isShowingUnitSelection = false
     @State private var activePlayCategory: ReviewCategory? = nil
-    @State private var activePlaySelection: ReviewUnitListView.Selection? = nil
+    @State private var activePlaySelection: ReviewUnitSelection? = nil
     @State private var isShowingPlayView = false
     
     var body: some View {
