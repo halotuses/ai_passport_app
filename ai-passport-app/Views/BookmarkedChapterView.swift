@@ -44,6 +44,13 @@ private extension BookmarkedChapterView {
     }
     @ViewBuilder
     func chapterDestination(for chapter: BookmarkUnitView.ChapterEntry) -> some View {
+        BookmarkPlayView(
+            unit: unit,
+            chapter: chapter,
+            onClose: {
+                setHeader()
+            }
+        )
     }
 
     func chapterRow(_ chapter: BookmarkUnitView.ChapterEntry) -> some View {

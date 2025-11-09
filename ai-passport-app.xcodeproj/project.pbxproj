@@ -57,6 +57,7 @@
 		0C395FB32EC07393007AF119 /* ReviewUnitSelection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C395FB22EC0738A007AF119 /* ReviewUnitSelection.swift */; };
 		0C395FB42EC0854E007AF119 /* ReviewUnitListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CC249AE2EBA3F730054EE3F /* ReviewUnitListView.swift */; };
 		0C395FB62EC08A01007AF119 /* ReviewChapterListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C395FB52EC089E2007AF119 /* ReviewChapterListView.swift */; };
+		0C395FB72EC08B0E007AF119 /* BookmarkPlayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C395FA62EBF9FDE007AF119 /* BookmarkPlayView.swift */; };
 		0C87869E2EA6725F0052D2A8 /* QuestionProgressObject.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C87869D2EA6725F0052D2A8 /* QuestionProgressObject.swift */; };
 		0C8786A12EA672D90052D2A8 /* RealmAnswerHistoryRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C8786A02EA672D90052D2A8 /* RealmAnswerHistoryRepository.swift */; };
 		0CC249AB2EBA3F3D0054EE3F /* ReviewUnitListViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CC249AA2EBA3F3B0054EE3F /* ReviewUnitListViewModel.swift */; };
@@ -822,6 +823,7 @@
 				0CE6D5BD2EB25B3200D38241 /* ReviewView.swift in Sources */,
 				0C30DDE32DFF1AAA00F25D02 /* ResultView.swift in Sources */,
 				0CF00B642EA91BF300B8A6D0 /* QuestionProgress.swift in Sources */,
+				0C395FB72EC08B0E007AF119 /* BookmarkPlayView.swift in Sources */,
 				0C8786A12EA672D90052D2A8 /* RealmAnswerHistoryRepository.swift in Sources */,
 				0C395FA32EBF9FAB007AF119 /* BookmarkPlayViewModel.swift in Sources */,
 				0CE6D5B92EB0DDD200D38241 /* BookmarkObject.swift in Sources */,

@@ -6,7 +6,11 @@ struct MainRouterView: View {
     @EnvironmentObject private var router: NavigationRouter
     @EnvironmentObject private var mainViewState: MainViewState
     @EnvironmentObject private var progressManager: ProgressManager
-    @StateObject private var unitListVM = UnitListViewModel()
+    @StateObject private var unitListVM: UnitListViewModel
+
+    init() {
+        _unitListVM = StateObject(wrappedValue: UnitListViewModel())
+    }
 
     
     var body: some View {
