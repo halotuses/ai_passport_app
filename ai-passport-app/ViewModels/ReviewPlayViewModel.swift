@@ -119,6 +119,7 @@ final class ReviewPlayViewModel: ObservableObject {
         NetworkManager.fetchQuizList(from: url) { [weak self] response in
             guard let self else { return }
             let result = self.makeQuizzes(from: response)
+            self.orderedQuestions = result.questions
             self.quizzes = result.quizzes
             self.questionIndexMap = result.indexMap
             self.isLoading = false
@@ -133,9 +134,14 @@ final class ReviewPlayViewModel: ObservableObject {
         }
     }
 
-    private func makeQuizzes(from response: QuizList?) -> (quizzes: [Quiz], indexMap: [String: Int]) {
+    private func makeQuizzes(from response: QuizList?) -> (
+        quizzes: [Quiz],
+        questions: [ReviewUnitListViewModel.ReviewChapter.ReviewQuestion],
+        indexMap: [String: Int]
+    ) {
         let fetchedQuizzes = response?.questions ?? []
         var quizzes: [Quiz] = []
+        var retainedQuestions: [ReviewUnitListViewModel.ReviewChapter.ReviewQuestion] = []
         var indexMap: [String: Int] = [:]
 
         for entry in orderedQuestions {
@@ -149,10 +155,11 @@ final class ReviewPlayViewModel: ObservableObject {
             if let quiz {
                 indexMap[entry.quizId] = quizzes.count
                 quizzes.append(quiz)
+                retainedQuestions.append(entry)
             }
         }
 
-        return (quizzes, indexMap)
+        return (quizzes, retainedQuestions, indexMap)
     }
 
     private func fallbackQuiz(from entry: ReviewUnitListViewModel.ReviewChapter.ReviewQuestion) -> Quiz? {
@@ -185,8 +192,9 @@ final class ReviewPlayViewModel: ObservableObject {
     }
 
     private func rebuildQuestionIndexMap() {
-        questionIndexMap = Dictionary(uniqueKeysWithValues: orderedQuestions.enumerated().map { index, question in
-            (question.quizId, index)
+        questionIndexMap = Dictionary(uniqueKeysWithValues: orderedQuestions.enumerated().compactMap { index, question in
+             guard quizzes.indices.contains(index) else { return nil }
+             return (question.quizId, index)
         })
     }
 
