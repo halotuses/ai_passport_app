@@ -2,7 +2,9 @@ import SwiftUI
 
 struct ReviewQuestionListView: View {
     let unit: ReviewUnitListViewModel.ReviewUnit
-    let onSelect: (ReviewUnitListViewModel.ReviewChapter) -> Void
+    let chapter: ReviewUnitListViewModel.ReviewChapter
+    let headerTitle: String
+    let onSelect: (ReviewUnitSelection) -> Void
     let onClose: () -> Void
 
     @EnvironmentObject private var mainViewState: MainViewState
@@ -10,90 +12,123 @@ struct ReviewQuestionListView: View {
 
     var body: some View {
         ScrollView {
-            VStack(spacing: 8) {
-                ForEach(unit.chapters) { chapter in
-                    Button {
-                        SoundManager.shared.play(.tap)
-                        onSelect(chapter)
-                    } label: {
-                        chapterRow(chapter)
+            LazyVStack(spacing: 16) {
+                if chapter.questions.isEmpty {
+                    emptyState
+                } else {
+                    ForEach(chapter.questions) { question in
+                        Button {
+                            SoundManager.shared.play(.tap)
+                            let selection = ReviewUnitSelection(
+                                unitId: unit.unitId,
+                                unit: unit.unit,
+                                chapter: chapter.chapter,
+                                initialQuestionIndex: question.questionIndex,
+                                questions: chapter.questions
+                            )
+                            onSelect(selection)
+                        } label: {
+                            questionRow(question)
+                        }
+                        .buttonStyle(.plain)
                     }
-                    .buttonStyle(.plain)
                 }
             }
-            .padding()
+            .padding(.vertical, 24)
+            .padding(.horizontal, 20)
         }
-        .background(Color.themeBase)
-        .onAppear {
-            let backButton = MainViewState.HeaderBackButton(
-                title: "戻る",
-                destination: .custom,
-                action: {
-                    dismiss()
-                    onClose()
-                }
-            )
-            mainViewState.setHeader(title: unit.unit.title, backButton: backButton)
-        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(
+            Color.themeBase
+                .ignoresSafeArea()
+        )
+        .navigationBarBackButtonHidden(true)
+        .onAppear(perform: configureHeader)
     }
 }
 
 private extension ReviewQuestionListView {
-    func chapterRow(_ chapter: ReviewUnitListViewModel.ReviewChapter) -> some View {
-        HStack(spacing: 16) {
-            Image(systemName: "book.closed")
-                .font(.system(size: 20, weight: .semibold))
-                .foregroundStyle(
-                    LinearGradient(
-                        colors: [Color.themeMain, Color.themeSecondary],
-                        startPoint: .top,
-                        endPoint: .bottom
-                    )
-                )
-            VStack(alignment: .leading, spacing: 4) {
-                Text(chapter.chapter.title)
-                    .font(.system(size: 16, weight: .bold))
-                    .foregroundColor(.themeTextPrimary)
-                Text("復習対象 \(chapter.reviewCount) 問")
-                    .font(.system(size: 13))
-                    .foregroundColor(.themeTextSecondary)
-            }
-            Spacer()
-            countBubble(total: chapter.reviewCount)
+    func configureHeader() {
+        let backButton = MainViewState.HeaderBackButton(
+            title: "戻る",
+            destination: .custom
+        ) {
+            dismiss()
+            onClose()
         }
-        .padding(14)
-        .background(
-            RoundedRectangle(cornerRadius: 18)
-                .fill(
-                    LinearGradient(
-                        colors: [Color.themeSurfaceElevated, Color.themeSurfaceAlt],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    )
-                )
-        )
-        .cornerRadius(18)
-        .overlay(
-            RoundedRectangle(cornerRadius: 18)
-                .stroke(Color.themeMain.opacity(0.12), lineWidth: 1)
-        )
-        .shadow(color: Color.themeShadowSoft, radius: 12, x: 0, y: 6)
+        let title = "\(headerTitle)（\(unit.unit.title)・\(chapter.chapter.title)）"
+        mainViewState.setHeader(title: title, backButton: backButton)
     }
 
-    func countBubble(total: Int) -> some View {
-        ZStack {
-            Circle()
-                .fill(
-                    LinearGradient(
-                        colors: [Color.themeSecondary.opacity(0.3), Color.themeMain.opacity(0.3)],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    )
-                )
-                .frame(width: 44, height: 44)
-            Text("\(total)")
-                .font(.system(size: 12, weight: .semibold))
+    var emptyState: some View {
+        VStack(spacing: 12) {
+            Image(systemName: "questionmark.circle")
+                .font(.largeTitle)
+                .foregroundColor(.themeTextSecondary)
+            Text("復習できる問題が見つかりませんでした。")
+                .font(.subheadline)
+                .foregroundColor(.themeTextSecondary)
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 32)
+    }
+
+    func questionRow(_ question: ReviewUnitListViewModel.ReviewChapter.ReviewQuestion) -> some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack(alignment: .center, spacing: 8) {
+                Text("第\(question.questionIndex + 1)問")
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundColor(.themeTextSecondary)
+                statusBadge(for: question.progress.status)
+                Spacer()
+                Image(systemName: "chevron.right")
+                    .font(.headline.weight(.semibold))
+                    .foregroundColor(.themeTextSecondary)
+            }
+
+            Text(question.progress.questionText ?? "問題文を表示できませんでした。")
+                .font(.headline)
                 .foregroundColor(.themeTextPrimary)
+                .multilineTextAlignment(.leading)
+
+            if question.progress.status.isAnswered,
+               let selected = question.progress.selectedChoiceText {
+                Text("前回の回答: \(selected)")
+                    .font(.footnote)
+                    .foregroundColor(.themeTextSecondary)
+            }
+        }
+        .padding(20)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(
+            RoundedRectangle(cornerRadius: 20, style: .continuous)
+                .fill(Color.themeSurface)
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 20, style: .continuous)
+                .stroke(Color.black.opacity(0.05), lineWidth: 0.5)
+        )
+        .shadow(color: Color.themeShadowSoft, radius: 12, x: 0, y: 8)
+    }
+
+    func statusBadge(for status: QuestionStatus) -> some View {
+        let descriptor = statusDescriptor(for: status)
+        return Text(descriptor.title)
+            .font(.caption.weight(.semibold))
+            .foregroundColor(descriptor.tint)
+            .padding(.horizontal, 10)
+            .padding(.vertical, 4)
+            .background(descriptor.tint.opacity(0.15), in: Capsule())
+    }
+
+    func statusDescriptor(for status: QuestionStatus) -> (title: String, tint: Color) {
+        switch status {
+        case .correct:
+            return ("正解", .themeCorrect)
+        case .incorrect:
+            return ("不正解", .themeIncorrect)
+        case .unanswered:
+            return ("未解答", .themeTextSecondary)
         }
     }
 }

@@ -10,6 +10,8 @@ struct ReviewChapterListView: View {
     @EnvironmentObject private var mainViewState: MainViewState
     @Environment(\.dismiss) private var dismiss
     @State private var chapterItems: [ReviewChapterItem]
+    @State private var activeChapter: ReviewUnitListViewModel.ReviewChapter? = nil
+    @State private var isShowingQuestionList = false
 
     init(
         unit: ReviewUnitListViewModel.ReviewUnit,
@@ -40,7 +42,8 @@ struct ReviewChapterListView: View {
                     ForEach(chapterItems) { item in
                         Button {
                             SoundManager.shared.play(.tap)
-                            handleSelection(item.chapter)
+                            activeChapter = item.chapter
+                            isShowingQuestionList = true
                         } label: {
                             ChapterCardView(viewModel: item.progressViewModel)
                         }
@@ -53,6 +56,7 @@ struct ReviewChapterListView: View {
         .background(Color.themeBase)
         .navigationBarBackButtonHidden(true)
         .onAppear(perform: configureHeader)
+        .background(questionSelectionNavigationLink)
     }
 }
 
@@ -82,15 +86,49 @@ private extension ReviewChapterListView {
         .padding(.vertical, 32)
     }
 
-    func handleSelection(_ chapter: ReviewUnitListViewModel.ReviewChapter) {
-        let selection = ReviewUnitSelection(
-            unitId: unit.unitId,
-            unit: unit.unit,
-            chapter: chapter.chapter,
-            initialQuestionIndex: chapter.initialQuestionIndex,
-            questions: chapter.questions
+    @ViewBuilder
+    var questionSelectionNavigationLink: some View {
+        NavigationLink(
+            isActive: Binding(
+                get: { isShowingQuestionList },
+                set: { newValue in
+                    if !newValue {
+                        isShowingQuestionList = false
+                        activeChapter = nil
+                        configureHeader()
+                    } else {
+                        isShowingQuestionList = true
+                    }
+                }
+            ),
+            destination: { questionSelectionView },
+            label: {
+                EmptyView()
+            }
         )
-        onSelect(selection)
+        .hidden()
+    }
+
+    @ViewBuilder
+    var questionSelectionView: some View {
+        if let chapter = activeChapter {
+            ReviewQuestionListView(
+                unit: unit,
+                chapter: chapter,
+                headerTitle: headerTitle,
+                onSelect: { selection in
+                    isShowingQuestionList = false
+                    DispatchQueue.main.async {
+                        onSelect(selection)
+                    }
+                },
+                onClose: {
+                    isShowingQuestionList = false
+                }
+            )
+        } else {
+            EmptyView()
+        }
     }
 }
 private extension ReviewChapterListView {
