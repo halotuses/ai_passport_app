@@ -359,9 +359,10 @@ private struct BookmarkExplanationView: View {
         ),
         chapter: BookmarkUnitView.ChapterEntry(
             id: "chapter1",
-            chapter: ChapterMetadata(id: "chapter1", title: "章1", file: "", description: "", sections: []),
+            chapter: ChapterMetadata(id: "chapter1", title: "章1", file: ""),
             questions: []
         ),
+        initialQuestionId: nil,
         onClose: {}
     )
     .environmentObject(MainViewState())
