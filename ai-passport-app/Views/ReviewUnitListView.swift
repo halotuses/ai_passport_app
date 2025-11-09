@@ -8,6 +8,7 @@ struct ReviewUnitListView: View {
     private let headerTitle: String
 
     @EnvironmentObject private var mainViewState: MainViewState
+    @Environment(\.dismiss) private var dismiss
 
     init(
         progresses: [QuestionProgress],
@@ -31,51 +32,43 @@ struct ReviewUnitListView: View {
         self.headerTitle = headerTitle
     }
 
-    var body: some View {
-        ScrollView {
+    ScrollView(showsIndicators: false) {
+        VStack(spacing: 24) {
             VStack(spacing: 8) {
                 if viewModel.isLoading {
-                    ProgressView().padding()
+                    ProgressView("読み込み中…")
+                        .frame(maxWidth: .infinity, alignment: .center)
+                        .padding(.vertical, 40)
                 } else if viewModel.hasError {
                     errorState
                 } else if viewModel.units.isEmpty {
                     emptyState
                 } else {
                     ForEach(viewModel.units) { unit in
-                        NavigationLink {
-                            ReviewQuestionListView(
-                                unit: unit,
-                                onSelect: { chapter in
-                                    handleSelection(chapter, in: unit)
-                                },
-                                onClose: handleBackToList
-                            )
-                        } label: {
-                            unitRow(unit)
-                        }
-                        .buttonStyle(.plain)
-                        .simultaneousGesture(TapGesture().onEnded {
-                            SoundManager.shared.play(.tap)
-                        })
+                        unitSection(unit)
                     }
                 }
             }
-            .padding()
+            .padding(.horizontal, 20)
+            .padding(.vertical, 24)
         }
         .background(Color.themeBase)
         .task { await viewModel.loadIfNeeded() }
-        .onAppear {
-            let backButton = MainViewState.HeaderBackButton(
-                title: "戻る",
-                destination: .custom,
-                action: onClose
-            )
-            mainViewState.setHeader(title: headerTitle, backButton: backButton)
-        }
+        .onAppear(perform: configureHeader)
     }
 }
 
 private extension ReviewUnitListView {
+    func configureHeader() {
+        let backButton = MainViewState.HeaderBackButton(
+            title: "戻る",
+            destination: .custom
+        ) {
+            dismiss()
+            onClose()
+        }
+        mainViewState.setHeader(title: headerTitle, backButton: backButton)
+    }
     var emptyState: some View {
         VStack(spacing: 12) {
             Image(systemName: "checklist")
@@ -87,6 +80,8 @@ private extension ReviewUnitListView {
         }
         .frame(maxWidth: .infinity)
         .padding(.vertical, 32)
+        .background(stateBackground)
+        .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
     }
 
     var errorState: some View {
@@ -100,34 +95,50 @@ private extension ReviewUnitListView {
         }
         .frame(maxWidth: .infinity)
         .padding(.vertical, 32)
+        .background(stateBackground)
+        .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
     }
 
-    func unitRow(_ unit: ReviewUnitListViewModel.ReviewUnit) -> some View {
-        HStack(spacing: 16) {
-            Image(systemName: "chevron.right")
-                .font(.system(size: 16, weight: .semibold))
-                .foregroundStyle(
-                    LinearGradient(
-                        colors: [Color.themeMain, Color.themeSecondary],
-                        startPoint: .top,
-                        endPoint: .bottom
-                    )
-                )
+    var stateBackground: some ShapeStyle {
+        LinearGradient(
+            colors: [Color.themeSurfaceElevated, Color.themeSurfaceAlt],
+            startPoint: .topLeading,
+            endPoint: .bottomTrailing
+        )
+    }
+
+    func unitSection(_ unit: ReviewUnitListViewModel.ReviewUnit) -> some View {
+        VStack(alignment: .leading, spacing: 16) {
             VStack(alignment: .leading, spacing: 4) {
                 Text("\(unit.unitId). \(unit.unit.title)")
-                    .font(.system(size: 16, weight: .bold))
+                    .font(.headline)
                     .foregroundColor(.themeTextPrimary)
-                Text(unit.unit.subtitle)
-                    .font(.system(size: 13))
-                    .italic()
+                if !unit.unit.subtitle.isEmpty {
+                    Text(unit.unit.subtitle)
+                        .font(.subheadline)
+                        .foregroundColor(.themeTextSecondary)
+                }
+                Text("復習対象 \(unit.reviewCount) 問")
+                    .font(.caption)
                     .foregroundColor(.themeTextSecondary)
             }
-            Spacer()
-            countBubble(total: unit.reviewCount)
+
+            VStack(spacing: 12) {
+                ForEach(unit.chapters) { chapter in
+                    Button {
+                        SoundManager.shared.play(.tap)
+                        handleSelection(chapter, in: unit)
+                    } label: {
+                        chapterRow(chapter)
+                    }
+                    .buttonStyle(.plain)
+                }
+            }
         }
-        .padding(14)
+        .padding(20)
+        .frame(maxWidth: .infinity, alignment: .leading)
         .background(
-            RoundedRectangle(cornerRadius: 18)
+            RoundedRectangle(cornerRadius: 24, style: .continuous)
                 .fill(
                     LinearGradient(
                         colors: [Color.themeSurfaceElevated, Color.themeSurfaceAlt],
@@ -136,12 +147,52 @@ private extension ReviewUnitListView {
                     )
                 )
         )
-        .cornerRadius(18)
         .overlay(
-            RoundedRectangle(cornerRadius: 18)
+            RoundedRectangle(cornerRadius: 24, style: .continuous)
                 .stroke(Color.themeMain.opacity(0.12), lineWidth: 1)
         )
-        .shadow(color: Color.themeShadowSoft, radius: 12, x: 0, y: 6)
+        .shadow(color: Color.themeShadowSoft, radius: 14, x: 0, y: 10)
+    }
+
+    func chapterRow(_ chapter: ReviewUnitListViewModel.ReviewChapter) -> some View {
+        HStack(spacing: 16) {
+            Image(systemName: "book.closed")
+                .font(.system(size: 20, weight: .semibold))
+                .foregroundStyle(
+                    LinearGradient(
+                        colors: [Color.themeMain, Color.themeSecondary],
+                        startPoint: .top,
+                        endPoint: .bottom
+                    )
+                )
+            VStack(alignment: .leading, spacing: 4) {
+                Text(chapter.chapter.title)
+                    .font(.system(size: 16, weight: .bold))
+                    .foregroundColor(.themeTextPrimary)
+                Text("復習対象 \(chapter.reviewCount) 問")
+                    .font(.system(size: 13))
+                    .foregroundColor(.themeTextSecondary)
+            }
+            Spacer()
+            countBubble(total: chapter.reviewCount)
+        }
+        .padding(14)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(
+            RoundedRectangle(cornerRadius: 18)
+                .fill(
+                    LinearGradient(
+                        colors: [Color.themeSurface, Color.themeSurfaceAlt.opacity(0.8)],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                )
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 18)
+                .stroke(Color.themeMain.opacity(0.1), lineWidth: 1)
+        )
+        .shadow(color: Color.themeShadowSoft.opacity(0.8), radius: 10, x: 0, y: 6)
     }
 
     func countBubble(total: Int) -> some View {
@@ -170,14 +221,5 @@ private extension ReviewUnitListView {
             questions: chapter.questions
         )
         onSelect(selection)
-    }
-
-    func handleBackToList() {
-        let backButton = MainViewState.HeaderBackButton(
-            title: "戻る",
-            destination: .custom,
-            action: onClose
-        )
-        mainViewState.setHeader(title: headerTitle, backButton: backButton)
     }
 }
