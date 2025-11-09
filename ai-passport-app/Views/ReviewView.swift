@@ -310,43 +310,53 @@ private extension ReviewView {
     }
 
     private func summaryStat(_ item: ReviewSummaryItem) -> some View {
-        HStack(spacing: 16) {
-            ZStack {
-                Circle()
-                    .fill(
-                        LinearGradient(
-                            colors: [item.tint.opacity(0.26), item.tint.opacity(0.12)],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
+        VStack(alignment: .leading, spacing: 16) {
+            HStack(alignment: .center, spacing: 14) {
+                ZStack {
+                    Circle()
+                        .fill(
+                            LinearGradient(
+                                colors: [item.tint.opacity(0.26), item.tint.opacity(0.12)],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            )
                         )
-                    )
-                    .frame(width: 44, height: 44)
-                Image(systemName: item.icon)
-                    .font(.headline.weight(.semibold))
-                    .foregroundColor(.white)
-                    .shadow(color: item.tint.opacity(0.4), radius: 4, x: 0, y: 3)
-            }
+                        .frame(width: 44, height: 44)
+                    Image(systemName: item.icon)
+                        .font(.headline.weight(.semibold))
+                        .foregroundColor(.white)
+                        .shadow(color: item.tint.opacity(0.4), radius: 4, x: 0, y: 3)
+                }
 
-            Text(item.title)
-                .font(.subheadline.weight(.semibold))
-                .foregroundColor(.themeTextPrimary)
-                .lineLimit(1)
-
-            Spacer(minLength: 12)
-
-
-            HStack(alignment: .firstTextBaseline, spacing: 8) {
-                Text("\(item.value)")
-                    .font(.system(size: 28, weight: .bold, design: .rounded))
-                    .monospacedDigit()
+                Text(item.title)
+                    .font(.subheadline.weight(.semibold))
                     .foregroundColor(.themeTextPrimary)
-                Text(item.unit)
-                    .font(.callout.weight(.medium))
-                    .foregroundColor(item.tint)
-                    .padding(.horizontal, 10)
-                    .padding(.vertical, 4)
-                    .background(item.tint.opacity(0.14), in: Capsule())
+                    .lineLimit(2)
+                    .fixedSize(horizontal: false, vertical: true)
+
+
+                HStack(alignment: .firstTextBaseline, spacing: 8) {
+                    Text("\(item.value)")
+                        .font(.system(size: 28, weight: .bold, design: .rounded))
+                        .monospacedDigit()
+                        .foregroundColor(.themeTextPrimary)
+                    Text(item.unit)
+                        .font(.callout.weight(.medium))
+                        .foregroundColor(item.tint)
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 4)
+                        .background(item.tint.opacity(0.14), in: Capsule())
+                }
             }
+            .frame(maxWidth: .infinity, alignment: .leading)
+
+            Divider()
+                .background(item.tint.opacity(0.1))
+
+            Text(summaryDescription(for: item))
+                .font(.footnote)
+                .foregroundColor(.themeTextSecondary)
+                .frame(maxWidth: .infinity, alignment: .leading)
         }
         .padding(.horizontal, 18)
         .padding(.vertical, 18)
@@ -368,6 +378,19 @@ private extension ReviewView {
         .shadow(color: item.tint.opacity(0.15), radius: 16, x: 0, y: 10)
     }
 
+    private func summaryDescription(for item: ReviewSummaryItem) -> String {
+        switch item.title {
+        case "ブックマーク":
+            return "後で振り返りたい問題の保存数です。"
+        case "正解":
+            return "これまでに正解した問題の合計です。"
+        case "不正解":
+            return "復習したい不正解の問題数です。"
+        default:
+            return ""
+        }
+    }
+    
     private struct ReviewSummaryItem: Identifiable, Equatable {
         let id: String
         let title: String
