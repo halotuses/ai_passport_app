@@ -176,10 +176,7 @@ private extension ReviewView {
                 onSelect: { selection in
                     activePlayCategory = category
                     activePlaySelection = selection
-                    isShowingUnitSelection = false
-                    DispatchQueue.main.async {
-                        isShowingPlayView = true
-                    }
+                    isShowingPlayView = true
                 },
                 onClose: {
                     isShowingUnitSelection = false
