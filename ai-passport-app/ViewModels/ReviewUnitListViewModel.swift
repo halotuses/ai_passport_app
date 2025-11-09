@@ -82,6 +82,7 @@ final class ReviewUnitListViewModel: ObservableObject {
         let reviewCount: Int
         let initialQuestionIndex: Int
         let questions: [ReviewQuestion]
+        let sortOrder: Int
         var hasReviewTargets: Bool { reviewCount > 0 }
         
         func hash(into hasher: inout Hasher) {
