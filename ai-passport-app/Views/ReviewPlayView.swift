@@ -51,6 +51,7 @@ struct ReviewPlayView: View {
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .navigationBarBackButtonHidden(true)
         .background(Color.themeBase)
         .onAppear(perform: handleOnAppear)
         .onChange(of: viewModel.currentQuestionIndex) { _ in updateHeader() }

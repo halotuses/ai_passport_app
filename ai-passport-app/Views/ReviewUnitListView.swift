@@ -56,6 +56,7 @@ struct ReviewUnitListView: View {
             .padding(.vertical, 24)
         }
         .background(Color.themeBase)
+        .navigationBarBackButtonHidden(true)
         .task { await viewModel.loadIfNeeded() }
         .onAppear(perform: configureHeader)
         .background(navigationLinks)

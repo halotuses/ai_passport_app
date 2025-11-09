@@ -43,6 +43,7 @@ struct ReviewChapterListView: View {
             .padding(.vertical, 24)
         }
         .background(Color.themeBase)
+        .navigationBarBackButtonHidden(true)
         .onAppear(perform: configureHeader)
     }
 }
