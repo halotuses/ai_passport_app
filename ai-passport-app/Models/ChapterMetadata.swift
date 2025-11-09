@@ -72,8 +72,9 @@ struct ChapterMetadata: Codable, Identifiable, Hashable {
             keys: [CodingKeys]
         ) -> String? {
             for key in keys {
-                if let value = try? container.decodeIfPresent(String.self, forKey: key) {
-                    if let value { return value }
+                if let value = try? container.decodeIfPresent(String.self, forKey: key),
+                   let unwrappedValue = value {
+                    return unwrappedValue
                 }
             }
             return nil
@@ -136,9 +137,8 @@ struct ChapterMetadata: Codable, Identifiable, Hashable {
          title = try container.decode(String.self, forKey: .title)
          file = try container.decode(String.self, forKey: .file)
 
-         if let pair = try? container.decodeIfPresent(WordPair.self, forKey: .wordPair),
-            let resolvedPair = pair,
-            !resolvedPair.isEffectivelyEmpty {
+         let decodedPair = try container.decodeIfPresent(WordPair.self, forKey: .wordPair)
+         if let resolvedPair = decodedPair, !resolvedPair.isEffectivelyEmpty {
              wordPair = resolvedPair
          } else {
              wordPair = nil
