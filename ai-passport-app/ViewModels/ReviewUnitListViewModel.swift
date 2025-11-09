@@ -17,6 +17,41 @@ final class ReviewUnitListViewModel: ObservableObject {
             chapters.count
         }
         
+        var statistics: ReviewStatistics {
+            var correct = 0
+            var answered = 0
+
+            for chapter in chapters {
+                for question in chapter.questions {
+                    if question.progress.status == .correct {
+                        correct += 1
+                    }
+                    if question.progress.status.isAnswered {
+                        answered += 1
+                    }
+                }
+            }
+
+            return ReviewStatistics(
+                correctCount: correct,
+                answeredCount: answered,
+                totalCount: reviewCount
+            )
+        }
+
+        var hasReviewTargets: Bool { reviewCount > 0 }
+
+        struct ReviewStatistics {
+            let correctCount: Int
+            let answeredCount: Int
+            let totalCount: Int
+
+            var accuracy: Double {
+                guard answeredCount > 0 else { return 0 }
+                return min(max(Double(correctCount) / Double(answeredCount), 0), 1)
+            }
+        }
+        
         func hash(into hasher: inout Hasher) {
             hasher.combine(id)
         }
@@ -90,13 +125,6 @@ final class ReviewUnitListViewModel: ObservableObject {
         hasError = false
         
         let aggregated = aggregateProgresses()
-        guard !aggregated.isEmpty else {
-            units = []
-            isLoading = false
-            hasLoaded = true
-            return
-        }
-        
         guard let metadataMap = await metadataProvider() else {
             hasError = true
             isLoading = false
@@ -106,57 +134,70 @@ final class ReviewUnitListViewModel: ObservableObject {
         var builtUnits: [ReviewUnit] = []
         var encounteredError = false
         
-        for (unitId, chapterInfo) in aggregated {
-            guard let unitMetadata = metadataMap[unitId] else {
-                encounteredError = true
-                continue
-            }
-            
-            guard let chapters = await chapterListProvider(unitId, unitMetadata.file) else {
-                encounteredError = true
-                continue
-            }
-            
-            let chapterMap = Dictionary(uniqueKeysWithValues: chapters.map { ($0.id, $0) })
+        let metadataUnitIds = metadataMap.keys.sorted { $0.localizedCompare($1) == .orderedAscending }
+
+        let aggregatedUnitIds = Set(aggregated.keys)
+        let missingUnitIds = aggregatedUnitIds.subtracting(metadataMap.keys)
+        if !missingUnitIds.isEmpty {
+            encounteredError = true
+        }
+
+        for unitId in metadataUnitIds {
+            guard let unitMetadata = metadataMap[unitId] else { continue }
+
+            let chapterInfo = aggregated[unitId] ?? [:]
             var entries: [ReviewChapter] = []
             
-            for (chapterId, summary) in chapterInfo {
-                guard let metadata = chapterMap[chapterId] else {
+            if !chapterInfo.isEmpty {
+                guard let chapters = await chapterListProvider(unitId, unitMetadata.file) else {
                     encounteredError = true
                     continue
                 }
                 
-                let questions = summary.entries
-                    .map { entry -> ReviewChapter.ReviewQuestion in
-                        ReviewChapter.ReviewQuestion(
-                            id: entry.progress.quizId,
-                            quizId: entry.progress.quizId,
-                            questionIndex: entry.questionIndex,
-                            progress: entry.progress,
-                            updatedAt: entry.progress.updatedAt
-                        )
+                let chapterMap = Dictionary(uniqueKeysWithValues: chapters.map { ($0.id, $0) })
+
+                for (chapterId, summary) in chapterInfo {
+                    guard let metadata = chapterMap[chapterId] else {
+                        encounteredError = true
+                        continue
                     }
-                    .sorted { lhs, rhs in
-                        if lhs.questionIndex == rhs.questionIndex {
-                            return lhs.quizId.localizedCompare(rhs.quizId) == .orderedAscending
+                    let questions = summary.entries
+                        .map { entry -> ReviewChapter.ReviewQuestion in
+                            ReviewChapter.ReviewQuestion(
+                                id: entry.progress.quizId,
+                                quizId: entry.progress.quizId,
+                                questionIndex: entry.questionIndex,
+                                progress: entry.progress,
+                                updatedAt: entry.progress.updatedAt
+                            )
                         }
-                        return lhs.questionIndex < rhs.questionIndex
-                    }
-                guard !questions.isEmpty else { continue }
-                
-                let entry = ReviewChapter(
-                    id: chapterId,
-                    chapter: metadata,
-                    reviewCount: questions.count,
-                    initialQuestionIndex: questions.first?.questionIndex ?? 0,
-                    questions: questions
-                )
-                entries.append(entry)
+                        .sorted { lhs, rhs in
+                            if lhs.questionIndex == rhs.questionIndex {
+                                return lhs.quizId.localizedCompare(rhs.quizId) == .orderedAscending
+                            }
+                            return lhs.questionIndex < rhs.questionIndex
+                        }
+                    guard !questions.isEmpty else { continue }
+
+                    let entry = ReviewChapter(
+                        id: chapterId,
+                        chapter: metadata,
+                        reviewCount: questions.count,
+                        initialQuestionIndex: questions.first?.questionIndex ?? 0,
+                        questions: questions
+                    )
+                    entries.append(entry)
+                }
+
+                entries.sort(by: chapterSortComparator)
+
+                if entries.isEmpty {
+                    // 章情報取得時に失敗した場合はエラー扱いとする
+                    encounteredError = true
+                    continue
+                }
             }
-            
-            entries.sort(by: chapterSortComparator)
-            
-            if !entries.isEmpty {
+            if !entries.isEmpty || chapterInfo.isEmpty {
                 builtUnits.append(
                     ReviewUnit(
                         id: unitId,
@@ -167,14 +208,9 @@ final class ReviewUnitListViewModel: ObservableObject {
                 )
             }
         }
-        
-        builtUnits.sort { lhs, rhs in
-            lhs.unitId.localizedCompare(rhs.unitId) == .orderedAscending
-        }
-        
         hasLoaded = true
         units = builtUnits
-        hasError = encounteredError && builtUnits.isEmpty
+        hasError = encounteredError && builtUnits.allSatisfy { !$0.hasReviewTargets }
         isLoading = false
     }
 }

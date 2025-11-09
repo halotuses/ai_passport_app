@@ -35,31 +35,29 @@ struct ReviewUnitListView: View {
     
     var body: some View {
         ScrollView(showsIndicators: false) {
-            VStack(spacing: 24) {
-                VStack(spacing: 8) {
-                    if viewModel.isLoading {
-                        ProgressView("読み込み中…")
-                            .frame(maxWidth: .infinity, alignment: .center)
-                            .padding(.vertical, 40)
-                    } else if viewModel.hasError {
-                        errorState
-                    } else if viewModel.units.isEmpty {
-                        emptyState
-                    } else {
-                        VStack(spacing: 16) {
-                            ForEach(viewModel.units) { unit in
-                                unitSection(unit)
-                            }
+            VStack(spacing: 20) {
+                if viewModel.isLoading {
+                    ProgressView("読み込み中…")
+                        .frame(maxWidth: .infinity, alignment: .center)
+                        .padding(.vertical, 48)
+                } else if viewModel.hasError {
+                    errorState
+                } else if viewModel.units.isEmpty {
+                    emptyState
+                } else {
+                    LazyVStack(spacing: 16) {
+                        ForEach(viewModel.units) { unit in
+                            unitSection(unit)
                         }
                     }
                 }
-                .padding(.horizontal, 20)
-                .padding(.vertical, 24)
             }
-            .background(Color.themeBase)
-            .task { await viewModel.loadIfNeeded() }
-            .onAppear(perform: configureHeader)
+            .padding(.horizontal, 20)
+            .padding(.vertical, 24)
         }
+        .background(Color.themeBase)
+        .task { await viewModel.loadIfNeeded() }
+        .onAppear(perform: configureHeader)
         .background(navigationLinks)
     }
 }
@@ -114,53 +112,17 @@ private extension ReviewUnitListView {
     }
     
     func unitSection(_ unit: ReviewUnitListViewModel.ReviewUnit) -> some View {
-        Button {
+        let isDisabled = !unit.hasReviewTargets
+
+        return Button {
             SoundManager.shared.play(.tap)
             selectedUnit = unit
             isShowingChapterList = true
         } label: {
-            VStack(alignment: .leading, spacing: 16) {
-                VStack(alignment: .leading, spacing: 4) {
-                    Text("\(unit.unitId). \(unit.unit.title)")
-                        .font(.headline)
-                        .foregroundColor(.themeTextPrimary)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                    if !unit.unit.subtitle.isEmpty {
-                        Text(unit.unit.subtitle)
-                            .font(.subheadline)
-                            .foregroundColor(.themeTextSecondary)
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                    }
-                }
-                
-                HStack(spacing: 12) {
-                    labelCapsule(text: "復習対象 \(unit.reviewCount) 問", systemImage: "doc.text")
-                    labelCapsule(text: "章 \(unit.chapterCount)", systemImage: "list.number")
-                    Spacer(minLength: 0)
-                    Image(systemName: "chevron.right")
-                        .font(.system(size: 16, weight: .semibold))
-                        .foregroundColor(.themeTextSecondary)
-                }
-            }
-            .padding(20)
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .background(
-                RoundedRectangle(cornerRadius: 24, style: .continuous)
-                    .fill(
-                        LinearGradient(
-                            colors: [Color.themeSurfaceElevated, Color.themeSurfaceAlt],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        )
-                    )
-            )
-            .overlay(
-                RoundedRectangle(cornerRadius: 24, style: .continuous)
-                    .stroke(Color.themeMain.opacity(0.12), lineWidth: 1)
-            )
-            .shadow(color: Color.themeShadowSoft, radius: 14, x: 0, y: 10)
+            ReviewUnitCardView(unit: unit, isDisabled: isDisabled)
         }
         .buttonStyle(.plain)
+        .disabled(isDisabled)
     }
     
     @ViewBuilder
@@ -207,14 +169,104 @@ private extension ReviewUnitListView {
         }
     }
     
-    func labelCapsule(text: String, systemImage: String) -> some View {
+}
+
+private struct ReviewUnitCardView: View {
+    let unit: ReviewUnitListViewModel.ReviewUnit
+    var isDisabled: Bool
+
+    private var iconGradient: LinearGradient {
+        LinearGradient(
+            colors: [Color.themeMain, Color.themeSecondary],
+            startPoint: .top,
+            endPoint: .bottom
+        )
+    }
+
+    private var backgroundGradient: LinearGradient {
+        LinearGradient(
+            colors: [Color.themeSurfaceElevated, Color.themeSurfaceAlt],
+            startPoint: .topLeading,
+            endPoint: .bottomTrailing
+        )
+    }
+
+    var body: some View {
+        let statistics = unit.statistics
+
+        VStack(alignment: .leading, spacing: 18) {
+            HStack(alignment: .top, spacing: 16) {
+                Image(systemName: "book.closed")
+                    .font(.system(size: 22, weight: .semibold))
+                    .foregroundStyle(iconGradient)
+                    .opacity(isDisabled ? 0.4 : 1.0)
+
+                VStack(alignment: .leading, spacing: 6) {
+                    Text("\(unit.unitId). \(unit.unit.title)")
+                        .font(.system(size: 17, weight: .semibold))
+                        .foregroundColor(.themeTextPrimary)
+                        .opacity(isDisabled ? 0.65 : 1.0)
+
+                    if !unit.unit.subtitle.isEmpty {
+                        Text(unit.unit.subtitle)
+                            .font(.system(size: 13))
+                            .foregroundColor(.themeTextSecondary)
+                            .opacity(isDisabled ? 0.5 : 1.0)
+                    }
+
+                    HStack(spacing: 10) {
+                        detailChip(text: "復習対象 \(unit.reviewCount) 問", systemImage: "doc.text")
+                        detailChip(text: "章 \(unit.chapterCount)", systemImage: "list.number")
+                    }
+                }
+
+                Spacer(minLength: 12)
+
+                Image(systemName: "chevron.right")
+                    .font(.system(size: 16, weight: .semibold))
+                    .foregroundColor(.themeTextSecondary.opacity(isDisabled ? 0.6 : 1.0))
+            }
+
+            ProgressBadgeView(
+                correctCount: statistics.correctCount,
+                answeredCount: statistics.answeredCount,
+                totalCount: statistics.totalCount,
+                accuracy: statistics.accuracy
+            )
+            .allowsHitTesting(false)
+        }
+        .padding(.vertical, 20)
+        .padding(.horizontal, 20)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(
+            RoundedRectangle(cornerRadius: 24, style: .continuous)
+                .fill(backgroundGradient)
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 24, style: .continuous)
+                .stroke(Color.themeMain.opacity(0.12), lineWidth: 1)
+        )
+        .shadow(color: Color.themeShadowSoft, radius: 14, x: 0, y: 10)
+        .overlay(disabledOverlay)
+        .opacity(isDisabled ? 0.55 : 1.0)
+    }
+
+    @ViewBuilder
+    private var disabledOverlay: some View {
+        if isDisabled {
+            RoundedRectangle(cornerRadius: 24, style: .continuous)
+                .fill(Color.black.opacity(0.04))
+        }
+    }
+
+    private func detailChip(text: String, systemImage: String) -> some View {
         HStack(spacing: 6) {
             Image(systemName: systemImage)
                 .font(.system(size: 12, weight: .semibold))
             Text(text)
                 .font(.system(size: 12, weight: .semibold))
         }
-        .foregroundColor(.themeTextSecondary)
+        .foregroundColor(.themeTextSecondary.opacity(isDisabled ? 0.6 : 1.0))
         .padding(.vertical, 6)
         .padding(.horizontal, 12)
         .background(
