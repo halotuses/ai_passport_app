@@ -199,48 +199,49 @@ private extension ReviewView {
                 } else {
                     EmptyView()
                 }
-                ),
-                label: {
-                    EmptyView()
-                }
-                )
-                .hidden()
+            },
+            label: {
+                EmptyView()
             }
             
-            @ViewBuilder
-            var playNavigationLink: some View {
-                NavigationLink(
-                    isActive: Binding(
-                        get: { isShowingPlayView },
-                        set: { newValue in
-                            if !newValue {
-                                isShowingPlayView = false
-                                activePlayCategory = nil
-                                activePlaySelection = nil
-                            }
-                        }
-                    ),
-                    destination: {
-                        if let category = activePlayCategory,
-                           let selection = activePlaySelection {
-                            ReviewPlayView(category: category, selection: selection) {
-                                isShowingPlayView = false
-                                activePlayCategory = nil
-                                activePlaySelection = nil
-                                isShowingUnitSelection = false
-                                activeUnitSelectionCategory = nil
-                                mainViewState.setHeader(title: "復習", backButton: .toHome)
-                            }
-                        } else {
-                            EmptyView()
-                        }
-                    },
-                    label: {
-                        EmptyView()
+        )
+        .hidden()
+    }
+
+    @ViewBuilder
+    var playNavigationLink: some View {
+        NavigationLink(
+            isActive: Binding(
+                get: { isShowingPlayView },
+                set: { newValue in
+                    if !newValue {
+                        isShowingPlayView = false
+                        activePlayCategory = nil
+                        activePlaySelection = nil
                     }
-                )
-                .hidden()
+                }
+            ),
+            destination: {
+                if let category = activePlayCategory,
+                   let selection = activePlaySelection {
+                    ReviewPlayView(category: category, selection: selection) {
+                        isShowingPlayView = false
+                        activePlayCategory = nil
+                        activePlaySelection = nil
+                        isShowingUnitSelection = false
+                        activeUnitSelectionCategory = nil
+                        mainViewState.setHeader(title: "復習", backButton: .toHome)
+                    }
+                } else {
+                    EmptyView()
+                }
+            },
+            label: {
+                EmptyView()
             }
+        )
+        .hidden()
+    }
             
             var bookmarkItems: [ReviewItem] {
                 let progressLookup = Dictionary(uniqueKeysWithValues: progresses.map { ($0.quizId, QuestionProgress(object: $0)) })
