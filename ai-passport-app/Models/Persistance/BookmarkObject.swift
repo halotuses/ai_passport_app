@@ -1,5 +1,5 @@
 import Foundation
-import RealmSwift
+@preconcurrency import RealmSwift
 
 final class BookmarkObject: Object, Identifiable {
     @Persisted(primaryKey: true) var quizId: String
@@ -11,3 +11,5 @@ final class BookmarkObject: Object, Identifiable {
 
     var id: String { quizId }
 }
+
+extension BookmarkObject: @unchecked Sendable {}

@@ -1,5 +1,5 @@
 import Foundation
-import RealmSwift
+@preconcurrency import RealmSwift
 
 enum QuestionStatus: String, CaseIterable, Sendable {
     case unanswered
@@ -28,3 +28,5 @@ final class QuestionProgressObject: Object, Identifiable {
 
     var id: String { quizId }
 }
+
+extension QuestionProgressObject: @unchecked Sendable {}

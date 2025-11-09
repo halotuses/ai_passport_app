@@ -1,5 +1,5 @@
 import SwiftUI
-import RealmSwift
+@preconcurrency import RealmSwift
 
 /// 復習機能のメイン画面
 struct ReviewView: View {

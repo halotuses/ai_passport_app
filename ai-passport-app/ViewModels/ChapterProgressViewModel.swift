@@ -1,5 +1,5 @@
 import Foundation
-import RealmSwift
+@preconcurrency import RealmSwift
 
 @MainActor
 final class ChapterProgressViewModel: ObservableObject, Identifiable {

@@ -1,6 +1,6 @@
 import SwiftUI
 import Foundation
-import RealmSwift
+@preconcurrency import RealmSwift
 
 /// アプリ起動エントリーポイント
 @main

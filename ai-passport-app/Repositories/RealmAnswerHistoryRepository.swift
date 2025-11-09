@@ -1,5 +1,5 @@
 import Foundation
-import RealmSwift
+@preconcurrency import RealmSwift
 
 enum IdentifierGenerator {
     static func chapterNumericId(unitId: String, chapterId: String) -> Int {
@@ -652,3 +652,5 @@ final class RealmAnswerHistoryRepository {
 extension Notification.Name {
     static let answerHistoryDidChange = Notification.Name("answerHistoryDidChange")
 }
+
+extension RealmAnswerHistoryRepository: @unchecked Sendable {}

@@ -1,6 +1,6 @@
 import Foundation
 import SwiftUI
-import RealmSwift
+@preconcurrency import RealmSwift
 
 struct BookmarkListView: View {
     private static let userId: String = {

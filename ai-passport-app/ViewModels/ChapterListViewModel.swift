@@ -1,6 +1,6 @@
 // ViewModels/ChapterListViewModel.swift
 import Foundation
-import RealmSwift
+@preconcurrency import RealmSwift
 
 class ChapterListViewModel: ObservableObject {
     

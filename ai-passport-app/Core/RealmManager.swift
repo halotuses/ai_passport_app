@@ -1,5 +1,5 @@
 import Foundation
-import RealmSwift
+@preconcurrency import RealmSwift
 
 /// Realmの初期化・生成処理を集中管理するマネージャ
 /// - ディレクトリの生成やファイル破損時の再生成を担う

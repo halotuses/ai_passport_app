@@ -1,10 +1,5 @@
-//
-//  QuizViewModel.swift
-//  ai-passport-app
-//
-
 import Foundation
-import RealmSwift
+@preconcurrency import RealmSwift
 
 @MainActor
 class QuizViewModel: ObservableObject {
