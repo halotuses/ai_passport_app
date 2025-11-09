@@ -310,34 +310,31 @@ private extension ReviewView {
     }
 
     private func summaryStat(_ item: ReviewSummaryItem) -> some View {
-        VStack(alignment: .leading, spacing: 14) {
-            HStack(spacing: 12) {
-                ZStack {
-                    Circle()
-                        .fill(
-                            LinearGradient(
-                                colors: [item.tint.opacity(0.26), item.tint.opacity(0.12)],
-                                startPoint: .topLeading,
-                                endPoint: .bottomTrailing
-                            )
+        HStack(spacing: 16) {
+            ZStack {
+                Circle()
+                    .fill(
+                        LinearGradient(
+                            colors: [item.tint.opacity(0.26), item.tint.opacity(0.12)],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
                         )
-                        .frame(width: 44, height: 44)
-                    Image(systemName: item.icon)
-                        .font(.headline.weight(.semibold))
-                        .foregroundColor(.white)
-                        .shadow(color: item.tint.opacity(0.4), radius: 4, x: 0, y: 3)
-                }
-
-                VStack(alignment: .leading, spacing: 4) {
-                    Text(item.title)
-                        .font(.subheadline.weight(.semibold))
-                        .foregroundColor(.themeTextPrimary)
-
-                    Text("直近の復習状況")
-                        .font(.caption)
-                        .foregroundColor(.themeTextSecondary.opacity(0.9))
-                }
+                    )
+                    .frame(width: 44, height: 44)
+                Image(systemName: item.icon)
+                    .font(.headline.weight(.semibold))
+                    .foregroundColor(.white)
+                    .shadow(color: item.tint.opacity(0.4), radius: 4, x: 0, y: 3)
             }
+
+            Text(item.title)
+                .font(.subheadline.weight(.semibold))
+                .foregroundColor(.themeTextPrimary)
+                .lineLimit(1)
+
+            Spacer(minLength: 12)
+
+
             HStack(alignment: .firstTextBaseline, spacing: 8) {
                 Text("\(item.value)")
                     .font(.system(size: 32, weight: .bold, design: .rounded))
