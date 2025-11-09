@@ -72,9 +72,8 @@ struct ChapterMetadata: Codable, Identifiable, Hashable {
             keys: [CodingKeys]
         ) -> String? {
             for key in keys {
-                if let value = try? container.decodeIfPresent(String.self, forKey: key),
-                   let unwrappedValue = value {
-                    return unwrappedValue
+                if let value = try? container.decode(String.self, forKey: key) {
+                    return value
                 }
             }
             return nil
