@@ -32,29 +32,31 @@ struct ReviewUnitListView: View {
         self.headerTitle = headerTitle
     }
 
-    ScrollView(showsIndicators: false) {
-        VStack(spacing: 24) {
-            VStack(spacing: 8) {
-                if viewModel.isLoading {
-                    ProgressView("読み込み中…")
-                        .frame(maxWidth: .infinity, alignment: .center)
-                        .padding(.vertical, 40)
-                } else if viewModel.hasError {
-                    errorState
-                } else if viewModel.units.isEmpty {
-                    emptyState
-                } else {
-                    ForEach(viewModel.units) { unit in
-                        unitSection(unit)
+    var body: some View {
+        ScrollView(showsIndicators: false) {
+            VStack(spacing: 24) {
+                VStack(spacing: 8) {
+                    if viewModel.isLoading {
+                        ProgressView("読み込み中…")
+                            .frame(maxWidth: .infinity, alignment: .center)
+                            .padding(.vertical, 40)
+                    } else if viewModel.hasError {
+                        errorState
+                    } else if viewModel.units.isEmpty {
+                        emptyState
+                    } else {
+                        ForEach(viewModel.units) { unit in
+                            unitSection(unit)
+                        }
                     }
                 }
+                .padding(.horizontal, 20)
+                .padding(.vertical, 24)
             }
-            .padding(.horizontal, 20)
-            .padding(.vertical, 24)
+            .background(Color.themeBase)
+            .task { await viewModel.loadIfNeeded() }
+            .onAppear(perform: configureHeader)
         }
-        .background(Color.themeBase)
-        .task { await viewModel.loadIfNeeded() }
-        .onAppear(perform: configureHeader)
     }
 }
 
