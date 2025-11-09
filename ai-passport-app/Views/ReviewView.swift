@@ -337,7 +337,7 @@ private extension ReviewView {
 
             HStack(alignment: .firstTextBaseline, spacing: 8) {
                 Text("\(item.value)")
-                    .font(.system(size: 32, weight: .bold, design: .rounded))
+                    .font(.system(size: 28, weight: .bold, design: .rounded))
                     .monospacedDigit()
                     .foregroundColor(.themeTextPrimary)
                 Text(item.unit)
@@ -349,7 +349,7 @@ private extension ReviewView {
             }
         }
         .padding(.horizontal, 18)
-        .padding(.vertical, 20)
+        .padding(.vertical, 18)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(
             RoundedRectangle(cornerRadius: 24, style: .continuous)
