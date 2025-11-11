@@ -92,24 +92,6 @@ private extension ReviewView {
     var reviewSections: some View {
         VStack(spacing: 24) {
             ReviewCategoryButtonSection(
-                title: "ブックマーク",
-                subtitle: "後で見返したい問題を集めています。",
-                iconName: "bookmark.fill",
-                tintColor: .themeAccent,
-                count: bookmarks.count,
-                emptyMessage: "ブックマークした問題はまだありません。",
-                buttonTitle: "単元を選択する",
-                buttonSubtitle: "ブックマーク \(bookmarks.count) 問",
-                isInteractionDisabled: false,
-                action: {
-                    guard !bookmarks.isEmpty else { return }
-                    SoundManager.shared.play(.tap)
-                    activeUnitSelectionCategory = .bookmark
-                    isShowingUnitSelection = true
-                }
-            )
-            
-            ReviewCategoryButtonSection(
                 title: "正解した問題",
                 subtitle: "正解できた問題も定期的に復習して定着させましょう。",
                 iconName: "checkmark.circle.fill",
@@ -144,6 +126,23 @@ private extension ReviewView {
                     isShowingUnitSelection = true
                 }
             )
+        ReviewCategoryButtonSection(
+            title: "ブックマーク",
+            subtitle: "後で見返したい問題を集めています。",
+            iconName: "bookmark.fill",
+            tintColor: .themeAccent,
+            count: bookmarks.count,
+            emptyMessage: "ブックマークした問題はまだありません。",
+            buttonTitle: "単元を選択する",
+            buttonSubtitle: "ブックマーク \(bookmarks.count) 問",
+            isInteractionDisabled: false,
+            action: {
+                guard !bookmarks.isEmpty else { return }
+                SoundManager.shared.play(.tap)
+                activeUnitSelectionCategory = .bookmark
+                isShowingUnitSelection = true
+            }
+        )
         }
     }
     
@@ -283,9 +282,9 @@ private extension ReviewView {
 
     private var summaryItems: [ReviewSummaryItem] {
         [
-            .init(title: "ブックマーク", value: bookmarks.count, unit: "問", icon: "bookmark.fill", tint: .themeAccent),
             .init(title: "正解", value: correctProgresses.count, unit: "問", icon: "checkmark.circle.fill", tint: .themeCorrect),
-            .init(title: "不正解", value: incorrectProgresses.count, unit: "問", icon: "xmark.circle.fill", tint: .themeIncorrect)
+            .init(title: "不正解", value: incorrectProgresses.count, unit: "問", icon: "xmark.circle.fill", tint: .themeIncorrect),
+            .init(title: "ブックマーク", value: bookmarks.count, unit: "問", icon: "bookmark.fill", tint: .themeAccent)
         ]
     }
 
