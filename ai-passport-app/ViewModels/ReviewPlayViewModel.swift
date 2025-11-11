@@ -184,6 +184,7 @@ final class ReviewPlayViewModel: ObservableObject {
         }
 
         return Quiz(
+            orderRef: entry.quizId,
             question: questionText,
             choices: choices,
             answerIndex: resolvedAnswerIndex,

@@ -186,8 +186,8 @@ final class ReviewUnitListViewModel: ObservableObject {
                         chapter: metadata,
                         reviewCount: questions.count,
                         initialQuestionIndex: summary?.initialQuestionIndex ?? Int.max,
-                        sortOrder: index,
-                        questions: questions
+                        questions: questions,
+                        sortOrder: index
                     )
                 }
 
