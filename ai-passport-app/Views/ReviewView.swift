@@ -46,10 +46,27 @@ struct ReviewView: View {
         .onAppear {
             mainViewState.setHeader(title: "復習", backButton: .toHome)
         }
+        .onChange(of: mainViewState.isShowingReview) { isShowing in
+            if !isShowing {
+                resetNavigationState()
+            }
+        }
+        .onChange(of: mainViewState.isOnHome) { isOnHome in
+            if isOnHome {
+                resetNavigationState()
+            }
+        }
     }
 }
 
 private extension ReviewView {
+    func resetNavigationState() {
+        isShowingUnitSelection = false
+        activeUnitSelectionCategory = nil
+        isShowingPlayView = false
+        activePlayCategory = nil
+        activePlaySelection = nil
+    }
     var headerSection: some View {
         VStack(alignment: .leading, spacing: 12) {
             Text("復習を始めましょう")
