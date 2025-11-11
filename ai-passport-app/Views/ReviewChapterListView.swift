@@ -12,6 +12,7 @@ struct ReviewChapterListView: View {
     @State private var chapterItems: [ReviewChapterItem]
     @State private var activeChapter: ReviewUnitListViewModel.ReviewChapter? = nil
     @State private var isShowingQuestionList = false
+    @State private var didTriggerExternalDismissal = false
 
     init(
         unit: ReviewUnitListViewModel.ReviewUnit,
@@ -63,10 +64,24 @@ struct ReviewChapterListView: View {
         .navigationBarBackButtonHidden(true)
         .onAppear(perform: configureHeader)
         .background(questionSelectionNavigationLink)
+        .onChange(of: mainViewState.isOnHome) { isOnHome in
+            guard isOnHome else { return }
+            handleExternalDismissal()
+        }
+        .onChange(of: mainViewState.isShowingReview) { isShowingReview in
+            guard !isShowingReview else { return }
+            handleExternalDismissal()
+        }
     }
 }
 
 private extension ReviewChapterListView {
+    func handleExternalDismissal() {
+        guard !didTriggerExternalDismissal else { return }
+        didTriggerExternalDismissal = true
+        dismiss()
+        onClose()
+    }
     func configureHeader() {
         let backButton = MainViewState.HeaderBackButton(
             title: "戻る",

@@ -9,6 +9,7 @@ struct ReviewQuestionListView: View {
 
     @EnvironmentObject private var mainViewState: MainViewState
     @Environment(\.dismiss) private var dismiss
+    @State private var didTriggerExternalDismissal = false
 
     var body: some View {
         ScrollView {
@@ -44,10 +45,24 @@ struct ReviewQuestionListView: View {
         )
         .navigationBarBackButtonHidden(true)
         .onAppear(perform: configureHeader)
+        .onChange(of: mainViewState.isOnHome) { isOnHome in
+            guard isOnHome else { return }
+            handleExternalDismissal()
+        }
+        .onChange(of: mainViewState.isShowingReview) { isShowingReview in
+            guard !isShowingReview else { return }
+            handleExternalDismissal()
+        }
     }
 }
 
 private extension ReviewQuestionListView {
+    func handleExternalDismissal() {
+        guard !didTriggerExternalDismissal else { return }
+        didTriggerExternalDismissal = true
+        dismiss()
+        onClose()
+    }
     func configureHeader() {
         let backButton = MainViewState.HeaderBackButton(
             title: "戻る",

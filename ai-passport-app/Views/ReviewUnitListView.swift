@@ -8,6 +8,8 @@ struct ReviewUnitListView: View {
     private let headerTitle: String
     @State private var selectedUnit: ReviewUnitListViewModel.ReviewUnit? = nil
     @State private var isShowingChapterList = false
+    @State private var hasRequestedExternalDismissal = false
+    @State private var didTriggerExternalDismissal = false
     
     @EnvironmentObject private var mainViewState: MainViewState
     @Environment(\.dismiss) private var dismiss
@@ -58,12 +60,40 @@ struct ReviewUnitListView: View {
         .background(Color.themeBase)
         .navigationBarBackButtonHidden(true)
         .task { await viewModel.loadIfNeeded() }
-        .onAppear(perform: configureHeader)
+        .onAppear {
+            hasRequestedExternalDismissal = false
+            configureHeader()
+        }
+        .onChange(of: mainViewState.isOnHome) { isOnHome in
+            guard isOnHome else { return }
+            handleExternalDismissal()
+        }
+        .onChange(of: mainViewState.isShowingReview) { isShowingReview in
+            guard isShowingReview else {
+                handleExternalDismissal()
+                return
+            }
+        }
         .background(navigationLinks)
+        .onChange(of: mainViewState.isOnHome) { isOnHome in
+            guard isOnHome else { return }
+            handleExternalDismissal()
+        }
+        .onChange(of: mainViewState.isShowingReview) { isShowingReview in
+            guard !isShowingReview else { return }
+            handleExternalDismissal()
+        }
     }
 }
 
 private extension ReviewUnitListView {
+    
+    func handleExternalDismissal() {
+        guard !hasRequestedExternalDismissal else { return }
+        hasRequestedExternalDismissal = true
+        dismiss()
+        onClose()
+    }
     func configureHeader() {
         let backButton = MainViewState.HeaderBackButton(
             title: "戻る",
