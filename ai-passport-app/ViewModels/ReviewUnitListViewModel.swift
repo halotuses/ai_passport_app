@@ -252,12 +252,24 @@ private extension ReviewUnitListViewModel {
     }
     
     func chapterSortComparator(_ lhs: ReviewChapter, _ rhs: ReviewChapter) -> Bool {
-        if lhs.initialQuestionIndex == rhs.initialQuestionIndex {
-            if lhs.initialQuestionIndex == Int.max {
-                return lhs.sortOrder < rhs.sortOrder
+        let lhsChapterNumber = chapterNumber(from: lhs.chapter.id)
+        let rhsChapterNumber = chapterNumber(from: rhs.chapter.id)
+
+        if lhsChapterNumber == rhsChapterNumber {
+            if lhs.initialQuestionIndex == rhs.initialQuestionIndex {
+                if lhs.initialQuestionIndex == Int.max {
+                    return lhs.sortOrder < rhs.sortOrder
+                }
+                return lhs.chapter.title.localizedCompare(rhs.chapter.title) == .orderedAscending
             }
-            return lhs.chapter.title.localizedCompare(rhs.chapter.title) == .orderedAscending
+            return lhs.initialQuestionIndex < rhs.initialQuestionIndex
         }
-        return lhs.initialQuestionIndex < rhs.initialQuestionIndex
+        return lhsChapterNumber < rhsChapterNumber
+    }
+
+    func chapterNumber(from identifier: String) -> Int {
+        let digits = identifier.compactMap(\.wholeNumberValue)
+        guard !digits.isEmpty else { return 0 }
+        return digits.reduce(0) { $0 * 10 + $1 }
     }
 }
