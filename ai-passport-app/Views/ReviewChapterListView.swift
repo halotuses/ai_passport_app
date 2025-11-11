@@ -138,7 +138,6 @@ private extension ReviewChapterListView {
                 chapter: chapter,
                 headerTitle: headerTitle,
                 onSelect: { selection in
-                    isShowingQuestionList = false
                     DispatchQueue.main.async {
                         onSelect(selection)
                     }

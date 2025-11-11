@@ -266,9 +266,6 @@ private extension ReviewUnitListView {
                 unit: unit,
                 headerTitle: headerTitle,
                 onSelect: { selection in
-                    isShowingChapterList = false
-                    selectedUnit = nil
-                    configureHeader()
                     onSelect(selection)
                 },
                 onClose: {
