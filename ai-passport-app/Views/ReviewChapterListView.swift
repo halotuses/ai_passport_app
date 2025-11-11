@@ -79,16 +79,16 @@ private extension ReviewChapterListView {
     func handleExternalDismissal() {
         guard !didTriggerExternalDismissal else { return }
         didTriggerExternalDismissal = true
-        dismiss()
         onClose()
+        dismiss()
     }
     func configureHeader() {
         let backButton = MainViewState.HeaderBackButton(
             title: "戻る",
             destination: .custom
         ) {
-            dismiss()
             onClose()
+            dismiss()
         }
         let title = "\(headerTitle) / \(unit.unit.title)"
         mainViewState.setHeader(title: title, backButton: backButton)
