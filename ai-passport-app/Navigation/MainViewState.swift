@@ -39,6 +39,7 @@ final class MainViewState: ObservableObject {
     
     weak var quizCleanupDelegate: QuizNavigationCleanupDelegate?
     var quizCleanupHandler: (() -> Void)?
+    var reviewCleanupHandler: (() -> Void)?
     private struct BookmarkReturnState {
         let headerTitle: String
         let headerBackButton: HeaderBackButton?
@@ -73,6 +74,7 @@ final class MainViewState: ObservableObject {
     
     /// ホーム画面（単元選択）に戻す
     func reset(router: NavigationRouter) {
+        prepareForReviewNavigationCleanupIfNeeded()
         prepareForQuizNavigationCleanupIfNeeded()
         selectedChapter = nil
         selectedUnit = nil
@@ -97,7 +99,7 @@ final class MainViewState: ObservableObject {
             backToUnitSelection(router: router)
             return
         }
-        
+        prepareForReviewNavigationCleanupIfNeeded()
         prepareForQuizNavigationCleanupIfNeeded()
         selectedChapter = nil
         showResultView = false
@@ -132,6 +134,7 @@ final class MainViewState: ObservableObject {
     
     /// ホーム画面に遷移
     func enterHome() {
+        prepareForReviewNavigationCleanupIfNeeded()
         isOnHome = true
         isShowingAnswerHistory = false
         isShowingReview = false
@@ -176,6 +179,7 @@ final class MainViewState: ObservableObject {
     }
     
     func backToHome(router: NavigationRouter) {
+        prepareForReviewNavigationCleanupIfNeeded()
         prepareForQuizNavigationCleanupIfNeeded()
         selectedChapter = nil
         selectedUnit = nil
@@ -306,6 +310,10 @@ final class MainViewState: ObservableObject {
         } else {
             quizCleanupHandler?()
         }
+    }
+    private func prepareForReviewNavigationCleanupIfNeeded() {
+        reviewCleanupHandler?()
+        reviewCleanupHandler = nil
     }
     private func restoreBookmarkState(router: NavigationRouter) {
         guard let state = bookmarkReturnState else {

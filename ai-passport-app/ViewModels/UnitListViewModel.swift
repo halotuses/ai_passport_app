@@ -6,6 +6,8 @@ final class UnitListViewModel: ObservableObject {
     @Published private(set) var metadata: QuizMetadataMap?
     @Published private(set) var quizCounts: [String: Int] = [:]
     @Published private(set) var answeredCounts: [String: Int] = [:]
+    @Published private(set) var correctCounts: [String: Int] = [:]
+    @Published private(set) var incorrectCounts: [String: Int] = [:]
     @Published private(set) var isLoading = false
     
     private let repository: RealmAnswerHistoryRepository
@@ -64,14 +66,22 @@ final class UnitListViewModel: ObservableObject {
     private func refreshAnsweredCounts(for metadata: QuizMetadataMap? = nil) {
         guard let metadata = metadata ?? self.metadata else {
             answeredCounts = [:]
+            correctCounts = [:]
+            incorrectCounts = [:]
             return
         }
 
-        var counts: [String: Int] = [:]
+        var answered: [String: Int] = [:]
+        var correct: [String: Int] = [:]
+        var incorrect: [String: Int] = [:]
         for key in metadata.keys {
-            counts[key] = repository.answeredCount(unitId: key)
+            answered[key] = repository.answeredCount(unitId: key)
+            correct[key] = repository.countCorrectAnswers(unitId: key)
+            incorrect[key] = repository.countIncorrectAnswers(unitId: key)
         }
-        answeredCounts = counts
+        answeredCounts = answered
+        correctCounts = correct
+        incorrectCounts = incorrect
     }
 
     private func loadQuizCounts(from metadata: QuizMetadataMap?) {

@@ -330,8 +330,16 @@ final class RealmAnswerHistoryRepository {
         count(for: .correct, unitId: unitId, chapterIdentifier: chapterIdentifier)
     }
     
+    func countCorrectAnswers(unitId: String) -> Int {
+        count(for: .correct, unitId: unitId)
+    }
+    
     func countIncorrectAnswers(for chapterId: Int) -> Int {
         count(for: .incorrect, chapterId: chapterId)
+    }
+    
+    func countIncorrectAnswers(unitId: String) -> Int {
+        count(for: .incorrect, unitId: unitId)
     }
     
     func totalAnsweredCount() -> Int {

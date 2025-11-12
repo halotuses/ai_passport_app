@@ -3,6 +3,8 @@ import SwiftUI
 struct UnitProgressCircleView: View {
     let answeredCount: Int
     let totalCount: Int
+    let correctCount: Int
+    let incorrectCount: Int
 
     private var sanitizedTotal: Int {
         max(totalCount, 0)
@@ -10,7 +12,19 @@ struct UnitProgressCircleView: View {
 
     private var sanitizedAnswered: Int {
         guard sanitizedTotal > 0 else { return 0 }
-        return min(max(answeredCount, 0), sanitizedTotal)
+        let clampedAnswered = min(max(answeredCount, 0), sanitizedTotal)
+        return max(clampedAnswered, sanitizedCorrect + sanitizedIncorrect)
+    }
+
+    private var sanitizedCorrect: Int {
+        guard sanitizedTotal > 0 else { return 0 }
+        return min(max(correctCount, 0), sanitizedTotal)
+    }
+
+    private var sanitizedIncorrect: Int {
+        guard sanitizedTotal > 0 else { return 0 }
+        let allowedIncorrect = sanitizedTotal - sanitizedCorrect
+        return min(max(incorrectCount, 0), allowedIncorrect)
     }
 
     private var progress: Double {
@@ -29,13 +43,14 @@ struct UnitProgressCircleView: View {
         )
     }
 
-    private var progressGradient: AngularGradient {
-        AngularGradient(
-            gradient: Gradient(colors: [Color.themeMain, Color.themeSecondary]),
-            center: .center,
-            startAngle: .degrees(-90),
-            endAngle: .degrees(270)
-        )
+    private var incorrectProgress: Double {
+        guard sanitizedTotal > 0 else { return 0 }
+        return Double(sanitizedIncorrect) / Double(sanitizedTotal)
+    }
+
+    private var correctProgress: Double {
+        guard sanitizedTotal > 0 else { return 0 }
+        return Double(sanitizedCorrect) / Double(sanitizedTotal)
     }
 
     private var textColor: Color {
@@ -47,15 +62,34 @@ struct UnitProgressCircleView: View {
             Circle()
                 .fill(backgroundGradient)
 
-            Circle()
-                .trim(from: 0, to: progress)
-                .stroke(
-                    progressGradient,
-                    style: StrokeStyle(lineWidth: 5, lineCap: .round, lineJoin: .round)
-                )
-                .rotationEffect(.degrees(-90))
-                .opacity(progress > 0 ? 1 : 0)
-                .animation(.easeInOut(duration: 0.35), value: progress)
+            if progress > 0 {
+                Circle()
+                    .trim(from: 0, to: CGFloat(min(incorrectProgress, 1)))
+                    .stroke(
+                        AngularGradient(
+                            gradient: Gradient(colors: [Color.themeIncorrect.opacity(0.85), Color.themeIncorrect]),
+                            center: .center
+                        ),
+                        style: StrokeStyle(lineWidth: 5, lineCap: .round)
+                    )
+                    .rotationEffect(.degrees(-90))
+                    .animation(.easeInOut(duration: 0.35), value: incorrectProgress)
+
+                Circle()
+                    .trim(
+                        from: CGFloat(min(incorrectProgress, 1)),
+                        to: CGFloat(min(incorrectProgress + correctProgress, 1))
+                    )
+                    .stroke(
+                        AngularGradient(
+                            gradient: Gradient(colors: [Color.themeCorrect.opacity(0.9), Color.themeCorrect]),
+                            center: .center
+                        ),
+                        style: StrokeStyle(lineWidth: 5, lineCap: .round)
+                    )
+                    .rotationEffect(.degrees(-90))
+                    .animation(.easeInOut(duration: 0.35), value: correctProgress)
+            }
 
             Circle()
                 .inset(by: 7)
@@ -82,9 +116,9 @@ struct UnitProgressCircleView: View {
 struct UnitProgressCircleView_Previews: PreviewProvider {
     static var previews: some View {
         VStack(spacing: 16) {
-            UnitProgressCircleView(answeredCount: 18, totalCount: 20)
-            UnitProgressCircleView(answeredCount: 3, totalCount: 20)
-            UnitProgressCircleView(answeredCount: 0, totalCount: 0)
+            UnitProgressCircleView(answeredCount: 18, totalCount: 20, correctCount: 15, incorrectCount: 3)
+            UnitProgressCircleView(answeredCount: 3, totalCount: 20, correctCount: 2, incorrectCount: 1)
+            UnitProgressCircleView(answeredCount: 0, totalCount: 0, correctCount: 0, incorrectCount: 0)
         }
         .padding()
         .previewLayout(.sizeThatFits)

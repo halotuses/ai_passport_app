@@ -40,6 +40,8 @@ struct UnitListView: View {
     private func unitRowView(key: String, unit: QuizMetadata) -> some View {
         let total = viewModel.quizCounts[key] ?? 0
         let answered = viewModel.answeredCounts[key] ?? 0
+        let correct = viewModel.correctCounts[key] ?? 0
+        let incorrect = viewModel.incorrectCounts[key] ?? 0
 
         return HStack {
             Image(systemName: "chevron.right")
@@ -61,7 +63,12 @@ struct UnitListView: View {
                     .foregroundColor(.themeTextSecondary)
             }
             Spacer()
-            UnitProgressCircleView(answeredCount: answered, totalCount: total)
+            UnitProgressCircleView(
+                answeredCount: answered,
+                totalCount: total,
+                correctCount: correct,
+                incorrectCount: incorrect
+            )
         }
         .padding(14)
         .background(
