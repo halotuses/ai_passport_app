@@ -27,9 +27,8 @@ struct UnitProgressCircleView: View {
         return min(max(incorrectCount, 0), allowedIncorrect)
     }
 
-    private var progress: Double {
-        guard sanitizedTotal > 0 else { return 0 }
-        return Double(sanitizedAnswered) / Double(sanitizedTotal)
+    private var sanitizedUnanswered: Int {
+        max(sanitizedTotal - sanitizedAnswered, 0)
     }
 
     private var backgroundGradient: LinearGradient {
@@ -52,17 +51,41 @@ struct UnitProgressCircleView: View {
         guard sanitizedTotal > 0 else { return 0 }
         return Double(sanitizedCorrect) / Double(sanitizedTotal)
     }
+    
+    private var unansweredProgress: Double {
+        guard sanitizedTotal > 0 else { return 0 }
+        return Double(sanitizedUnanswered) / Double(sanitizedTotal)
+    }
 
     private var textColor: Color {
         sanitizedAnswered > 0 ? .themeTextPrimary : .themeTextSecondary
     }
 
+    private var correctPercentageText: String {
+        guard sanitizedTotal > 0 else { return "0%" }
+        let percentage = Double(sanitizedCorrect) / Double(sanitizedTotal) * 100
+        return "\(Int(round(percentage)))%"
+    }
+    
     var body: some View {
         ZStack {
             Circle()
                 .fill(backgroundGradient)
 
-            if progress > 0 {
+            if sanitizedTotal > 0 {
+                if sanitizedUnanswered > 0 {
+                    Circle()
+                        .trim(
+                            from: CGFloat(min(incorrectProgress + correctProgress, 1)),
+                            to: 1
+                        )
+                        .stroke(
+                            Color.gray.opacity(0.25),
+                            style: StrokeStyle(lineWidth: 5, lineCap: .round)
+                        )
+                        .rotationEffect(.degrees(-90))
+                        .animation(.easeInOut(duration: 0.35), value: unansweredProgress)
+                }
                 Circle()
                     .trim(from: 0, to: CGFloat(min(incorrectProgress, 1)))
                     .stroke(
@@ -98,10 +121,10 @@ struct UnitProgressCircleView: View {
             Circle()
                 .stroke(Color.white.opacity(0.16), lineWidth: 1)
 
-            VStack(spacing: 1) {
-                Text("\(sanitizedAnswered)")
-                    .font(.system(size: 13, weight: .semibold))
-                Text("/\(sanitizedTotal)")
+            VStack(spacing: 2) {
+                Text(correctPercentageText)
+                    .font(.system(size: 14, weight: .bold))
+                Text("\(sanitizedCorrect)/\(sanitizedTotal)")
                     .font(.system(size: 9, weight: .medium))
             }
             .foregroundStyle(textColor)
@@ -109,7 +132,7 @@ struct UnitProgressCircleView: View {
         .frame(width: 44, height: 44)
         .accessibilityElement(children: .ignore)
         .accessibilityLabel("学習進捗")
-        .accessibilityValue("\(sanitizedAnswered)問中\(sanitizedTotal)問を解答済み")
+        .accessibilityValue("\(sanitizedTotal)問中\(sanitizedCorrect)問正解、正答率\(correctPercentageText)")
     }
 }
 

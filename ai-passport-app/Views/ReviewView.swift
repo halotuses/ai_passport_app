@@ -45,6 +45,9 @@ struct ReviewView: View {
         .background(reviewNavigationLinks)
         .onAppear {
             mainViewState.setHeader(title: "復習", backButton: .toHome)
+            mainViewState.reviewCleanupHandler = {
+                resetNavigationState()
+            }
         }
         .onChange(of: mainViewState.isShowingReview) { isShowing in
             if !isShowing && !mainViewState.isSuspendingReviewForBookmarks {
@@ -54,6 +57,11 @@ struct ReviewView: View {
         .onChange(of: mainViewState.isOnHome) { isOnHome in
             if isOnHome {
                 resetNavigationState()
+            }
+        }
+        .onDisappear {
+            if mainViewState.reviewCleanupHandler != nil {
+                mainViewState.reviewCleanupHandler = nil
             }
         }
     }
