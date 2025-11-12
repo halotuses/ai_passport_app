@@ -73,6 +73,9 @@ struct ReviewChapterListView: View {
             if mainViewState.isSuspendingReviewForBookmarks { return }
             handleExternalDismissal()
         }
+        .onChange(of: mainViewState.navigationResetToken) { _ in
+            handleExternalDismissal()
+        }
     }
 }
 
@@ -84,6 +87,7 @@ private extension ReviewChapterListView {
         dismiss()
     }
     func configureHeader() {
+        guard !mainViewState.isOnHome else { return }
         let backButton = MainViewState.HeaderBackButton(
             title: "戻る",
             destination: .custom
