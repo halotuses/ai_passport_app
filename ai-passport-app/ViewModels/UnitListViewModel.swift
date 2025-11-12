@@ -6,9 +6,29 @@ final class UnitListViewModel: ObservableObject {
     
     @Published private(set) var metadata: QuizMetadataMap?
     @Published private(set) var quizCounts: [String: Int] = [:]
+    @Published private(set) var answeredCounts: [String: Int] = [:]
     @Published private(set) var isLoading = false
     
+    private let repository: RealmAnswerHistoryRepository
     private var hasLoadedOnce = false
+    private var answerHistoryObserver: NSObjectProtocol?
+
+    init(repository: RealmAnswerHistoryRepository = RealmAnswerHistoryRepository()) {
+        self.repository = repository
+        answerHistoryObserver = NotificationCenter.default.addObserver(
+            forName: .answerHistoryDidChange,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            self?.refreshAnsweredCounts()
+        }
+    }
+
+    deinit {
+        if let observer = answerHistoryObserver {
+            NotificationCenter.default.removeObserver(observer)
+        }
+    }
     
     func fetchMetadata() {
         guard !isLoading else { return }
@@ -18,6 +38,7 @@ final class UnitListViewModel: ObservableObject {
             guard let self else { return }
             self.metadata = result
             self.quizCounts = Self.buildInitialQuizCounts(from: result)
+            self.refreshAnsweredCounts(for: result)
             self.isLoading = false
             self.hasLoadedOnce = (result != nil)
             self.loadQuizCounts(from: result)
@@ -39,6 +60,18 @@ final class UnitListViewModel: ObservableObject {
             
         }
         return counts
+        private func refreshAnsweredCounts(for metadata: QuizMetadataMap? = nil) {
+            guard let metadata = metadata ?? self.metadata else {
+                answeredCounts = [:]
+                return
+            }
+
+            var counts: [String: Int] = [:]
+            for key in metadata.keys {
+                counts[key] = repository.answeredCount(unitId: key)
+            }
+            answeredCounts = counts
+        }
     }
     private func loadQuizCounts(from metadata: QuizMetadataMap?) {
         guard let metadata else { return }

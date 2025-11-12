@@ -39,6 +39,7 @@ struct UnitListView: View {
 
     private func unitRowView(key: String, unit: QuizMetadata) -> some View {
         let total = viewModel.quizCounts[key] ?? 0
+        let answered = viewModel.answeredCounts[key] ?? 0
 
         return HStack {
             Image(systemName: "chevron.right")
@@ -60,20 +61,7 @@ struct UnitListView: View {
                     .foregroundColor(.themeTextSecondary)
             }
             Spacer()
-            ZStack {
-                Circle()
-                    .fill(
-                        LinearGradient(
-                            colors: [Color.themeSecondary.opacity(0.3), Color.themeMain.opacity(0.3)],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        )
-                    )
-                    .frame(width: 44, height: 44)
-                Text("\(total)")
-                    .font(.system(size: 12, weight: .semibold))
-                    .foregroundColor(.themeTextPrimary)
-            }
+            UnitProgressCircleView(answeredCount: answered, totalCount: total)
         }
         .padding(14)
         .background(

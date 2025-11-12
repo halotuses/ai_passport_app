@@ -20,13 +20,13 @@ final class MainViewState: ObservableObject {
         let title: String
         let destination: Destination
         let action: (() -> Void)?
-
+        
         init(title: String, destination: Destination, action: (() -> Void)? = nil) {
             self.title = title
             self.destination = destination
             self.action = action
         }
-
+        
         static func == (lhs: HeaderBackButton, rhs: HeaderBackButton) -> Bool {
             lhs.title == rhs.title && lhs.destination == rhs.destination
         }
@@ -53,7 +53,7 @@ final class MainViewState: ObservableObject {
         let showResultView: Bool
         let navigationPath: NavigationPath
     }
-
+    
     private var bookmarkReturnState: BookmarkReturnState?
     
     @Published var selectedUnit: QuizMetadata? = nil
@@ -69,6 +69,7 @@ final class MainViewState: ObservableObject {
     @Published var isShowingAnswerHistory: Bool = false
     @Published var isShowingBookmarks: Bool = false
     @Published var isShowingReview: Bool = false
+    @Published var isSuspendingReviewForBookmarks: Bool = false
     
     /// ホーム画面（単元選択）に戻す
     func reset(router: NavigationRouter) {
@@ -79,6 +80,7 @@ final class MainViewState: ObservableObject {
         isShowingAnswerHistory = false
         isShowingBookmarks = false
         isShowingReview = false
+        isSuspendingReviewForBookmarks = false
         router.reset()
         navigationResetToken = UUID()
         showResultView = false
@@ -95,7 +97,7 @@ final class MainViewState: ObservableObject {
             backToUnitSelection(router: router)
             return
         }
-
+        
         prepareForQuizNavigationCleanupIfNeeded()
         selectedChapter = nil
         showResultView = false
@@ -104,12 +106,13 @@ final class MainViewState: ObservableObject {
         isShowingAnswerHistory = false
         isShowingBookmarks = false
         isShowingReview = false
+        isSuspendingReviewForBookmarks = false
         clearHeaderBookmark()
-
+        
         let unitTitle = selectedUnit?.title ?? "章選択"
         setHeader(title: unitTitle, backButton: .toUnitList)
     }
-
+    
     /// 単元選択画面へ戻す
     func backToUnitSelection(router: NavigationRouter) {
         prepareForQuizNavigationCleanupIfNeeded()
@@ -122,6 +125,7 @@ final class MainViewState: ObservableObject {
         isShowingAnswerHistory = false
         isShowingBookmarks = false
         isShowingReview = false
+        isSuspendingReviewForBookmarks = false
         clearHeaderBookmark()
         enterUnitSelection()
     }
@@ -133,6 +137,7 @@ final class MainViewState: ObservableObject {
         isShowingReview = false
         setHeader(title: "ホーム")
         isShowingBookmarks = false
+        isSuspendingReviewForBookmarks = false
         clearHeaderBookmark()
     }
     
@@ -143,8 +148,9 @@ final class MainViewState: ObservableObject {
         isShowingBookmarks = false
         isShowingReview = false
         setHeader(title: "学習アプリ", backButton: .toHome)
+        isSuspendingReviewForBookmarks = false
         clearHeaderBookmark()
-
+        
     }
     
     /// 復習画面に遷移
@@ -154,9 +160,10 @@ final class MainViewState: ObservableObject {
         isShowingBookmarks = false
         isShowingReview = true
         setHeader(title: "復習", backButton: .toHome)
+        isSuspendingReviewForBookmarks = false
         clearHeaderBookmark()
     }
-
+    
     /// 回答履歴画面に遷移
     func enterAnswerHistory() {
         isOnHome = false
@@ -164,6 +171,7 @@ final class MainViewState: ObservableObject {
         isShowingBookmarks = false
         isShowingReview = false
         setHeader(title: "回答履歴", backButton: .toHome)
+        isSuspendingReviewForBookmarks = false
         clearHeaderBookmark()
     }
     
@@ -178,6 +186,7 @@ final class MainViewState: ObservableObject {
         isShowingAnswerHistory = false
         isShowingBookmarks = false
         isShowingReview = false
+        isSuspendingReviewForBookmarks = false
         enterHome()
         clearHeaderBookmark()
         bookmarkReturnState = nil
@@ -201,26 +210,27 @@ final class MainViewState: ObservableObject {
     func enterBookmarks(router: NavigationRouter) {
         prepareForQuizNavigationCleanupIfNeeded()
         let returnButtonTitle: String
-          if let existingBackButtonTitle = headerBackButton?.title {
-              returnButtonTitle = existingBackButtonTitle
-          } else {
-              returnButtonTitle = "◀ \(headerTitle)"
-          }
-
-          bookmarkReturnState = BookmarkReturnState(
-              headerTitle: headerTitle,
-              headerBackButton: headerBackButton,
-              headerBookmark: headerBookmark,
-              returnButtonTitle: returnButtonTitle,
-              isOnHome: isOnHome,
-              isShowingAnswerHistory: isShowingAnswerHistory,
-              isShowingReview: isShowingReview,
-              selectedUnit: selectedUnit,
-              selectedChapter: selectedChapter,
-              selectedUnitKey: selectedUnitKey,
-              showResultView: showResultView,
-              navigationPath: router.path
-          )
+        if let existingBackButtonTitle = headerBackButton?.title {
+            returnButtonTitle = existingBackButtonTitle
+        } else {
+            returnButtonTitle = "◀ \(headerTitle)"
+        }
+        
+        bookmarkReturnState = BookmarkReturnState(
+            headerTitle: headerTitle,
+            headerBackButton: headerBackButton,
+            headerBookmark: headerBookmark,
+            returnButtonTitle: returnButtonTitle,
+            isOnHome: isOnHome,
+            isShowingAnswerHistory: isShowingAnswerHistory,
+            isShowingReview: isShowingReview,
+            selectedUnit: selectedUnit,
+            selectedChapter: selectedChapter,
+            selectedUnitKey: selectedUnitKey,
+            showResultView: showResultView,
+            navigationPath: router.path
+        )
+        let wasShowingReview = isShowingReview
         selectedChapter = nil
         selectedUnit = nil
         selectedUnitKey = nil
@@ -230,6 +240,7 @@ final class MainViewState: ObservableObject {
         isOnHome = false
         isShowingAnswerHistory = false
         isShowingBookmarks = true
+        isSuspendingReviewForBookmarks = wasShowingReview
         isShowingReview = false
         clearHeaderBookmark()
         setHeader(
@@ -248,12 +259,12 @@ final class MainViewState: ObservableObject {
     func setHeaderBookmark(isActive: Bool, action: @escaping () -> Void) {
         headerBookmark = HeaderBookmarkConfiguration(action: action, isActive: isActive)
     }
-
+    
     func updateHeaderBookmarkState(isActive: Bool) {
         guard let configuration = headerBookmark else { return }
         headerBookmark = HeaderBookmarkConfiguration(action: configuration.action, isActive: isActive)
     }
-
+    
     func clearHeaderBookmark() {
         headerBookmark = nil
     }
@@ -280,15 +291,15 @@ final class MainViewState: ObservableObject {
             self.handleBackAction(backButton, router: router)
         }
     }
-
+    
     func makeHomeButtonAction(router: NavigationRouter) -> () -> Void {
         { [weak self] in
             guard let self else { return }
             self.reset(router: router)
         }
     }
-
-
+    
+    
     private func prepareForQuizNavigationCleanupIfNeeded() {
         if let delegate = quizCleanupDelegate {
             delegate.prepareForQuizNavigationCleanup()
@@ -297,24 +308,25 @@ final class MainViewState: ObservableObject {
         }
     }
     private func restoreBookmarkState(router: NavigationRouter) {
-         guard let state = bookmarkReturnState else {
-             backToHome(router: router)
-             return
-         }
-
-         bookmarkReturnState = nil
-         isShowingBookmarks = false
+        guard let state = bookmarkReturnState else {
+            backToHome(router: router)
+            return
+        }
+        
+        bookmarkReturnState = nil
+        isShowingBookmarks = false
         router.path = state.navigationPath
-         isOnHome = state.isOnHome
-         isShowingAnswerHistory = state.isShowingAnswerHistory
-         isShowingReview = state.isShowingReview
-         selectedUnit = state.selectedUnit
-         selectedChapter = state.selectedChapter
-         selectedUnitKey = state.selectedUnitKey
-         showResultView = state.showResultView
-         headerBookmark = state.headerBookmark
-         setHeader(title: state.headerTitle, backButton: state.headerBackButton)
-     }
+        isOnHome = state.isOnHome
+        isShowingAnswerHistory = state.isShowingAnswerHistory
+        isShowingReview = state.isShowingReview
+        isSuspendingReviewForBookmarks = false
+        selectedUnit = state.selectedUnit
+        selectedChapter = state.selectedChapter
+        selectedUnitKey = state.selectedUnitKey
+        showResultView = state.showResultView
+        headerBookmark = state.headerBookmark
+        setHeader(title: state.headerTitle, backButton: state.headerBackButton)
+    }
 }
 
 extension MainViewState.HeaderBackButton {

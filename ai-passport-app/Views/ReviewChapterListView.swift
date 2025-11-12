@@ -70,6 +70,7 @@ struct ReviewChapterListView: View {
         }
         .onChange(of: mainViewState.isShowingReview) { isShowingReview in
             guard !isShowingReview else { return }
+            if mainViewState.isSuspendingReviewForBookmarks { return }
             handleExternalDismissal()
         }
     }

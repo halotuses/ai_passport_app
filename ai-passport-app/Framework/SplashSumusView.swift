@@ -3,10 +3,12 @@ import SwiftUI
 /// Luxurious SUMUS™ splash screen.
 struct SplashSumusView: View {
     @State private var isVisible = false
+    @State private var hasScheduledDismissal = false
 
     private let backgroundColor = Color(red: 255/255, green: 255/255, blue: 255/255)
     private let animationDuration: TimeInterval = 0.8
-    private let autoDismissDelay: TimeInterval = 1.5
+    private let autoDismissDelay: TimeInterval = 2.3
+    private let fadeOutDuration: TimeInterval = 0.45
 
     var onFinished: (() -> Void)?
 
@@ -60,10 +62,18 @@ struct SplashSumusView: View {
             .scaleEffect(isVisible ? 1 : 0.9)
             .animation(.easeOut(duration: animationDuration), value: isVisible)
             .onAppear {
-                guard !isVisible else { return }
+                guard !hasScheduledDismissal else { return }
                 isVisible = true
+                hasScheduledDismissal = true
+                
                 DispatchQueue.main.asyncAfter(deadline: .now() + autoDismissDelay) {
-                    onFinished?()
+                    withAnimation(.easeInOut(duration: fadeOutDuration)) {
+                        isVisible = false
+                    }
+
+                    DispatchQueue.main.asyncAfter(deadline: .now() + fadeOutDuration) {
+                        onFinished?()
+                    }
                 }
             }
         }

@@ -64,16 +64,6 @@ struct ReviewUnitListView: View {
             hasRequestedExternalDismissal = false
             configureHeader()
         }
-        .onChange(of: mainViewState.isOnHome) { isOnHome in
-            guard isOnHome else { return }
-            handleExternalDismissal()
-        }
-        .onChange(of: mainViewState.isShowingReview) { isShowingReview in
-            guard isShowingReview else {
-                handleExternalDismissal()
-                return
-            }
-        }
         .background(navigationLinks)
         .onChange(of: mainViewState.isOnHome) { isOnHome in
             guard isOnHome else { return }
@@ -81,6 +71,7 @@ struct ReviewUnitListView: View {
         }
         .onChange(of: mainViewState.isShowingReview) { isShowingReview in
             guard !isShowingReview else { return }
+            if mainViewState.isSuspendingReviewForBookmarks { return }
             handleExternalDismissal()
         }
     }

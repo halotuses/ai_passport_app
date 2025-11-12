@@ -47,7 +47,7 @@ struct ReviewView: View {
             mainViewState.setHeader(title: "復習", backButton: .toHome)
         }
         .onChange(of: mainViewState.isShowingReview) { isShowing in
-            if !isShowing {
+            if !isShowing && !mainViewState.isSuspendingReviewForBookmarks {
                 resetNavigationState()
             }
         }

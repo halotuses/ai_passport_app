@@ -342,6 +342,10 @@ final class RealmAnswerHistoryRepository {
         countAnswered(chapterId: chapterId)
     }
     
+    func answeredCount(unitId: String) -> Int {
+        countAnswered(unitId: unitId)
+    }
+    
     func answeredCount(unitId: String, chapterIdentifier: String) -> Int {
         countAnswered(unitId: unitId, chapterIdentifier: chapterIdentifier)
     }
