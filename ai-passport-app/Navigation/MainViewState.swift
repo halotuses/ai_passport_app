@@ -312,7 +312,7 @@ extension MainViewState.HeaderBackButton {
     /// 単元一覧に戻る際のラベル
     static let toUnitList = Self(title: "◀ 単元", destination: .unitList)
     /// ホームに戻る際のラベル
-    static let toHome = Self(title: "◀ ホーム", destination: .home)
+    static let toHome = Self(title: "◀ 戻る", destination: .home)
     /// 解説画面から問題画面へ戻る
     static let toQuizQuestion = Self(title: "◀ 問題", destination: .quizQuestion)
     /// シートを閉じるためのボタン

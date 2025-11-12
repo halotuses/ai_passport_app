@@ -40,6 +40,7 @@ struct BottomTabBarView: View {
                 
                 // 🏠 ホームタブ
                 Button(action: {
+                    guard isHomeButtonEnabled else { return }
                     withAnimation {
                         mainViewState.reset(router: router)
                     }
@@ -53,13 +54,14 @@ struct BottomTabBarView: View {
                     .padding(.top, tabItemTopPadding)
                 }
                 .buttonStyle(.plain)
-                .allowsHitTesting(isHovering)
+                .allowsHitTesting(isHovering && isHomeButtonEnabled)
                 .foregroundColor(mainViewState.isOnHome && !mainViewState.isShowingBookmarks ? .white : .white.opacity(0.8))
                 
                 Spacer()
                 
                 // 🔖 ブックマークタブ
                 Button(action: {
+                    guard isBookmarksButtonEnabled else { return }
                     withAnimation {
                         mainViewState.enterBookmarks(router: router)
                     }
@@ -73,7 +75,7 @@ struct BottomTabBarView: View {
                     .padding(.top, tabItemTopPadding)
                 }
                 .buttonStyle(.plain)
-                .allowsHitTesting(isHovering)
+                .allowsHitTesting(isHovering && isBookmarksButtonEnabled)
                 .foregroundColor(mainViewState.isShowingBookmarks ? .white : .white.opacity(0.8))
                 
                 Spacer()
@@ -120,6 +122,16 @@ extension BottomTabBarView {
     /// SafeArea込みの合計高さ
     private var totalHeight: CGFloat {
         tabBarContentHeight + safeAreaInsetsBottom
+    }
+    
+    /// ホームボタンの押下可否
+    private var isHomeButtonEnabled: Bool {
+        !(mainViewState.isOnHome && !mainViewState.isShowingBookmarks)
+    }
+
+    /// ブックマークボタンの押下可否
+    private var isBookmarksButtonEnabled: Bool {
+        !mainViewState.isShowingBookmarks
     }
 
     /// グラデーションの定義（全体背景）
