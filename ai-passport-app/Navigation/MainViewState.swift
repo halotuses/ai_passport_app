@@ -51,6 +51,7 @@ final class MainViewState: ObservableObject {
         let selectedChapter: ChapterMetadata?
         let selectedUnitKey: String?
         let showResultView: Bool
+        let navigationPath: NavigationPath
     }
 
     private var bookmarkReturnState: BookmarkReturnState?
@@ -217,7 +218,8 @@ final class MainViewState: ObservableObject {
               selectedUnit: selectedUnit,
               selectedChapter: selectedChapter,
               selectedUnitKey: selectedUnitKey,
-              showResultView: showResultView
+              showResultView: showResultView,
+              navigationPath: router.path
           )
         selectedChapter = nil
         selectedUnit = nil
@@ -302,6 +304,7 @@ final class MainViewState: ObservableObject {
 
          bookmarkReturnState = nil
          isShowingBookmarks = false
+        router.path = state.navigationPath
          isOnHome = state.isOnHome
          isShowingAnswerHistory = state.isShowingAnswerHistory
          isShowingReview = state.isShowingReview
