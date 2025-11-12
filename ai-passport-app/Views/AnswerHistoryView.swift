@@ -17,7 +17,7 @@ struct AnswerHistoryView: View {
                     .ignoresSafeArea()
             )
             .onAppear {
-                mainViewState.setHeader(title: "回答履歴", backButton: .toHome)
+                mainViewState.enterAnswerHistory()
                 viewModel.refresh()
             }
             .navigationBarBackButtonHidden(true)

@@ -156,6 +156,16 @@ final class MainViewState: ObservableObject {
         clearHeaderBookmark()
     }
 
+    /// 回答履歴画面に遷移
+    func enterAnswerHistory() {
+        isOnHome = false
+        isShowingAnswerHistory = true
+        isShowingBookmarks = false
+        isShowingReview = false
+        setHeader(title: "回答履歴", backButton: .toHome)
+        clearHeaderBookmark()
+    }
+    
     func backToHome(router: NavigationRouter) {
         prepareForQuizNavigationCleanupIfNeeded()
         selectedChapter = nil
