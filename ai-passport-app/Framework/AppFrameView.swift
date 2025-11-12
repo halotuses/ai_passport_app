@@ -16,6 +16,7 @@ struct AppFrameView: View {
             Divider()
             MainRouterView()
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .enableEdgeSwipeBackGesture()
             Divider()
             BottomTabBarView(onTapSettings: {
                 isShowingSettings = true
