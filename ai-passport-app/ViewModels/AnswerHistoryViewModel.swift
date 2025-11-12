@@ -30,9 +30,11 @@ final class AnswerHistoryViewModel: ObservableObject {
 
     private func observeHistory() {
         token = repository.observeAnswerHistory { [weak self] progresses in
-            guard let self else { return }
-            self.histories = progresses
-            self.isLoading = false
+            Task { @MainActor [weak self] in
+                guard let self else { return }
+                self.histories = progresses
+                self.isLoading = false
+            }
         }
     }
 }

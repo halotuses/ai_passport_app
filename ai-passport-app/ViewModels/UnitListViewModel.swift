@@ -1,4 +1,3 @@
-
 import Foundation
 
 @MainActor
@@ -51,28 +50,30 @@ final class UnitListViewModel: ObservableObject {
         }
     }
     
-    
+    // ✅ staticメソッド内ではインスタンスメンバーを使わない
     private static func buildInitialQuizCounts(from metadata: QuizMetadataMap?) -> [String: Int] {
         guard let metadata else { return [:] }
         var counts: [String: Int] = [:]
         for (key, value) in metadata {
             counts[key] = value.total
-            
         }
         return counts
-        private func refreshAnsweredCounts(for metadata: QuizMetadataMap? = nil) {
-            guard let metadata = metadata ?? self.metadata else {
-                answeredCounts = [:]
-                return
-            }
-
-            var counts: [String: Int] = [:]
-            for key in metadata.keys {
-                counts[key] = repository.answeredCount(unitId: key)
-            }
-            answeredCounts = counts
-        }
     }
+
+    // ✅ クラス直下に配置してスコープを正す
+    private func refreshAnsweredCounts(for metadata: QuizMetadataMap? = nil) {
+        guard let metadata = metadata ?? self.metadata else {
+            answeredCounts = [:]
+            return
+        }
+
+        var counts: [String: Int] = [:]
+        for key in metadata.keys {
+            counts[key] = repository.answeredCount(unitId: key)
+        }
+        answeredCounts = counts
+    }
+
     private func loadQuizCounts(from metadata: QuizMetadataMap?) {
         guard let metadata else { return }
         
