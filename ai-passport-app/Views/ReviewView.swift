@@ -37,6 +37,7 @@ struct ReviewView: View {
                 summarySection
                 reviewSections
             }
+            
             .frame(maxWidth: 560)
             .padding(.horizontal, 24)
             .padding(.vertical, 32)
