@@ -6,12 +6,6 @@ struct ProgressBadgeView: View {
     let answeredCount: Int
     let totalCount: Int
     let accuracy: Double
-    
-    private var incorrectCount: Int { max(answeredCount - correctCount, 0) }
-    private var unansweredCount: Int {
-        guard totalCount > 0 else { return 0 }
-        return max(totalCount - answeredCount, 0)
-    }
 
     private var clampedAccuracy: Double {
         min(max(accuracy, 0), 1)
@@ -20,6 +14,21 @@ struct ProgressBadgeView: View {
     private var accuracyText: String {
         guard answeredCount > 0 else { return "--%" }
         return "\(Int((clampedAccuracy * 100).rounded()))%"
+    }
+
+    private var answerSummaryText: String {
+        guard totalCount > 0 else { return "解答済み 0問" }
+        return "解答済み \(answeredCount)/\(totalCount)"
+    }
+
+    private var correctSummaryText: String {
+        if answeredCount > 0 {
+            return "正答数 \(correctCount)/\(answeredCount)"
+        }
+        if totalCount > 0 {
+            return "正答数 \(correctCount)/\(totalCount)"
+        }
+        return "正答数 0/0"
     }
 
     private var badgeGradient: LinearGradient {
@@ -35,6 +44,18 @@ struct ProgressBadgeView: View {
     }
 
     
+    private var progressGradient: LinearGradient {
+        if isPerfectScore {
+            return .crownGold
+        }
+
+        return LinearGradient(
+            colors: [Color.themeMain, Color.themeSecondary.opacity(0.85)],
+            startPoint: .leading,
+            endPoint: .trailing
+        )
+    }
+
     private var accuracyForegroundStyle: AnyShapeStyle {
         if isPerfectScore {
             return AnyShapeStyle(Color.crownGoldDeep)
@@ -42,52 +63,18 @@ struct ProgressBadgeView: View {
 
         return AnyShapeStyle(Color.themeSecondary)
     }
-
-    private var correctProgress: Double {
-        guard totalCount > 0 else { return 0 }
-        return min(max(Double(correctCount) / Double(totalCount), 0), 1)
-    }
-
-    private var incorrectProgress: Double {
-        guard totalCount > 0 else { return 0 }
-        return min(max(Double(incorrectCount) / Double(totalCount), 0), 1)
-    }
-
-    private var correctBarGradient: LinearGradient {
-        if isPerfectScore {
-            return .crownGold
-        }
-
-        return LinearGradient(
-            colors: [Color.themeCorrect.opacity(0.85), Color.themeCorrect],
-            startPoint: .leading,
-            endPoint: .trailing
-        )
-    }
-
-    private var incorrectBarGradient: LinearGradient {
-        LinearGradient(
-            colors: [Color.themeIncorrect.opacity(0.85), Color.themeIncorrect],
-            startPoint: .leading,
-            endPoint: .trailing
-        )
-    }
-
-    private var unansweredLabelText: String {
-        guard totalCount > 0 else { return "未回答 0問" }
-        return "未回答 \(unansweredCount)問"
-    }
-    private var correctLabelText: String { "正解 \(correctCount)問" }
-
-      private var incorrectLabelText: String { "不正解 \(incorrectCount)問" }
-    
     
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            HStack(alignment: .firstTextBaseline, spacing: 12) {
-                statusTag(color: .themeCorrect, text: correctLabelText)
-                statusTag(color: .themeIncorrect, text: incorrectLabelText)
-                statusTag(color: .gray, text: unansweredLabelText)
+            HStack(alignment: .firstTextBaseline) {
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(correctSummaryText)
+                        .font(.system(size: 16, weight: .semibold))
+                        .foregroundStyle(Color.themeTextPrimary)
+                    Text(answerSummaryText)
+                        .font(.system(size: 12, weight: .medium))
+                        .foregroundStyle(Color.themeTextSecondary)
+                }
                 Spacer()
                 Text(accuracyText)
                     .font(.system(size: 14, weight: .semibold))
@@ -104,20 +91,10 @@ struct ProgressBadgeView: View {
                 ZStack(alignment: .leading) {
                     Capsule()
                         .fill(Color.themeSurface.opacity(0.7))
-                    if incorrectProgress > 0 {
-                        Capsule()
-                            .fill(incorrectBarGradient)
-                            .frame(width: geometry.size.width * incorrectProgress)
-                            .animation(.easeInOut(duration: 0.45), value: incorrectProgress)
-                    }
-
-                    if correctProgress > 0 {
-                        Capsule()
-                            .fill(correctBarGradient)
-                            .frame(width: geometry.size.width * correctProgress)
-                            .offset(x: geometry.size.width * incorrectProgress)
-                            .animation(.easeInOut(duration: 0.45), value: correctProgress + incorrectProgress)
-                    }
+                    Capsule()
+                        .fill(progressGradient)
+                        .frame(width: geometry.size.width * clampedAccuracy)
+                        .animation(.easeInOut(duration: 0.45), value: clampedAccuracy)
                 }
             }
             .frame(height: 8)
@@ -134,22 +111,6 @@ struct ProgressBadgeView: View {
         )
         .shadow(color: Color.themeShadowSoft.opacity(0.5), radius: 10, x: 0, y: 6)
     }
-    private func statusTag(color: Color, text: String) -> some View {
-         HStack(spacing: 6) {
-             Circle()
-                 .fill(color.opacity(0.9))
-                 .frame(width: 10, height: 10)
-             Text(text)
-                 .font(.system(size: 12, weight: .medium))
-                 .foregroundColor(.themeTextPrimary)
-         }
-         .padding(.horizontal, 10)
-         .padding(.vertical, 6)
-         .background(
-             Capsule()
-                 .fill(Color.themeSurface.opacity(0.8))
-         )
-     }
 }
 
 struct ProgressBadgeView_Previews: PreviewProvider {
