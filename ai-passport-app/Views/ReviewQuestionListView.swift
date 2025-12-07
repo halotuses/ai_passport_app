@@ -8,7 +8,6 @@ struct ReviewQuestionListView: View {
     let onClose: () -> Void
 
     @EnvironmentObject private var mainViewState: MainViewState
-    @Environment(\.dismiss) private var dismiss
     @State private var didTriggerExternalDismissal = false
 
     var body: some View {
@@ -65,7 +64,6 @@ private extension ReviewQuestionListView {
         guard !didTriggerExternalDismissal else { return }
         didTriggerExternalDismissal = true
         onClose()
-        dismiss()
     }
     func configureHeader() {
         guard !mainViewState.isOnHome else { return }
@@ -74,7 +72,6 @@ private extension ReviewQuestionListView {
             destination: .custom
         ) {
             onClose()
-            dismiss()
         }
         let title = "\(headerTitle)（\(unit.unit.title)・\(chapter.chapter.title)）"
         mainViewState.setHeader(title: title, backButton: backButton)
