@@ -480,6 +480,8 @@ private struct ReviewCategoryButtonSection: View {
                     )
                 }
                 .buttonStyle(.plain)
+                .contentShape(Rectangle())
+                .simultaneousGesture(DragGesture())
                 .disabled(isInteractionDisabled)
                 .opacity(isInteractionDisabled ? 0.6 : 1)
             }
