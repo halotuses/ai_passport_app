@@ -149,6 +149,7 @@ private extension ReviewChapterListView {
                 },
                 onClose: {
                     isShowingQuestionList = false
+                    dismiss()
                 }
             )
         } else {
