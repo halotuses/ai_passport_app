@@ -16,10 +16,6 @@ struct ProgressBadgeView: View {
         return "\(Int((clampedAccuracy * 100).rounded()))%"
     }
 
-    private var answerSummaryText: String {
-        guard totalCount > 0 else { return "解答済み 0問" }
-        return "解答済み \(answeredCount)/\(totalCount)"
-    }
 
     private var correctSummaryText: String {
         if answeredCount > 0 {
@@ -29,6 +25,31 @@ struct ProgressBadgeView: View {
             return "正答数 \(correctCount)/\(totalCount)"
         }
         return "正答数 0/0"
+    }
+    
+    private var incorrectCount: Int {
+        max(answeredCount - correctCount, 0)
+    }
+
+    private var incorrectSummaryText: String {
+        if answeredCount > 0 {
+            return "不正解数 \(incorrectCount)/\(answeredCount)"
+        }
+        if totalCount > 0 {
+            return "不正解数 \(incorrectCount)/\(totalCount)"
+        }
+        return "不正解数 0/0"
+    }
+
+    private var unansweredCount: Int {
+        max(totalCount - answeredCount, 0)
+    }
+
+    private var unansweredSummaryText: String {
+        if totalCount > 0 {
+            return "未解答数 \(unansweredCount)/\(totalCount)"
+        }
+        return "未解答数 0/0"
     }
 
     private var badgeGradient: LinearGradient {
@@ -71,7 +92,10 @@ struct ProgressBadgeView: View {
                     Text(correctSummaryText)
                         .font(.system(size: 16, weight: .semibold))
                         .foregroundStyle(Color.themeTextPrimary)
-                    Text(answerSummaryText)
+                    Text(incorrectSummaryText)
+                        .font(.system(size: 12, weight: .medium))
+                        .foregroundStyle(Color.themeTextSecondary)
+                    Text(unansweredSummaryText)
                         .font(.system(size: 12, weight: .medium))
                         .foregroundStyle(Color.themeTextSecondary)
                 }
