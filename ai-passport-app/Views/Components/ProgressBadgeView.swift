@@ -10,44 +10,64 @@ struct ProgressBadgeView: View {
     private var clampedAccuracy: Double {
         min(max(accuracy, 0), 1)
     }
+    
+    private var totalQuestionCount: Int {
+        max(totalCount, 0)
+    }
+
+    private var sanitizedCorrectCount: Int {
+        min(max(correctCount, 0), totalQuestionCount)
+    }
+
+    private var sanitizedAnsweredCount: Int {
+        min(max(answeredCount, 0), totalQuestionCount)
+    }
+
+    private var sanitizedIncorrectCount: Int {
+        max(sanitizedAnsweredCount - sanitizedCorrectCount, 0)
+    }
+
+    private var sanitizedUnansweredCount: Int {
+        max(totalQuestionCount - sanitizedAnsweredCount, 0)
+    }
 
     private var accuracyText: String {
-        guard answeredCount > 0 else { return "--%" }
+        guard sanitizedAnsweredCount > 0 else { return "--%" }
         return "\(Int((clampedAccuracy * 100).rounded()))%"
     }
 
 
     private var correctSummaryText: String {
-        if answeredCount > 0 {
-            return "正答数 \(correctCount)/\(answeredCount)"
+        if sanitizedAnsweredCount > 0 {
+            return "正答数 \(sanitizedCorrectCount)/\(sanitizedAnsweredCount)"
         }
-        if totalCount > 0 {
-            return "正答数 \(correctCount)/\(totalCount)"
+        if totalQuestionCount > 0 {
+            return "正答数 \(sanitizedCorrectCount)/\(totalQuestionCount)"
         }
         return "正答数 0/0"
     }
     
     private var incorrectCount: Int {
-        max(answeredCount - correctCount, 0)
+        sanitizedIncorrectCount
     }
 
     private var incorrectSummaryText: String {
-        if answeredCount > 0 {
-            return "不正解数 \(incorrectCount)/\(answeredCount)"
+        if sanitizedAnsweredCount > 0 {
+            return "不正解数 \(incorrectCount)/\(sanitizedAnsweredCount)"
         }
-        if totalCount > 0 {
-            return "不正解数 \(incorrectCount)/\(totalCount)"
+        if totalQuestionCount > 0 {
+            return "不正解数 \(incorrectCount)/\(totalQuestionCount)"
         }
         return "不正解数 0/0"
     }
 
     private var unansweredCount: Int {
-        max(totalCount - answeredCount, 0)
+        sanitizedUnansweredCount
     }
 
     private var unansweredSummaryText: String {
-        if totalCount > 0 {
-            return "未解答数 \(unansweredCount)/\(totalCount)"
+        if totalQuestionCount > 0 {
+            return "未解答数 \(unansweredCount)/\(totalQuestionCount)"
         }
         return "未解答数 0/0"
     }
@@ -61,7 +81,7 @@ struct ProgressBadgeView: View {
     }
     
     private var isPerfectScore: Bool {
-        totalCount > 0 && correctCount == totalCount
+        totalQuestionCount > 0 && sanitizedCorrectCount == totalQuestionCount
     }
 
     
@@ -83,6 +103,23 @@ struct ProgressBadgeView: View {
         }
 
         return AnyShapeStyle(Color.themeSecondary)
+    }
+    
+    private var correctFraction: Double {
+        progressFraction(for: sanitizedCorrectCount)
+    }
+
+    private var incorrectFraction: Double {
+        progressFraction(for: sanitizedIncorrectCount)
+    }
+
+    private var unansweredFraction: Double {
+        progressFraction(for: sanitizedUnansweredCount)
+    }
+
+    private func progressFraction(for count: Int) -> Double {
+        guard totalQuestionCount > 0 else { return 0 }
+        return Double(count) / Double(totalQuestionCount)
     }
     
     var body: some View {
@@ -112,14 +149,7 @@ struct ProgressBadgeView: View {
             }
 
             GeometryReader { geometry in
-                ZStack(alignment: .leading) {
-                    Capsule()
-                        .fill(Color.themeSurface.opacity(0.7))
-                    Capsule()
-                        .fill(progressGradient)
-                        .frame(width: geometry.size.width * clampedAccuracy)
-                        .animation(.easeInOut(duration: 0.45), value: clampedAccuracy)
-                }
+                segmentedProgressBar(width: geometry.size.width)
             }
             .frame(height: 8)
         }
@@ -134,6 +164,39 @@ struct ProgressBadgeView: View {
                 .stroke(Color.white.opacity(0.35), lineWidth: 0.8)
         )
         .shadow(color: Color.themeShadowSoft.opacity(0.5), radius: 10, x: 0, y: 6)
+    }
+    @ViewBuilder
+    private func segmentedProgressBar(width: CGFloat) -> some View {
+        let correctWidth = width * correctFraction
+        let incorrectWidth = width * incorrectFraction
+        let unansweredWidth = width * unansweredFraction
+
+        ZStack(alignment: .leading) {
+            Capsule()
+                .fill(Color.themeSurface.opacity(0.7))
+
+            HStack(spacing: 0) {
+                if correctWidth > 0 {
+                    segment(width: correctWidth, fill: progressGradient)
+                        .animation(.easeInOut(duration: 0.45), value: correctFraction)
+                }
+                if incorrectWidth > 0 {
+                    segment(width: incorrectWidth, fill: Color.themeIncorrect)
+                        .animation(.easeInOut(duration: 0.45), value: incorrectFraction)
+                }
+                if unansweredWidth > 0 {
+                    segment(width: unansweredWidth, fill: Color.themeTextSecondary.opacity(0.28))
+                        .animation(.easeInOut(duration: 0.45), value: unansweredFraction)
+                }
+            }
+            .mask(Capsule())
+        }
+    }
+
+    private func segment(width: CGFloat, fill: some ShapeStyle) -> some View {
+        Rectangle()
+            .fill(fill)
+            .frame(width: width)
     }
 }
 
