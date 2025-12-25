@@ -6,6 +6,8 @@ struct ExplanationView: View {
     @ObservedObject var viewModel: QuizViewModel
     let quiz: Quiz
     let selectedAnswerIndex: Int
+    let primaryButtonTitle: String?
+    let primaryAction: (() -> Void)?
     @Environment(\.dismiss) private var dismiss
     let onNext: () -> Void
     
@@ -88,22 +90,40 @@ struct ExplanationView: View {
 
         // ✅ 常に画面下部にボタンを固定
         .safeAreaInset(edge: .bottom) {
-            Button(action: {
-                handleNextAction()
-            }) {
-                Text(hasNextQuestion ? "次の問題へ" : "結果表示")
-                    .frame(maxWidth: .infinity)
-                    .padding()
-                    .background(
-                        LinearGradient(
-                            colors: [Color.themeSecondary, Color.themeMain],
-                            startPoint: .leading,
-                            endPoint: .trailing
+            if let primaryAction {
+                Button(action: primaryAction) {
+                    Text(primaryButtonTitle ?? "次の問題へ")
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(
+                            LinearGradient(
+                                colors: [Color.themeSecondary, Color.themeMain],
+                                startPoint: .leading,
+                                endPoint: .trailing
+                            )
                         )
-                    )
-                    .foregroundColor(.white)
-                    .cornerRadius(12)
-                    .shadow(color: Color.themeSecondary.opacity(0.25), radius: 12, x: 0, y: 6)
+                        .foregroundColor(.white)
+                        .cornerRadius(12)
+                        .shadow(color: Color.themeSecondary.opacity(0.25), radius: 12, x: 0, y: 6)
+                }
+            } else {
+                Button(action: {
+                    handleNextAction()
+                }) {
+                    Text(hasNextQuestion ? "次の問題へ" : "結果表示")
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(
+                            LinearGradient(
+                                colors: [Color.themeSecondary, Color.themeMain],
+                                startPoint: .leading,
+                                endPoint: .trailing
+                            )
+                        )
+                        .foregroundColor(.white)
+                        .cornerRadius(12)
+                        .shadow(color: Color.themeSecondary.opacity(0.25), radius: 12, x: 0, y: 6)
+                }
             }
             .padding(.horizontal)
             .padding(.bottom, 20)

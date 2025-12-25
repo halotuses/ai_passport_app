@@ -32,6 +32,10 @@ struct ContentView: View {
                     viewModel: viewModel,
                     quiz: route.quiz,
                     selectedAnswerIndex: route.selectedAnswerIndex,
+                    primaryButtonTitle: mainViewState.isShowingBookmarkQuiz ? "ブックマークに戻る" : nil,
+                    primaryAction: mainViewState.isShowingBookmarkQuiz ? {
+                        mainViewState.returnFromBookmarkQuiz(router: router)
+                    } : nil,
                     onNext: handleExplanationNext
                 )
             } else {
@@ -181,20 +185,29 @@ private extension ContentView {
     
     
     func updateHeaderForCurrentState() {
+        let isBookmarkQuiz = mainViewState.isShowingBookmarkQuiz
+        let bookmarkBackButton = MainViewState.HeaderBackButton(
+            title: "◀ ブックマーク",
+            destination: .custom,
+            action: { [weak mainViewState, weak router] in
+                guard let mainViewState, let router else { return }
+                mainViewState.returnFromBookmarkQuiz(router: router)
+            }
+        )
         let bookmarkQuiz: Quiz?
         if activeExplanationRoute != nil {
             let questionNumber = min(viewModel.currentQuestionIndex + 1, viewModel.totalCount)
             mainViewState.setHeader(title: "第\(questionNumber)問 解説", backButton: .toQuizQuestion)
             bookmarkQuiz = activeExplanationRoute?.quiz
         } else if viewModel.totalCount > 0 && viewModel.currentQuestionIndex >= viewModel.totalCount {
-            mainViewState.setHeader(title: "結果", backButton: .toChapterList)
+            mainViewState.setHeader(title: "結果", backButton: isBookmarkQuiz ? bookmarkBackButton : .toChapterList)
             bookmarkQuiz = nil
         } else if viewModel.isLoaded && viewModel.totalCount > 0 {
             let questionNumber = min(viewModel.currentQuestionIndex + 1, viewModel.totalCount)
-            mainViewState.setHeader(title: "第\(questionNumber)問", backButton: .toChapterList)
+            mainViewState.setHeader(title: "第\(questionNumber)問", backButton: isBookmarkQuiz ? bookmarkBackButton : .toChapterList)
             bookmarkQuiz = viewModel.currentQuiz
         } else {
-            mainViewState.setHeader(title: chapter.title, backButton: .toChapterList)
+            mainViewState.setHeader(title: chapter.title, backButton: isBookmarkQuiz ? bookmarkBackButton : .toChapterList)
             bookmarkQuiz = nil
         }
 

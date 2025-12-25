@@ -17,6 +17,10 @@ struct BookmarkListView: View {
         where: { $0.userId == BookmarkListView.userId && $0.isBookmarked == true }
     ) var bookmarks
     @ObservedResults(QuestionProgressObject.self) var progresses
+    @EnvironmentObject private var mainViewState: MainViewState
+    @EnvironmentObject private var router: NavigationRouter
+    @EnvironmentObject private var progressManager: ProgressManager
+    @State private var metadataCache: QuizMetadataMap?
 
     var body: some View {
         Group {
@@ -61,24 +65,28 @@ private extension BookmarkListView {
             ? (progress?.questionText ?? "問題文なし")
             : bookmark.questionText
         
-        VStack(alignment: .leading, spacing: 6) {
-            Text(questionText)
-                .font(.headline)
-                .foregroundColor(.themeTextPrimary)
-                .lineLimit(3)
-            if let answer = correctAnswerText(for: progress) {
-                Text("正解: \(answer)")
-                    .font(.subheadline)
-             
-                    .foregroundColor(.themeTextSecondary)
+        Button {
+            handleBookmarkSelection(bookmark, progress: progress)
+        } label: {
+            VStack(alignment: .leading, spacing: 6) {
+                Text(questionText)
+                    .font(.headline)
+                    .foregroundColor(.themeTextPrimary)
+                    .lineLimit(3)
+                if let answer = correctAnswerText(for: progress) {
+                    Text("正解: \(answer)")
+                        .font(.subheadline)
+                        .foregroundColor(.themeTextSecondary)
+                }
+                if let location = locationText(for: progress) {
+                    Text(location)
+                        .font(.caption)
+                        .foregroundColor(.themeTextSecondary.opacity(0.8))
+                }
             }
-            if let location = locationText(for: progress) {
-                Text(location)
-                    .font(.caption)
-                    .foregroundColor(.themeTextSecondary.opacity(0.8))
-            }
+            .padding(.vertical, 4)
         }
-        .padding(.vertical, 4)
+        .buttonStyle(.plain)
     }
     
     @ViewBuilder
@@ -137,4 +145,58 @@ private extension BookmarkListView {
             return progress.quizId
         }
     }
+    func handleBookmarkSelection(_ bookmark: BookmarkObject, progress: QuestionProgressObject?) {
+         guard let info = bookmarkNavigationInfo(for: bookmark, progress: progress) else { return }
+         resolveMetadata { metadata in
+             guard let metadata,
+                   let unit = metadata[info.unitId] else { return }
+             resolveChapter(for: unit, chapterId: info.chapterId) { chapter in
+                 guard let chapter else { return }
+                 progressManager.quizViewModel.prepareForReviewNavigation(initialQuestionIndex: info.questionIndex)
+                 mainViewState.enterBookmarkQuiz(
+                     router: router,
+                     unitKey: info.unitId,
+                     unit: unit,
+                     chapter: chapter
+                 )
+             }
+         }
+     }
+
+     func resolveMetadata(completion: @escaping (QuizMetadataMap?) -> Void) {
+         if let metadataCache {
+             completion(metadataCache)
+             return
+         }
+         NetworkManager.fetchMetadata { metadata in
+             metadataCache = metadata
+             completion(metadata)
+         }
+     }
+
+     func resolveChapter(for unit: QuizMetadata, chapterId: String, completion: @escaping (ChapterMetadata?) -> Void) {
+         let url = Constants.url(unit.file)
+         NetworkManager.fetchChapterList(from: url) { chapterList in
+             let chapter = chapterList?.chapters.first(where: { $0.id == chapterId })
+             completion(chapter)
+         }
+     }
+
+     func bookmarkNavigationInfo(
+         for bookmark: BookmarkObject,
+         progress: QuestionProgressObject?
+     ) -> (unitId: String, chapterId: String, questionIndex: Int)? {
+         let quizId = bookmark.quizId
+         let parts = quizId.split(separator: "#")
+         guard parts.count == 2, let questionIndex = Int(parts[1]) else { return nil }
+         let identifiers = parts[0].split(separator: "-")
+         guard identifiers.count >= 2 else { return nil }
+
+         let fallbackUnitId = String(identifiers[0])
+         let fallbackChapterId = String(identifiers[1])
+         let unitId = progress?.unitIdentifier.isEmpty == false ? progress?.unitIdentifier ?? fallbackUnitId : fallbackUnitId
+         let chapterId = progress?.chapterIdentifier.isEmpty == false ? progress?.chapterIdentifier ?? fallbackChapterId : fallbackChapterId
+
+         return (unitId: unitId, chapterId: chapterId, questionIndex: questionIndex)
+     }
 }
