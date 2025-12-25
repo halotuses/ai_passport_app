@@ -21,9 +21,11 @@ struct BookmarkListView: View {
     @EnvironmentObject private var router: NavigationRouter
     @EnvironmentObject private var progressManager: ProgressManager
     @State private var metadataCache: QuizMetadataMap?
+    @State private var isShowingCorrectAnswers: Bool = true
 
     var body: some View {
-        Group {
+        VStack(spacing: 0) {
+            bookmarkAnswerToggle()
             if bookmarks.isEmpty {
                 VStack(spacing: 12) {
                     bookmarkCountSummary()
@@ -64,6 +66,7 @@ private extension BookmarkListView {
         let questionText = bookmark.questionText.isEmpty
             ? (progress?.questionText ?? "問題文なし")
             : bookmark.questionText
+        let answerText = correctAnswerText(for: progress)
         
         Button {
             handleBookmarkSelection(bookmark, progress: progress)
@@ -73,8 +76,12 @@ private extension BookmarkListView {
                     .font(.headline)
                     .foregroundColor(.themeTextPrimary)
                     .lineLimit(3)
-                if let answer = correctAnswerText(for: progress) {
-                    Text("正解: \(answer)")
+                if isShowingCorrectAnswers, let answerText {
+                    Text("正解: \(answerText)")
+                        .font(.subheadline)
+                        .foregroundColor(.themeTextSecondary)
+                } else if !isShowingCorrectAnswers, answerText != nil {
+                    Text("正解: ••••••••")
                         .font(.subheadline)
                         .foregroundColor(.themeTextSecondary)
                 }
@@ -87,6 +94,14 @@ private extension BookmarkListView {
             .padding(.vertical, 4)
         }
         .buttonStyle(.plain)
+    }
+    
+    @ViewBuilder
+    func bookmarkAnswerToggle() -> some View {
+        Toggle("正解を表示", isOn: $isShowingCorrectAnswers)
+            .toggleStyle(SwitchToggleStyle(tint: .themeAccent))
+            .padding(.horizontal)
+            .padding(.vertical, 12)
     }
     
     @ViewBuilder
