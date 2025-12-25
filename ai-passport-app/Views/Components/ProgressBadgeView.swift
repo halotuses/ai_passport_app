@@ -200,6 +200,7 @@ struct ProgressBadgeView: View {
     }
 }
 
+
 struct ProgressBadgeView_Previews: PreviewProvider {
     static var previews: some View {
         VStack(spacing: 20) {
