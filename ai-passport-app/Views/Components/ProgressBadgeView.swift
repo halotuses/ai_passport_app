@@ -91,7 +91,7 @@ struct ProgressBadgeView: View {
         }
 
         return LinearGradient(
-            colors: [Color.themeMain, Color.themeSecondary.opacity(0.85)],
+            colors: [Color.themeCorrect.opacity(0.9), Color.themeCorrect],
             startPoint: .leading,
             endPoint: .trailing
         )
@@ -102,7 +102,7 @@ struct ProgressBadgeView: View {
             return AnyShapeStyle(Color.crownGoldDeep)
         }
 
-        return AnyShapeStyle(Color.themeSecondary)
+        return AnyShapeStyle(Color.themeTextPrimary)
     }
     
     private var correctFraction: Double {
