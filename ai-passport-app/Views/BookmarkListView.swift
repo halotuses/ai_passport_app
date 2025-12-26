@@ -98,10 +98,44 @@ private extension BookmarkListView {
     
     @ViewBuilder
     func bookmarkAnswerToggle() -> some View {
-        Toggle("正解を表示", isOn: $isShowingCorrectAnswers)
-            .toggleStyle(SwitchToggleStyle(tint: .themeAccent))
-            .padding(.horizontal)
-            .padding(.vertical, 12)
+        HStack(spacing: 12) {
+            Image(systemName: isShowingCorrectAnswers ? "eye.fill" : "eye.slash.fill")
+                .font(.title3)
+                .foregroundColor(.themeAccent)
+                .frame(width: 32)
+            VStack(alignment: .leading, spacing: 4) {
+                Text("正解の表示")
+                    .font(.headline)
+                    .foregroundColor(.themeTextPrimary)
+                Text("ブックマークの正解を表示・非表示できます")
+                    .font(.caption)
+                    .foregroundColor(.themeTextSecondary)
+            }
+            Spacer()
+            VStack(alignment: .trailing, spacing: 6) {
+                Toggle("", isOn: $isShowingCorrectAnswers)
+                    .labelsHidden()
+                    .toggleStyle(SwitchToggleStyle(tint: .themeAccent))
+                Text(isShowingCorrectAnswers ? "表示中" : "非表示")
+                    .font(.caption2.weight(.semibold))
+                    .foregroundColor(.themeAccent)
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 4)
+                    .background(
+                        Capsule()
+                            .fill(Color.themePillBackground)
+                    )
+            }
+        }
+        .padding(.horizontal, 16)
+        .padding(.vertical, 14)
+        .background(
+            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                .fill(Color.themeSurface)
+                .shadow(color: Color.black.opacity(0.04), radius: 6, x: 0, y: 2)
+        )
+        .padding(.horizontal)
+        .padding(.vertical, 12)
     }
     
     @ViewBuilder
