@@ -25,10 +25,10 @@ struct BookmarkListView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            bookmarkAnswerNote()
             if bookmarks.isEmpty {
                 VStack(spacing: 12) {
                     bookmarkCountSummary()
+                    bookmarkAnswerNote()
                     Image(systemName: "bookmark")
                         .font(.largeTitle)
                         .foregroundColor(.secondary)
@@ -103,19 +103,21 @@ private extension BookmarkListView {
             .foregroundColor(.themeTextSecondary)
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(.horizontal)
-            .padding(.vertical, 12)
     }
     
     @ViewBuilder
     func bookmarkListHeader() -> some View {
-        HStack(alignment: .center) {
-            Text("ブックマーク")
-                .font(.headline)
-                .foregroundColor(.themeTextPrimary)
-            Spacer()
-            bookmarkCountBadge(for: bookmarks.count)
+        VStack(alignment: .leading, spacing: 6) {
+            HStack(alignment: .center) {
+                Text("ブックマーク")
+                    .font(.headline)
+                    .foregroundColor(.themeTextPrimary)
+                Spacer()
+                bookmarkCountBadge(for: bookmarks.count)
+            }
+            bookmarkAnswerNote()
         }
-        .padding(.bottom, 4)
+        .padding(.bottom, 6)
     }
 
     @ViewBuilder
