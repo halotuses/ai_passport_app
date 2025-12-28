@@ -3,6 +3,7 @@ import SwiftUI
 enum AppSettingsKeys {
     static let soundEnabled = "settings.soundEnabled"
     static let fontSizeIndex = "settings.fontSizeIndex"
+    static let bookmarkShowCorrectAnswers = "settings.bookmark.showCorrectAnswers"
 }
 
 struct AppFontSizeOption: Identifiable {

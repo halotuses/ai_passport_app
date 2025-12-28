@@ -6,6 +6,7 @@ struct SettingsView: View {
 
     @AppStorage(AppSettingsKeys.soundEnabled) private var soundEnabled = true
     @AppStorage(AppSettingsKeys.fontSizeIndex) private var fontSizeIndex = AppFontSettings.defaultIndex
+    @AppStorage(AppSettingsKeys.bookmarkShowCorrectAnswers) private var bookmarkShowCorrectAnswers = true
 
 
     private let fontSliderRange = 0.0...Double(AppFontSettings.options.count - 1)
@@ -21,6 +22,7 @@ struct SettingsView: View {
                 ScrollView {
                     VStack(spacing: 28) {
                         accountSection
+                        bookmarkSection
                         dataSection
                         supportSection
                     }
@@ -122,6 +124,27 @@ private extension SettingsView {
         }
     }
 
+    var bookmarkSection: some View {
+        SettingsSection(title: "ブックマーク") {
+            SettingsRow {
+                HStack(spacing: 16) {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("正解の表示")
+                            .font(.headline)
+                            .foregroundColor(.themeTextPrimary)
+                        Text("ブックマークした問題の正解について表示・非表示を設定できます。")
+                            .font(.caption)
+                            .foregroundColor(.themeTextSecondary)
+                    }
+                    Spacer()
+                    Toggle("", isOn: $bookmarkShowCorrectAnswers)
+                        .labelsHidden()
+                        .toggleStyle(SwitchToggleStyle(tint: Color.themeMain))
+                }
+            }
+        }
+    }
+    
     var dataSection: some View {
         SettingsSection(title: "データ管理") {
             SettingsRow {
