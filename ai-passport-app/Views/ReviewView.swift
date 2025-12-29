@@ -32,7 +32,7 @@ struct ReviewView: View {
     
     var body: some View {
         ScrollView(showsIndicators: false) {
-            VStack(spacing: 28) {
+            VStack(spacing: 22) {
                 headerSection
                 summarySection
                 reviewSections
@@ -40,7 +40,7 @@ struct ReviewView: View {
             
             .frame(maxWidth: 560)
             .padding(.horizontal, 24)
-            .padding(.vertical, 32)
+            .padding(.vertical, 24)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(reviewNavigationLinks)
@@ -77,7 +77,7 @@ private extension ReviewView {
         activePlaySelection = nil
     }
     var headerSection: some View {
-        VStack(alignment: .leading, spacing: 12) {
+        VStack(alignment: .leading, spacing: 8) {
             Text("復習を始めましょう")
                 .font(.title2.weight(.semibold))
                 .foregroundColor(.themeTextPrimary)
@@ -91,7 +91,7 @@ private extension ReviewView {
     }
     
     var summarySection: some View {
-        VStack(alignment: .leading, spacing: 16) {
+        VStack(alignment: .leading, spacing: 12) {
             Text("学習サマリー")
                 .font(.headline)
                 .foregroundColor(.themeTextPrimary)
@@ -99,7 +99,7 @@ private extension ReviewView {
         }
     }
     var reviewSections: some View {
-        VStack(spacing: 24) {
+        VStack(spacing: 20) {
             ReviewCategoryButtonSection(
                 title: "正解した問題",
                 subtitle: "正解できた問題も定期的に復習して定着させましょう。",
@@ -298,7 +298,7 @@ private extension ReviewView {
     }
 
     private func summaryStat(_ item: ReviewSummaryItem) -> some View {
-        VStack(spacing: 12) {
+        VStack(spacing: 10) {
             ZStack {
                 Circle()
                     .fill(item.tint.opacity(0.18))
@@ -323,8 +323,8 @@ private extension ReviewView {
                     .foregroundColor(.themeTextSecondary)
             }
         }
-        .padding(.vertical, 18)
-        .padding(.horizontal, 16)
+        .padding(.vertical, 14)
+        .padding(.horizontal, 14)
         .frame(maxWidth: .infinity)
         .background(
             RoundedRectangle(cornerRadius: 20, style: .continuous)
@@ -409,7 +409,7 @@ private struct ReviewCategoryButtonSection: View {
     let action: () -> Void
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 20) {
+        VStack(alignment: .leading, spacing: 16) {
             HStack(alignment: .center, spacing: 12) {
                 Image(systemName: iconName)
                     .font(.title2.weight(.semibold))
@@ -441,7 +441,7 @@ private struct ReviewCategoryButtonSection: View {
                     .font(.footnote)
                     .foregroundColor(.themeTextSecondary)
                     .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(20)
+                    .padding(16)
                     .background(
                         RoundedRectangle(cornerRadius: 16, style: .continuous)
                             .fill(Color.themeSurface)
@@ -468,7 +468,7 @@ private struct ReviewCategoryButtonSection: View {
                             .font(.headline.weight(.semibold))
                             .foregroundColor(.themeTextSecondary)
                     }
-                    .padding(20)
+                    .padding(16)
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .background(
                         RoundedRectangle(cornerRadius: 18, style: .continuous)
@@ -486,7 +486,7 @@ private struct ReviewCategoryButtonSection: View {
                 .opacity(isInteractionDisabled ? 0.6 : 1)
             }
         }
-        .padding(24)
+        .padding(20)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(
             RoundedRectangle(cornerRadius: 24, style: .continuous)
