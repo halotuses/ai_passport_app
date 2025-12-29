@@ -18,13 +18,7 @@ struct ProgressBadgeView: View {
 
 
     private var correctSummaryText: String {
-        if answeredCount > 0 {
-            return "正答数 \(correctCount)/\(answeredCount)"
-        }
-        if totalCount > 0 {
-            return "正答数 \(correctCount)/\(totalCount)"
-        }
-        return "正答数 0/0"
+        "正答数 \(correctCount)"
     }
     
     private var incorrectCount: Int {
@@ -32,13 +26,7 @@ struct ProgressBadgeView: View {
     }
 
     private var incorrectSummaryText: String {
-        if answeredCount > 0 {
-            return "不正解数 \(incorrectCount)/\(answeredCount)"
-        }
-        if totalCount > 0 {
-            return "不正解数 \(incorrectCount)/\(totalCount)"
-        }
-        return "不正解数 0/0"
+        "不正解数 \(incorrectCount)"
     }
 
     private var unansweredCount: Int {
@@ -46,10 +34,7 @@ struct ProgressBadgeView: View {
     }
 
     private var unansweredSummaryText: String {
-        if totalCount > 0 {
-            return "未解答数 \(unansweredCount)/\(totalCount)"
-        }
-        return "未解答数 0/0"
+        "未解答数 \(unansweredCount)"
     }
 
     private var badgeGradient: LinearGradient {
