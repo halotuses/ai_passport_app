@@ -38,38 +38,27 @@ struct ProgressBadgeView: View {
 
 
     private var correctSummaryText: String {
-        if sanitizedAnsweredCount > 0 {
-            return "正答数 \(sanitizedCorrectCount)/\(sanitizedAnsweredCount)"
-        }
+
         if totalQuestionCount > 0 {
-            return "正答数 \(sanitizedCorrectCount)/\(totalQuestionCount)"
+            return "正解 \(sanitizedCorrectCount) / \(totalQuestionCount)"
         }
-        return "正答数 0/0"
+        return "正解 0 / 0"
     }
     
     private var incorrectCount: Int {
         sanitizedIncorrectCount
     }
 
-    private var incorrectSummaryText: String {
-        if sanitizedAnsweredCount > 0 {
-            return "不正解数 \(incorrectCount)/\(sanitizedAnsweredCount)"
-        }
+    private var remainingSummaryText: String {
         if totalQuestionCount > 0 {
-            return "不正解数 \(incorrectCount)/\(totalQuestionCount)"
+            let remainingCount = incorrectCount + unansweredCount
+            return "残り \(remainingCount)（不正解 \(incorrectCount)・未解答 \(unansweredCount)）"
         }
-        return "不正解数 0/0"
+        return "残り 0（ 不正解 0・ 未解答 0 ）"
     }
 
     private var unansweredCount: Int {
         sanitizedUnansweredCount
-    }
-
-    private var unansweredSummaryText: String {
-        if totalQuestionCount > 0 {
-            return "未解答数 \(unansweredCount)/\(totalQuestionCount)"
-        }
-        return "未解答数 0/0"
     }
 
     private var badgeGradient: LinearGradient {
@@ -129,10 +118,7 @@ struct ProgressBadgeView: View {
                     Text(correctSummaryText)
                         .font(.system(size: 16, weight: .semibold))
                         .foregroundStyle(Color.themeTextPrimary)
-                    Text(incorrectSummaryText)
-                        .font(.system(size: 12, weight: .medium))
-                        .foregroundStyle(Color.themeTextSecondary)
-                    Text(unansweredSummaryText)
+                    Text(remainingSummaryText)
                         .font(.system(size: 12, weight: .medium))
                         .foregroundStyle(Color.themeTextSecondary)
                 }
