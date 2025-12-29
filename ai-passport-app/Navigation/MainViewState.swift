@@ -182,7 +182,7 @@ final class MainViewState: ObservableObject {
     
     /// 回答履歴画面に遷移
     func enterAnswerHistory() {
-        isOnHome = false
+        isOnHome = true
         isShowingAnswerHistory = true
         isShowingBookmarks = false
         isShowingBookmarkQuiz = false
