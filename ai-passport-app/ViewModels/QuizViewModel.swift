@@ -405,6 +405,16 @@ private extension QuizViewModel {
 extension QuizViewModel {
     /// 復習画面などから特定の問題に直接遷移する際の初期位置を設定する
     func prepareForReviewNavigation(initialQuestionIndex: Int) {
-        pendingInitialQuestionIndex = max(0, initialQuestionIndex)
+        let normalizedIndex = max(0, initialQuestionIndex)
+        pendingInitialQuestionIndex = normalizedIndex
+
+        guard isLoaded, quizzes.indices.contains(normalizedIndex) else { return }
+        currentQuestionIndex = normalizedIndex
+        if selectedAnswers.indices.contains(normalizedIndex) {
+            selectedAnswerIndex = selectedAnswers[normalizedIndex]
+        } else {
+            selectedAnswerIndex = nil
+        }
+        showResultView = false
     }
 }
