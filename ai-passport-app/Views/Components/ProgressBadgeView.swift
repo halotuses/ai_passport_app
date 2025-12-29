@@ -10,55 +10,46 @@ struct ProgressBadgeView: View {
     private var clampedAccuracy: Double {
         min(max(accuracy, 0), 1)
     }
-    
-    private var totalQuestionCount: Int {
-        max(totalCount, 0)
-    }
-
-    private var sanitizedCorrectCount: Int {
-        min(max(correctCount, 0), totalQuestionCount)
-    }
-
-    private var sanitizedAnsweredCount: Int {
-        min(max(answeredCount, 0), totalQuestionCount)
-    }
-
-    private var sanitizedIncorrectCount: Int {
-        max(sanitizedAnsweredCount - sanitizedCorrectCount, 0)
-    }
-
-    private var sanitizedUnansweredCount: Int {
-        max(totalQuestionCount - sanitizedAnsweredCount, 0)
-    }
 
     private var accuracyText: String {
-        guard sanitizedAnsweredCount > 0 else { return "--%" }
+        guard answeredCount > 0 else { return "--%" }
         return "\(Int((clampedAccuracy * 100).rounded()))%"
     }
 
 
     private var correctSummaryText: String {
-
-        if totalQuestionCount > 0 {
-            return "正解 \(sanitizedCorrectCount) / \(totalQuestionCount)"
+        if answeredCount > 0 {
+            return "正答数 \(correctCount)/\(answeredCount)"
         }
-        return "正解 0 / 0"
+        if totalCount > 0 {
+            return "正答数 \(correctCount)/\(totalCount)"
+        }
+        return "正答数 0/0"
     }
     
     private var incorrectCount: Int {
-        sanitizedIncorrectCount
+        max(answeredCount - correctCount, 0)
     }
 
-    private var remainingSummaryText: String {
-        if totalQuestionCount > 0 {
-            let remainingCount = incorrectCount + unansweredCount
-            return "残り \(remainingCount)（不正解 \(incorrectCount)・未解答 \(unansweredCount)）"
+    private var incorrectSummaryText: String {
+        if answeredCount > 0 {
+            return "不正解数 \(incorrectCount)/\(answeredCount)"
         }
-        return "残り 0（ 不正解 0・ 未解答 0 ）"
+        if totalCount > 0 {
+            return "不正解数 \(incorrectCount)/\(totalCount)"
+        }
+        return "不正解数 0/0"
     }
 
     private var unansweredCount: Int {
-        sanitizedUnansweredCount
+        max(totalCount - answeredCount, 0)
+    }
+
+    private var unansweredSummaryText: String {
+        if totalCount > 0 {
+            return "未解答数 \(unansweredCount)/\(totalCount)"
+        }
+        return "未解答数 0/0"
     }
 
     private var badgeGradient: LinearGradient {
@@ -70,7 +61,7 @@ struct ProgressBadgeView: View {
     }
     
     private var isPerfectScore: Bool {
-        totalQuestionCount > 0 && sanitizedCorrectCount == totalQuestionCount
+        totalCount > 0 && correctCount == totalCount
     }
 
     
@@ -80,7 +71,7 @@ struct ProgressBadgeView: View {
         }
 
         return LinearGradient(
-            colors: [Color.themeCorrect.opacity(0.9), Color.themeCorrect],
+            colors: [Color.themeMain, Color.themeSecondary.opacity(0.85)],
             startPoint: .leading,
             endPoint: .trailing
         )
@@ -91,24 +82,7 @@ struct ProgressBadgeView: View {
             return AnyShapeStyle(Color.crownGoldDeep)
         }
 
-        return AnyShapeStyle(Color.themeTextPrimary)
-    }
-    
-    private var correctFraction: Double {
-        progressFraction(for: sanitizedCorrectCount)
-    }
-
-    private var incorrectFraction: Double {
-        progressFraction(for: sanitizedIncorrectCount)
-    }
-
-    private var unansweredFraction: Double {
-        progressFraction(for: sanitizedUnansweredCount)
-    }
-
-    private func progressFraction(for count: Int) -> Double {
-        guard totalQuestionCount > 0 else { return 0 }
-        return Double(count) / Double(totalQuestionCount)
+        return AnyShapeStyle(Color.themeSecondary)
     }
     
     var body: some View {
@@ -118,7 +92,10 @@ struct ProgressBadgeView: View {
                     Text(correctSummaryText)
                         .font(.system(size: 16, weight: .semibold))
                         .foregroundStyle(Color.themeTextPrimary)
-                    Text(remainingSummaryText)
+                    Text(incorrectSummaryText)
+                        .font(.system(size: 12, weight: .medium))
+                        .foregroundStyle(Color.themeTextSecondary)
+                    Text(unansweredSummaryText)
                         .font(.system(size: 12, weight: .medium))
                         .foregroundStyle(Color.themeTextSecondary)
                 }
@@ -135,7 +112,14 @@ struct ProgressBadgeView: View {
             }
 
             GeometryReader { geometry in
-                segmentedProgressBar(width: geometry.size.width)
+                ZStack(alignment: .leading) {
+                    Capsule()
+                        .fill(Color.themeSurface.opacity(0.7))
+                    Capsule()
+                        .fill(progressGradient)
+                        .frame(width: geometry.size.width * clampedAccuracy)
+                        .animation(.easeInOut(duration: 0.45), value: clampedAccuracy)
+                }
             }
             .frame(height: 8)
         }
@@ -151,41 +135,7 @@ struct ProgressBadgeView: View {
         )
         .shadow(color: Color.themeShadowSoft.opacity(0.5), radius: 10, x: 0, y: 6)
     }
-    @ViewBuilder
-    private func segmentedProgressBar(width: CGFloat) -> some View {
-        let correctWidth = width * correctFraction
-        let incorrectWidth = width * incorrectFraction
-        let unansweredWidth = width * unansweredFraction
-
-        ZStack(alignment: .leading) {
-            Capsule()
-                .fill(Color.themeSurface.opacity(0.7))
-
-            HStack(spacing: 0) {
-                if correctWidth > 0 {
-                    segment(width: correctWidth, fill: progressGradient)
-                        .animation(.easeInOut(duration: 0.45), value: correctFraction)
-                }
-                if incorrectWidth > 0 {
-                    segment(width: incorrectWidth, fill: Color.themeIncorrect)
-                        .animation(.easeInOut(duration: 0.45), value: incorrectFraction)
-                }
-                if unansweredWidth > 0 {
-                    segment(width: unansweredWidth, fill: Color.themeTextSecondary.opacity(0.28))
-                        .animation(.easeInOut(duration: 0.45), value: unansweredFraction)
-                }
-            }
-            .mask(Capsule())
-        }
-    }
-
-    private func segment(width: CGFloat, fill: some ShapeStyle) -> some View {
-        Rectangle()
-            .fill(fill)
-            .frame(width: width)
-    }
 }
-
 
 struct ProgressBadgeView_Previews: PreviewProvider {
     static var previews: some View {
