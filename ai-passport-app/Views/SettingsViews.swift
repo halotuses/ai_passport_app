@@ -26,7 +26,9 @@ struct SettingsView: View {
                         dataSection
                         supportSection
                     }
+                    .padding(.horizontal, 20)
                 }
+                .padding(.horizontal, -20)
             }
             .padding(.horizontal, 20)
             .padding(.top, 12)

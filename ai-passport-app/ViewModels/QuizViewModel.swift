@@ -202,8 +202,17 @@ class QuizViewModel: ObservableObject {
             var isNowBookmarked = false
             try realm.write {
                 if let existingBookmark = realm.object(ofType: BookmarkObject.self, forPrimaryKey: stableQuizId) {
-                    realm.delete(existingBookmark)
-                    isNowBookmarked = false
+                    if existingBookmark.isBookmarked {
+                        existingBookmark.isBookmarked = false
+                        existingBookmark.updatedAt = now
+                        isNowBookmarked = false
+                    } else {
+                        existingBookmark.isBookmarked = true
+                        existingBookmark.userId = currentUserId
+                        existingBookmark.updatedAt = now
+                        existingBookmark.questionText = quiz.question
+                        isNowBookmarked = true
+                    }
                 } else {
                     let bookmark = BookmarkObject()
                     bookmark.quizId = stableQuizId
@@ -213,6 +222,11 @@ class QuizViewModel: ObservableObject {
                     bookmark.isBookmarked = true
                     bookmark.questionText = quiz.question
                     realm.add(bookmark)
+                    
+                    isNowBookmarked = true
+                }
+
+                if isNowBookmarked {
 
                     let progressObject: QuestionProgressObject
                     if let existingProgress = realm.object(ofType: QuestionProgressObject.self, forPrimaryKey: stableQuizId) {
@@ -234,7 +248,6 @@ class QuizViewModel: ObservableObject {
                     progressObject.correctChoiceIndex = quiz.answerIndex
                     progressObject.updatedAt = now
 
-                    isNowBookmarked = true
                 }
             }
 
