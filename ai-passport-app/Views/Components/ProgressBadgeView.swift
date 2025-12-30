@@ -17,25 +17,19 @@ struct ProgressBadgeView: View {
     }
 
 
-    private var correctSummaryText: String {
-        "正答数 \(correctCount)"
-    }
+
     
     private var incorrectCount: Int {
         max(answeredCount - correctCount, 0)
     }
 
-    private var incorrectSummaryText: String {
-        "不正解数 \(incorrectCount)"
-    }
+
 
     private var unansweredCount: Int {
         max(totalCount - answeredCount, 0)
     }
 
-    private var unansweredSummaryText: String {
-        "未解答数 \(unansweredCount)"
-    }
+
 
     private var badgeGradient: LinearGradient {
         LinearGradient(
@@ -71,29 +65,38 @@ struct ProgressBadgeView: View {
     }
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            HStack(alignment: .firstTextBaseline) {
-                VStack(alignment: .leading, spacing: 2) {
-                    Text(correctSummaryText)
-                        .font(.system(size: 16, weight: .semibold))
-                        .foregroundStyle(Color.themeTextPrimary)
-                    Text(incorrectSummaryText)
-                        .font(.system(size: 12, weight: .medium))
-                        .foregroundStyle(Color.themeTextSecondary)
-                    Text(unansweredSummaryText)
-                        .font(.system(size: 12, weight: .medium))
-                        .foregroundStyle(Color.themeTextSecondary)
+        VStack(alignment: .leading, spacing: 10) {
+            HStack(alignment: .top, spacing: 12) {
+                HStack(alignment: .center, spacing: 12) {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("正答数")
+                        Text("不正解数")
+                        Text("未解答数")
+                    }
+                    .font(.system(size: 12, weight: .medium))
+                    .foregroundStyle(Color.themeTextSecondary)
+
+                    VStack(alignment: .trailing, spacing: 4) {
+                        Text("\(correctCount)")
+                        Text("\(incorrectCount)")
+                        Text("\(unansweredCount)")
+                    }
+                    .font(.system(size: 14, weight: .semibold))
+                    .foregroundStyle(Color.themeTextPrimary)
+                    .monospacedDigit()
                 }
                 Spacer()
-                Text(accuracyText)
-                    .font(.system(size: 14, weight: .semibold))
-                    .foregroundStyle(accuracyForegroundStyle)
-                    .padding(.horizontal, 10)
-                    .padding(.vertical, 4)
-                    .background(
-                        Capsule()
-                            .fill(Color.themeBadgeBackground.opacity(0.5))
-                    )
+                VStack(alignment: .trailing, spacing: 4) {
+                    Text(accuracyText)
+                        .font(.system(size: 14, weight: .semibold))
+                        .foregroundStyle(accuracyForegroundStyle)
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 4)
+                        .background(
+                            Capsule()
+                                .fill(Color.themeBadgeBackground.opacity(0.5))
+                        )
+                }
             }
 
             GeometryReader { geometry in
@@ -106,9 +109,9 @@ struct ProgressBadgeView: View {
                         .animation(.easeInOut(duration: 0.45), value: clampedAccuracy)
                 }
             }
-            .frame(height: 8)
+            .frame(height: 7)
         }
-        .padding(.vertical, 14)
+        .padding(.vertical, 12)
         .padding(.horizontal, 16)
         .background(
             RoundedRectangle(cornerRadius: 18, style: .continuous)
