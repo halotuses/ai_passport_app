@@ -334,15 +334,16 @@ class QuizViewModel: ObservableObject {
     
     // MARK: - Reset
     func reset() {
+        quizzes = []
         currentQuestionIndex = 0
         selectedAnswerIndex = nil
-        selectedAnswers = Array(repeating: nil, count: quizzes.count)
-        isLoaded = !quizzes.isEmpty
+        selectedAnswers = []
+        isLoaded = false
         hasError = false
         chapterId = ""
         unitId = ""
         showResultView = false
-        questionStatuses = Array(repeating: .unanswered, count: quizzes.count)
+        questionStatuses = []
         bookmarkedQuizIds = []
         pendingInitialQuestionIndex = nil
     }
