@@ -8,6 +8,7 @@ struct HeaderView: View {
     @EnvironmentObject private var mainViewState: MainViewState
     // ルーティング管理（画面遷移を制御）
     @EnvironmentObject private var router: NavigationRouter
+    @ScaledMetric(relativeTo: .title2) private var headerHeight: CGFloat = 48
 
     var body: some View {
         let needsSidePadding = (mainViewState.headerBackButton != nil) || (mainViewState.headerBookmark != nil)
@@ -65,8 +66,8 @@ struct HeaderView: View {
             }
         }
         // MARK: - レイアウト全体設定
-        .padding(.vertical, 10)
         .padding(.horizontal, 16)
+        .frame(height: headerHeight)
         .frame(maxWidth: .infinity)
 
         // MARK: - 背景スタイル
