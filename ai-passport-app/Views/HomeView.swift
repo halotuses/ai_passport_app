@@ -188,7 +188,6 @@ struct HomeView: View {
                     highlightValue: (completionPercentageValue ?? 0) == 100
                 )
                 HStack(spacing: 8) {
-                    StatColumnView(color: .themeStreak, label: "連続正解", value: progressViewModel.currentCorrectStreak)
                     StatColumnView(color: .themeCorrect, label: "正解", value: progressViewModel.totalCorrect)
                     StatColumnView(color: .themeIncorrect, label: "不正解", value: progressViewModel.totalIncorrect)
                     StatColumnView(color: .gray, label: "未回答", value: unansweredCount)

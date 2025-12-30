@@ -21,8 +21,7 @@ extension Color {
     static let themeShadowSoft = Color.black.opacity(0.08)
     static let themeCorrect = Color(red: 119/255, green: 221/255, blue: 119/255)
     static let themeIncorrect = Color(red: 246/255, green: 114/255, blue: 128/255)
-    static let themeStreak = Color(red: 255/255, green: 214/255, blue: 74/255)
-    
+
     static let crownGoldLight = Color(red: 0.93, green: 0.80, blue: 0.40)
     static let crownGoldDeep = Color(red: 0.80, green: 0.65, blue: 0.20)
     static let crownGoldHighlight = Color(red: 1.00, green: 0.90, blue: 0.60)

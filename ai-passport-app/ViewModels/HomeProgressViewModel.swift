@@ -8,7 +8,6 @@ final class HomeProgressViewModel: ObservableObject {
     @Published private(set) var totalIncorrect: Int = 0
     @Published private(set) var totalAnswered: Int = 0
     @Published private(set) var completionRate: Double = 0
-    @Published private(set) var currentCorrectStreak: Int = 0
     @Published private(set) var isLoading: Bool = false
 
     private let repository: RealmAnswerHistoryRepository
@@ -38,8 +37,7 @@ final class HomeProgressViewModel: ObservableObject {
         let correct = repository.totalCorrectAnswerCount()
         let incorrect = repository.totalIncorrectAnswerCount()
         let answered = repository.totalAnsweredCount()
-        let streak = repository.currentCorrectStreakCount()
-        updateAggregates(correct: correct, incorrect: incorrect, answered: answered, streak: streak)
+        updateAggregates(correct: correct, incorrect: incorrect, answered: answered)
     }
 
     var totalUnanswered: Int {
@@ -149,8 +147,7 @@ final class HomeProgressViewModel: ObservableObject {
                     let correct = collection.filter("statusRaw == %@", QuestionStatus.correct.rawValue).count
                     let incorrect = collection.filter("statusRaw == %@", QuestionStatus.incorrect.rawValue).count
                     let answered = collection.filter("statusRaw != %@", QuestionStatus.unanswered.rawValue).count
-                    let streak = self.currentStreak(from: collection)
-                    self.updateAggregates(correct: correct, incorrect: incorrect, answered: answered, streak: streak)
+                    self.updateAggregates(correct: correct, incorrect: incorrect, answered: answered)
                 case .error(let error):
                     print("❌ Realm observe failed: \(error)")
                 }
@@ -160,29 +157,14 @@ final class HomeProgressViewModel: ObservableObject {
         }
     }
 
-    private func updateAggregates(correct: Int, incorrect: Int, answered: Int, streak: Int? = nil) {
+    private func updateAggregates(correct: Int, incorrect: Int, answered: Int) {
         totalCorrect = correct
         totalIncorrect = incorrect
         totalAnswered = answered
-        if let streak {
-            currentCorrectStreak = streak
-        }
         if totalQuestions < answered {
             totalQuestions = answered
         }
         updateCompletionRate()
-    }
-    private func currentStreak(from collection: Results<QuestionProgressObject>) -> Int {
-        var streak = 0
-        for object in collection {
-            switch object.status {
-            case .correct:
-                streak += 1
-            case .incorrect, .unanswered:
-                return streak
-            }
-        }
-        return streak
     }
     deinit {
         progressToken?.invalidate()

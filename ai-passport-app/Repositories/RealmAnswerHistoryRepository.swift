@@ -314,18 +314,6 @@ final class RealmAnswerHistoryRepository {
         count(for: .correct, chapterId: chapterId)
     }
     
-    func currentCorrectStreakCount() -> Int {
-        do {
-            let realm = try realm()
-            let results = realm.objects(QuestionProgressObject.self)
-                .sorted(byKeyPath: "updatedAt", ascending: false)
-            return Self.currentStreak(from: results)
-        } catch {
-            print("❌ Realm streak calculation failed: \(error)")
-            return 0
-        }
-    }
-    
     func countCorrectAnswers(unitId: String, chapterIdentifier: String) -> Int {
         count(for: .correct, unitId: unitId, chapterIdentifier: chapterIdentifier)
     }
@@ -477,19 +465,6 @@ final class RealmAnswerHistoryRepository {
             print("❌ Realm count failed: \(error)")
             return 0
         }
-    }
-    
-    private static func currentStreak<S: Sequence>(from sequence: S) -> Int where S.Element == QuestionProgressObject {
-        var streak = 0
-        for object in sequence {
-            switch object.status {
-            case .correct:
-                streak += 1
-            case .incorrect, .unanswered:
-                return streak
-            }
-        }
-        return streak
     }
     
     private func realm() throws -> Realm {
