@@ -2,11 +2,19 @@ import SwiftUI
 
 /// 章選択画面での学習状況を示すバッジスタイルのプログレスビュー
 struct ProgressBadgeView: View {
+    
+    enum DisplayMode {
+        case detailed
+        case ratio
+    }
+    
+    
     let correctCount: Int
     let answeredCount: Int
     let totalCount: Int
     let accuracy: Double
-
+    var displayMode: DisplayMode = .detailed
+    
     private var clampedAccuracy: Double {
         min(max(accuracy, 0), 1)
     }
@@ -64,7 +72,34 @@ struct ProgressBadgeView: View {
         return AnyShapeStyle(Color.themeSecondary)
     }
     
+    private var ratioText: String {
+        guard totalCount > 0 else { return "--/--" }
+        return "\(correctCount)/\(totalCount)"
+    }
+    
     var body: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            switch displayMode {
+            case .detailed:
+                detailedContent
+            case .ratio:
+                ratioContent
+            }
+        }
+        .padding(.vertical, 12)
+        .padding(.horizontal, 16)
+        .background(
+            RoundedRectangle(cornerRadius: 18, style: .continuous)
+                .fill(badgeGradient)
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 18, style: .continuous)
+                .stroke(Color.white.opacity(0.35), lineWidth: 0.8)
+        )
+        .shadow(color: Color.themeShadowSoft.opacity(0.5), radius: 10, x: 0, y: 6)
+    }
+
+    private var detailedContent: some View {
         VStack(alignment: .leading, spacing: 10) {
             HStack(alignment: .top, spacing: 12) {
                 HStack(alignment: .center, spacing: 12) {
@@ -111,17 +146,17 @@ struct ProgressBadgeView: View {
             }
             .frame(height: 7)
         }
-        .padding(.vertical, 12)
-        .padding(.horizontal, 16)
-        .background(
-            RoundedRectangle(cornerRadius: 18, style: .continuous)
-                .fill(badgeGradient)
-        )
-        .overlay(
-            RoundedRectangle(cornerRadius: 18, style: .continuous)
-                .stroke(Color.white.opacity(0.35), lineWidth: 0.8)
-        )
-        .shadow(color: Color.themeShadowSoft.opacity(0.5), radius: 10, x: 0, y: 6)
+    }
+
+    private var ratioContent: some View {
+        HStack {
+            Text(ratioText)
+                .font(.system(size: 16, weight: .semibold))
+                .foregroundStyle(Color.themeTextPrimary)
+                .monospacedDigit()
+            Spacer()
+        }
+        .frame(minWidth: 100)
     }
 }
 

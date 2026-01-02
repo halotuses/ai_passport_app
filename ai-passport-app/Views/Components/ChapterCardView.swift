@@ -4,7 +4,8 @@ import SwiftUI
 struct ChapterCardView<ViewModel: ChapterProgressDisplayable>: View {
     @ObservedObject var viewModel: ViewModel
     var isDisabled: Bool = false
-
+    var badgeDisplayMode: ProgressBadgeView.DisplayMode = .detailed
+    
     private var iconGradient: LinearGradient {
         LinearGradient(
             colors: [Color.themeMain, Color.themeSecondary],
@@ -49,7 +50,8 @@ struct ChapterCardView<ViewModel: ChapterProgressDisplayable>: View {
                 correctCount: viewModel.correctCount,
                 answeredCount: viewModel.answeredCount,
                 totalCount: viewModel.totalQuestions,
-                accuracy: viewModel.accuracyRate
+                accuracy: viewModel.accuracyRate,
+                displayMode: badgeDisplayMode
             )
             .allowsHitTesting(false)
         }

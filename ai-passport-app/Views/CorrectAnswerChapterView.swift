@@ -32,7 +32,10 @@ struct CorrectAnswerChapterView: View {
                                     onClose: { setHeader() }
                                 )
                             } label: {
-                                ChapterCardView(viewModel: chapter.progressViewModel)
+                                ChapterCardView(
+                                    viewModel: chapter.progressViewModel,
+                                    badgeDisplayMode: .ratio
+                                )
                             }
                             .buttonStyle(.plain)
                             .simultaneousGesture(
@@ -43,7 +46,8 @@ struct CorrectAnswerChapterView: View {
                         } else {
                             ChapterCardView(
                                 viewModel: chapter.progressViewModel,
-                                isDisabled: true
+                                isDisabled: true,
+                                badgeDisplayMode: .ratio
                             )
                             .allowsHitTesting(false)
                         }
