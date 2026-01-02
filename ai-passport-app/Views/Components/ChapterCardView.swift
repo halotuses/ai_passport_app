@@ -5,6 +5,7 @@ struct ChapterCardView<ViewModel: ChapterProgressDisplayable>: View {
     @ObservedObject var viewModel: ViewModel
     var isDisabled: Bool = false
     var badgeDisplayMode: ProgressBadgeView.DisplayMode = .detailed
+    var badgeCorrectCount: Int? = nil
     
     private var iconGradient: LinearGradient {
         LinearGradient(
@@ -23,6 +24,7 @@ struct ChapterCardView<ViewModel: ChapterProgressDisplayable>: View {
     }
 
     var body: some View {
+        let displayCorrectCount = badgeDisplayMode == .ratio ? (badgeCorrectCount ?? viewModel.correctCount) : viewModel.correctCount
         HStack(spacing: 16) {
             Image(systemName: "book.closed")
                 .font(.system(size: 20, weight: .semibold))
@@ -47,7 +49,7 @@ struct ChapterCardView<ViewModel: ChapterProgressDisplayable>: View {
             Spacer()
 
             ProgressBadgeView(
-                correctCount: viewModel.correctCount,
+                correctCount: displayCorrectCount,
                 answeredCount: viewModel.answeredCount,
                 totalCount: viewModel.totalQuestions,
                 accuracy: viewModel.accuracyRate,

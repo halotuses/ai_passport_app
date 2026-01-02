@@ -34,7 +34,8 @@ struct CorrectAnswerChapterView: View {
                             } label: {
                                 ChapterCardView(
                                     viewModel: chapter.progressViewModel,
-                                    badgeDisplayMode: .ratio
+                                    badgeDisplayMode: .ratio,
+                                    badgeCorrectCount: chapter.correctCount
                                 )
                             }
                             .buttonStyle(.plain)
@@ -47,7 +48,8 @@ struct CorrectAnswerChapterView: View {
                             ChapterCardView(
                                 viewModel: chapter.progressViewModel,
                                 isDisabled: true,
-                                badgeDisplayMode: .ratio
+                                badgeDisplayMode: .ratio,
+                                badgeCorrectCount: chapter.correctCount
                             )
                             .allowsHitTesting(false)
                         }
