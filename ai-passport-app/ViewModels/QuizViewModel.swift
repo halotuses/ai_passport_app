@@ -44,7 +44,7 @@ class QuizViewModel: ObservableObject {
     }
     
     // MARK: - Load
-    func fetchQuizzes(from chapterFilePath: String) {
+    func fetchQuizzes(from chapterFilePath: String, completion: ((Bool) -> Void)? = nil) {
         isLoaded = false
         hasError = false
         quizzes = []
@@ -97,6 +97,7 @@ class QuizViewModel: ObservableObject {
                 }
 
                 self.pendingInitialQuestionIndex = nil
+                completion?(true)
             } else {
                 self.quizzes = []
                 self.selectedAnswers = []
@@ -107,11 +108,18 @@ class QuizViewModel: ObservableObject {
                 self.questionStatuses = []
                 self.bookmarkedQuizIds = []
                 self.pendingInitialQuestionIndex = nil
+                completion?(false)
                 
             }
         }
     }
-    
+    func prefetchQuizzes(from chapterFilePath: String) async -> Bool {
+        await withCheckedContinuation { continuation in
+            fetchQuizzes(from: chapterFilePath) { success in
+                continuation.resume(returning: success)
+            }
+        }
+    }
     
     // MARK: - Answer Record
     func recordAnswer(selectedIndex: Int) {

@@ -9,6 +9,8 @@ struct ChapterListView: View {
     @StateObject private var viewModel: ChapterListViewModel
     @Binding var selectedChapter: ChapterMetadata?
     @EnvironmentObject private var mainViewState: MainViewState
+    @EnvironmentObject private var progressManager: ProgressManager
+    @State private var isPrefetching = false
     
     init(
         unitKey: String,
@@ -30,7 +32,16 @@ struct ChapterListView: View {
                 ForEach(viewModel.progressViewModels) { progressVM in
                     Button(action: {
                         SoundManager.shared.play(.tap)
-                        selectedChapter = progressVM.chapter
+                        guard !isPrefetching else { return }
+                        let chapter = progressVM.chapter
+                        isPrefetching = true
+                        progressManager.quizViewModel.unitId = unitKey
+                        progressManager.quizViewModel.chapterId = chapter.id
+                        Task {
+                            _ = await progressManager.quizViewModel.prefetchQuizzes(from: chapter.file)
+                            selectedChapter = chapter
+                            isPrefetching = false
+                        }
                     }) {
                         ChapterCardView(viewModel: progressVM)
                     }

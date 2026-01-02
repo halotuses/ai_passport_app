@@ -167,7 +167,13 @@ private extension ContentView {
     
     func loadQuizzes() {
         let chapterFilePath = chapter.file
-        viewModel.unitId = extractUnitIdentifier(from: chapterFilePath)
+        let unitId = extractUnitIdentifier(from: chapterFilePath)
+        if viewModel.isLoaded,
+           viewModel.chapterId == chapter.id,
+           viewModel.unitId == unitId {
+            return
+        }
+        viewModel.unitId = unitId
         viewModel.chapterId = chapter.id
         viewModel.fetchQuizzes(from: chapterFilePath)
     }
