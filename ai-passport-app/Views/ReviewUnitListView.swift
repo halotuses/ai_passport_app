@@ -152,7 +152,9 @@ private extension ReviewUnitListView {
     }
     
     func unitRowView(unit: ReviewUnitListViewModel.ReviewUnit, isDisabled: Bool) -> some View {
-        let total = unit.reviewCount
+        let totalReviewCount = unit.reviewCount
+        let totalUnitCount = unit.unit.total > 0 ? unit.unit.total : totalReviewCount
+        let ratioText = "\(totalReviewCount)/\(totalUnitCount)"
         
         return HStack(spacing: 16) {
             Image(systemName: "chevron.right")
@@ -197,9 +199,12 @@ private extension ReviewUnitListView {
                     )
                     .frame(width: 44, height: 44)
                 
-                Text("\(total)")
-                    .font(.system(size: 12, weight: .semibold))
+                Text(ratioText)
+                    .font(.system(size: 11, weight: .semibold))
                     .foregroundColor(.themeTextPrimary)
+                    .minimumScaleFactor(0.6)
+                    .lineLimit(1)
+                    .monospacedDigit()
             }
             .opacity(isDisabled ? 0.6 : 1.0)
         }
