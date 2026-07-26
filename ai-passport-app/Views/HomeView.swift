@@ -129,22 +129,29 @@ struct HomeView: View {
     
     // MARK: - メインビュー構築
     var body: some View {
-        ScrollView(showsIndicators: false) {
-            VStack(spacing: 28) {
-                progressCard         // 学習進捗カード
-                VStack(spacing: 16) {
-                    startLearningButton  // 学習開始ボタン
-                    startReviewButton   // 復習開始ボタン
+        GeometryReader { geometry in
+            let layout = HomeLayout(availableSize: geometry.size)
+
+            ScrollView(showsIndicators: false) {
+                VStack(spacing: layout.sectionSpacing) {
+                    progressCard(layout: layout)
+                    VStack(spacing: layout.buttonSpacing) {
+                        actionButton(title: "学習を始める", systemImage: "play.fill", layout: layout) {
+                            mainViewState.enterUnitSelection()
+                        }
+                        actionButton(title: "復習を始める", systemImage: "arrow.triangle.2.circlepath", layout: layout) {
+                            mainViewState.enterReview()
+                        }
+                    }
                 }
+                .frame(maxWidth: 520)
+                .frame(maxWidth: .infinity)
+                .padding(.horizontal, layout.screenHorizontalPadding)
+                .padding(.vertical, layout.screenVerticalPadding)
+                .frame(minHeight: geometry.size.height, alignment: .top)
             }
-            .frame(maxWidth: 520)
-            .padding(.horizontal, 24)
-            .padding(.vertical, 32)
+            .background(PaperBackground().ignoresSafeArea())
         }
-        .background(
-            PaperBackground()
-                .ignoresSafeArea()
-        )
         .onAppear {
             mainViewState.enterHome()
             viewModel.refresh()
@@ -157,8 +164,8 @@ struct HomeView: View {
     }
     
     // MARK: - 学習進捗カード
-    private var progressCard: some View {
-        VStack(alignment: .leading, spacing: 20) {
+    private func progressCard(layout: HomeLayout) -> some View {
+        VStack(alignment: .leading, spacing: layout.cardSpacing) {
             // タイトル行
             HStack(alignment: .center, spacing: 12) {
                 Label("学習進捗", systemImage: "chart.pie.fill")
@@ -178,14 +185,16 @@ struct HomeView: View {
             }
             
             // 円グラフ＋統計3列
-            VStack(spacing: 20) {
+            VStack(spacing: layout.cardSpacing) {
                 ProgressRingView(
                     correctProgress: correctProgressValue,
                     incorrectProgress: incorrectProgressValue,
                     titleText: completionPercentageDisplay.label,
                     valueText: completionPercentageDisplay.value,
                     detailText: progressRingDetailText,
-                    highlightValue: (completionPercentageValue ?? 0) == 100
+                    highlightValue: (completionPercentageValue ?? 0) == 100,
+                    size: layout.ringSize,
+                    lineWidth: layout.ringLineWidth
                 )
                 HStack(spacing: 8) {
                     StatColumnView(color: .themeCorrect, label: "正解", value: progressViewModel.totalCorrect)
@@ -228,8 +237,8 @@ struct HomeView: View {
             )
             .buttonStyle(.plain)
         }
-        .padding(.horizontal, 22)
-        .padding(.vertical, 20)
+        .padding(.horizontal, layout.cardHorizontalPadding)
+        .padding(.vertical, layout.cardVerticalPadding)
         .frame(maxWidth: .infinity)
         .background(
             RoundedRectangle(cornerRadius: 28, style: .continuous)
@@ -250,34 +259,36 @@ struct HomeView: View {
                 )
         )
         .shadow(color: Color.themeSecondary.opacity(0.14), radius: 20, x: 0, y: 14)
-        .padding(.horizontal, 8)
-        .padding(.vertical, 4)
     }
     
-    // MARK: - 学習開始ボタン
-    private var startLearningButton: some View {
+    // MARK: - ホームアクションボタン
+    private func actionButton(
+        title: String,
+        systemImage: String,
+        layout: HomeLayout,
+        action: @escaping () -> Void
+    ) -> some View {
         Button {
             withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
-                mainViewState.enterUnitSelection()
+                action()
             }
         } label: {
             ZStack {
                 HStack(spacing: 12) {
-                    Image(systemName: "play.fill").font(.headline)
-                    Text("学習を始める").font(.headline)
+                    Image(systemName: systemImage).font(.headline)
+                    Text(title).font(.headline)
                 }
                 .frame(maxWidth: .infinity)
                 HStack {
                     Spacer()
                     Image(systemName: "arrow.right")
                         .font(.headline)
-                        .foregroundColor(.white)
                 }
             }
             .foregroundColor(.white)
-            .padding(.vertical, 20)
-            .padding(.horizontal, 28)
-            .frame(maxWidth: 360)
+            .frame(maxWidth: .infinity)
+            .frame(minHeight: layout.buttonHeight)
+            .padding(.horizontal, 24)
             .background(
                 LinearGradient(
                     colors: [
@@ -298,49 +309,31 @@ struct HomeView: View {
         }
         .buttonStyle(.plain)
     }
-    private var startReviewButton: some View {
-        Button {
-            withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
-                mainViewState.enterReview()
-            }
-        } label: {
-            ZStack {
-                HStack(spacing: 12) {
-                    Image(systemName: "arrow.triangle.2.circlepath").font(.headline)
-                    Text("復習を始める").font(.headline)
-                }
-                .frame(maxWidth: .infinity)
-                HStack {
-                    Spacer()
-                    Image(systemName: "arrow.right")
-                        .font(.headline)
-                        .foregroundColor(.white)
-                }
-            }
-            .foregroundColor(.white)
-            .padding(.vertical, 20)
-            .padding(.horizontal, 28)
-            .frame(maxWidth: 360)
-            .background(
-                LinearGradient(
-                    colors: [
-                        Color.themeSecondary,
-                        Color.themeMain,
-                        Color.themeAccent.opacity(0.9)
-                    ],
-                    startPoint: .leading,
-                    endPoint: .trailing
-                )
-            )
-            .cornerRadius(24)
-            .shadow(color: Color.themeSecondary.opacity(0.35), radius: 18, x: 0, y: 12)
-            .overlay(
-                RoundedRectangle(cornerRadius: 24)
-                    .stroke(Color.white.opacity(0.35), lineWidth: 1)
-            )
-        }
-        .buttonStyle(.plain)
+
+}
+
+/// 端末の表示領域からホーム固有の余白と部品サイズを算出する。
+/// 固定値を各Viewへ散らさず、狭い端末では密度を上げ、広い端末では窮屈さを防ぐ。
+private struct HomeLayout {
+    let availableSize: CGSize
+
+    private var isCompactHeight: Bool { availableSize.height < 680 }
+    private var contentWidth: CGFloat {
+        min(availableSize.width - screenHorizontalPadding * 2, 520)
     }
+
+    var screenHorizontalPadding: CGFloat { availableSize.width < 390 ? 14 : 20 }
+    var screenVerticalPadding: CGFloat { isCompactHeight ? 16 : 24 }
+    var sectionSpacing: CGFloat { isCompactHeight ? 18 : 24 }
+    var buttonSpacing: CGFloat { isCompactHeight ? 12 : 14 }
+    var cardHorizontalPadding: CGFloat { contentWidth < 350 ? 16 : 20 }
+    var cardVerticalPadding: CGFloat { isCompactHeight ? 16 : 20 }
+    var cardSpacing: CGFloat { isCompactHeight ? 14 : 18 }
+    var buttonHeight: CGFloat { isCompactHeight ? 54 : 60 }
+    var ringSize: CGFloat {
+        min(max(contentWidth * 0.54, 160), isCompactHeight ? 176 : 204)
+    }
+    var ringLineWidth: CGFloat { min(max(ringSize * 0.095, 15), 20) }
 }
 
 // MARK: - 円グラフコンポーネント
@@ -351,12 +344,11 @@ private struct ProgressRingView: View {
     let valueText: String
     let detailText: String?
     let highlightValue: Bool
+    let size: CGFloat
+    let lineWidth: CGFloat
     
     @State private var animatedCorrect: Double = 0
     @State private var animatedIncorrect: Double = 0
-    
-    private let ringLineWidth: CGFloat = 20
-    private let ringSize: CGFloat = 188
     
     private var clampedAnimatedCorrect: Double { max(0, min(animatedCorrect, 1)) }
     private var clampedAnimatedIncorrect: Double { max(0, min(animatedIncorrect, 1)) }
@@ -415,7 +407,7 @@ private struct ProgressRingView: View {
     var body: some View {
         ZStack {
             // ベースリング（グレー背景）
-            Circle().stroke(Color.themeTextSecondary.opacity(0.12), lineWidth: ringLineWidth)
+            Circle().stroke(Color.themeTextSecondary.opacity(0.12), lineWidth: lineWidth)
             
             if isIndeterminate {
                 // データ未確定時（点線アニメーション）
@@ -423,7 +415,7 @@ private struct ProgressRingView: View {
                     .trim(from: 0, to: 0.85)
                     .stroke(
                         Color.themeTextSecondary.opacity(0.25),
-                        style: StrokeStyle(lineWidth: ringLineWidth, lineCap: .round, dash: [1, 6])
+                        style: StrokeStyle(lineWidth: lineWidth, lineCap: .round, dash: [1, 6])
                     )
                     .rotationEffect(.degrees(-90))
             } else {
@@ -439,7 +431,7 @@ private struct ProgressRingView: View {
                                 gradient: Gradient(colors: [Color.themeIncorrect.opacity(0.85), Color.themeIncorrect]),
                                 center: .center
                             ),
-                            style: StrokeStyle(lineWidth: ringLineWidth, lineCap: .round)
+                            style: StrokeStyle(lineWidth: lineWidth, lineCap: .round)
                         )
                         .rotationEffect(.degrees(-90))
                 }
@@ -453,7 +445,7 @@ private struct ProgressRingView: View {
                         )
                         .stroke(
                             correctSegmentGradient,
-                            style: StrokeStyle(lineWidth: ringLineWidth, lineCap: .round)
+                            style: StrokeStyle(lineWidth: lineWidth, lineCap: .round)
                         )
                         .rotationEffect(.degrees(-90))
                 }
@@ -474,7 +466,7 @@ private struct ProgressRingView: View {
                 }
             }
         }
-        .frame(width: ringSize, height: ringSize)
+        .frame(width: size, height: size)
         .onAppear { animateToCurrentProgress() }
         .onChange(of: correctProgress) { _ in animateToCurrentProgress() }
         .onChange(of: incorrectProgress) { _ in animateToCurrentProgress() }
