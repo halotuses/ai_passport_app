@@ -25,7 +25,6 @@ final class ProgressManager: ObservableObject {
 
     func removeBookmark(with quizId: String) {
         repository.removeBookmark(with: quizId)
-        NotificationCenter.default.post(name: .bookmarkDidChange, object: quizId)
     }
 
     func isBookmarked(_ quizId: String) -> Bool {
@@ -47,11 +46,6 @@ final class ProgressManager: ObservableObject {
             questionText: questionText,
             isBookmarked: isBookmarked
         )
-        NotificationCenter.default.post(name: .bookmarkDidChange, object: quizId)
     }
     
-}
-
-extension Notification.Name {
-    static let bookmarkDidChange = Notification.Name("bookmarkDidChange")
 }

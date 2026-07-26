@@ -1,5 +1,4 @@
 import SwiftUI
-@preconcurrency import RealmSwift
 
 struct ReviewQuestionListView: View {
     let unit: ReviewUnitListViewModel.ReviewUnit
@@ -9,7 +8,8 @@ struct ReviewQuestionListView: View {
     let onClose: () -> Void
 
     @EnvironmentObject private var mainViewState: MainViewState
-    @ObservedResults(BookmarkObject.self) private var bookmarks
+    @EnvironmentObject private var progressManager: ProgressManager
+    @State private var bookmarkStates: [String: Bool] = [:]
     @State private var didTriggerExternalDismissal = false
 
     var body: some View {
@@ -49,6 +49,7 @@ struct ReviewQuestionListView: View {
         )
         .navigationBarBackButtonHidden(true)
         .onAppear(perform: configureHeader)
+        .onAppear(perform: refreshBookmarkStates)
         .onChange(of: mainViewState.isOnHome) { _, isOnHome in
             guard isOnHome else { return }
             handleExternalDismissal()
@@ -67,6 +68,15 @@ struct ReviewQuestionListView: View {
 private extension ReviewQuestionListView {
     var isBookmarkReview: Bool {
         headerTitle == ReviewCategory.bookmark.unitSelectionHeader
+    }
+
+    func refreshBookmarkStates() {
+        guard isBookmarkReview else { return }
+        bookmarkStates = Dictionary(
+            uniqueKeysWithValues: chapter.questions.map { question in
+                (question.quizId, progressManager.isBookmarked(question.quizId))
+            }
+        )
     }
 
     func handleExternalDismissal() {
@@ -100,7 +110,7 @@ private extension ReviewQuestionListView {
     }
 
     func isBookmarked(_ quizId: String) -> Bool {
-        bookmarks.first(where: { $0.quizId == quizId })?.isBookmarked == true
+        bookmarkStates[quizId] ?? progressManager.isBookmarked(quizId)
     }
 
     func questionRow(

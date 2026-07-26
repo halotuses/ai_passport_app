@@ -101,40 +101,21 @@ struct ProgressBadgeView: View {
     }
 
     private var detailedContent: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            HStack(alignment: .top, spacing: 12) {
-                HStack(alignment: .center, spacing: 12) {
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("正答数")
-                        Text("不正解数")
-                        Text("未解答数")
-                        Text("ブックマーク")
-                    }
-                    .font(.system(size: 12, weight: .medium))
-                    .foregroundStyle(Color.themeTextSecondary)
-
-                    VStack(alignment: .trailing, spacing: 4) {
-                        Text("\(correctCount)")
-                        Text("\(incorrectCount)")
-                        Text("\(unansweredCount)")
-                        Text("\(bookmarkCount)")
-                    }
-                    .font(.system(size: 14, weight: .semibold))
-                    .foregroundStyle(Color.themeTextPrimary)
-                    .monospacedDigit()
-                }
+        VStack(alignment: .leading, spacing: 9) {
+            HStack(alignment: .center, spacing: 8) {
+                compactStatistic(symbol: "checkmark.circle.fill", value: correctCount, tint: .themeCorrect, accessibilityLabel: "正答数")
+                compactStatistic(symbol: "xmark.circle.fill", value: incorrectCount, tint: .themeIncorrect, accessibilityLabel: "不正解数")
+                compactStatistic(symbol: "circle", value: unansweredCount, tint: .themeTextSecondary, accessibilityLabel: "未解答数")
+                compactStatistic(symbol: "bookmark.fill", value: bookmarkCount, tint: .themeAccent, accessibilityLabel: "ブックマーク数")
                 Spacer()
-                VStack(alignment: .trailing, spacing: 4) {
-                    Text(accuracyText)
-                        .font(.system(size: 14, weight: .semibold))
-                        .foregroundStyle(accuracyForegroundStyle)
-                        .padding(.horizontal, 10)
-                        .padding(.vertical, 4)
-                        .background(
-                            Capsule()
-                                .fill(Color.themeBadgeBackground.opacity(0.5))
-                        )
-                }
+                Text(accuracyText)
+                    .font(.system(size: 13, weight: .semibold))
+                    .foregroundStyle(accuracyForegroundStyle)
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 4)
+                    .background(Capsule().fill(Color.themeBadgeBackground.opacity(0.5)))
+                    .frame(minWidth: 50)
+                    .fixedSize(horizontal: true, vertical: false)
             }
 
             GeometryReader { geometry in
@@ -149,6 +130,27 @@ struct ProgressBadgeView: View {
             }
             .frame(height: 7)
         }
+    }
+
+    private func compactStatistic(
+        symbol: String,
+        value: Int,
+        tint: Color,
+        accessibilityLabel: String
+    ) -> some View {
+        VStack(spacing: 2) {
+            Image(systemName: symbol)
+                .font(.system(size: 10, weight: .semibold))
+                .foregroundStyle(tint)
+            Text("\(value)")
+                .font(.system(size: 13, weight: .bold))
+                .foregroundStyle(Color.themeTextPrimary)
+                .monospacedDigit()
+        }
+        .frame(minWidth: 20)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(accessibilityLabel)
+        .accessibilityValue("\(value)")
     }
 
     private var ratioContent: some View {

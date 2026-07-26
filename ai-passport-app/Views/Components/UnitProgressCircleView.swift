@@ -103,10 +103,7 @@ struct UnitProgressCircleView: View {
                 Circle()
                     .trim(from: 0, to: CGFloat(min(incorrectProgress, 1)))
                     .stroke(
-                        AngularGradient(
-                            gradient: Gradient(colors: [Color.themeIncorrect.opacity(0.85), Color.themeIncorrect]),
-                            center: .center
-                        ),
+                        Color.themeIncorrect.opacity(0.88),
                         style: StrokeStyle(lineWidth: ringWidth, lineCap: .round)
                     )
                     .rotationEffect(.degrees(-90))
@@ -118,10 +115,7 @@ struct UnitProgressCircleView: View {
                         to: CGFloat(min(incorrectProgress + correctProgress, 1))
                     )
                     .stroke(
-                        AngularGradient(
-                            gradient: Gradient(colors: [Color.themeCorrect.opacity(0.9), Color.themeCorrect]),
-                            center: .center
-                        ),
+                        Color.themeCorrect.opacity(0.88),
                         style: StrokeStyle(lineWidth: ringWidth, lineCap: .round)
                     )
                     .rotationEffect(.degrees(-90))

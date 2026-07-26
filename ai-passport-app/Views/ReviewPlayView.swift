@@ -92,9 +92,7 @@ private extension ReviewPlayView {
             VStack(spacing: 0) {
                 ReviewQuestionView(
                     viewModel: viewModel,
-                    category: category,
-                    isBookmarked: isCurrentQuestionBookmarked,
-                    onToggleBookmark: toggleCurrentBookmark
+                    category: category
                 )
                 .padding(.top, 12)
                 Spacer(minLength: 0)
@@ -189,14 +187,22 @@ private extension ReviewPlayView {
         } else {
             mainViewState.setHeader(title: baseTitle, backButton: backButton)
         }
+
+        if category == .bookmark, viewModel.currentQuestion != nil {
+            mainViewState.setHeaderBookmark(isActive: isCurrentQuestionBookmarked) {
+                SoundManager.shared.play(.tap)
+                toggleCurrentBookmark()
+                mainViewState.updateHeaderBookmarkState(isActive: isCurrentQuestionBookmarked)
+            }
+        } else {
+            mainViewState.clearHeaderBookmark()
+        }
     }
 }
 
 private struct ReviewQuestionView: View {
     @ObservedObject var viewModel: ReviewPlayViewModel
     let category: ReviewCategory
-    let isBookmarked: Bool
-    let onToggleBookmark: () -> Void
 
     var body: some View {
         VStack(spacing: 20) {
@@ -210,26 +216,6 @@ private struct ReviewQuestionView: View {
                             .foregroundColor(.themeTextPrimary)
 
                         Spacer(minLength: 8)
-
-                        if category == .bookmark {
-                            Button {
-                                SoundManager.shared.play(.tap)
-                                onToggleBookmark()
-                            } label: {
-                                Label(
-                                    isBookmarked ? "ブックマーク解除" : "ブックマーク登録",
-                                    systemImage: isBookmarked ? "bookmark.slash" : "bookmark"
-                                )
-                                    .font(.footnote.weight(.semibold))
-                                    .padding(.horizontal, 12)
-                                    .padding(.vertical, 6)
-                                    .background(Color.themeAccent.opacity(0.12))
-                                    .foregroundColor(.themeAccent)
-                                    .clipShape(Capsule())
-                            }
-                            .buttonStyle(.plain)
-                            .accessibilityLabel(isBookmarked ? "ブックマーク解除" : "ブックマーク登録")
-                        }
                     }
 
                     VStack(spacing: 12) {

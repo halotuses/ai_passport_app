@@ -79,7 +79,10 @@ struct HomeView: View {
     // 正解割合（グラフ用）
     private var correctProgressValue: Double {
         if progressViewModel.totalQuestions > 0 {
-            return progressViewModel.completionRate
+            return min(
+                max(Double(progressViewModel.totalCorrect) / Double(progressViewModel.totalQuestions), 0),
+                1
+            )
         }
         let answered = progressViewModel.totalAnswered
         guard answered > 0 else { return 0 }
@@ -412,10 +415,7 @@ private struct ProgressRingView: View {
                             to: CGFloat(incorrectSegmentRange.upperBound)
                         )
                         .stroke(
-                            AngularGradient(
-                                gradient: Gradient(colors: [Color.themeIncorrect.opacity(0.85), Color.themeIncorrect]),
-                                center: .center
-                            ),
+                            Color.themeIncorrect.opacity(0.88),
                             style: StrokeStyle(lineWidth: lineWidth, lineCap: .round)
                         )
                         .rotationEffect(.degrees(-90))

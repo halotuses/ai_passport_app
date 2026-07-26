@@ -25,11 +25,12 @@ struct ReviewChapterListView: View {
         self.onSelect = onSelect
         self.onClose = onClose
         let items = unit.chapters.map { chapter -> ReviewChapterItem in
-            let progressViewModel = ReviewChapterProgressViewModel(
-                chapter: chapter.chapter,
-                questions: chapter.questions,
-                wordPair: chapter.chapter.wordPair
+            // 復習対象だけでなく、通常の章選択と同じ保存済み学習進捗を表示する。
+            let progressViewModel = ChapterProgressViewModel(
+                unitId: unit.unitId,
+                chapter: chapter.chapter
             )
+            Self.loadTotalQuestionCount(for: chapter.chapter, into: progressViewModel)
             return ReviewChapterItem(chapter: chapter, progressViewModel: progressViewModel)
         }
         _chapterItems = State(initialValue: items)
@@ -80,6 +81,14 @@ struct ReviewChapterListView: View {
 }
 
 private extension ReviewChapterListView {
+    static func loadTotalQuestionCount(for chapter: ChapterMetadata, into viewModel: ChapterProgressViewModel) {
+        NetworkManager.fetchQuizList(from: Constants.url(chapter.file)) { quizList in
+            let count = quizList?.questions.count ?? 0
+            Task { @MainActor in
+                viewModel.updateTotalQuestions(count)
+            }
+        }
+    }
     func handleExternalDismissal() {
         guard !didTriggerExternalDismissal else { return }
         didTriggerExternalDismissal = true
@@ -160,66 +169,8 @@ private extension ReviewChapterListView {
 private extension ReviewChapterListView {
     struct ReviewChapterItem: Identifiable {
         let chapter: ReviewUnitListViewModel.ReviewChapter
-        let progressViewModel: ReviewChapterProgressViewModel
+        let progressViewModel: ChapterProgressViewModel
 
         var id: String { chapter.id }
-    }
-}
-
-@MainActor
-final class ReviewChapterProgressViewModel: ObservableObject, Identifiable, ChapterProgressDisplayable {
-    let id: String
-    let chapter: ChapterMetadata
-    let wordPair: ChapterMetadata.WordPair?
-
-    @Published private(set) var correctCount: Int
-    @Published private(set) var answeredCount: Int
-    @Published private(set) var totalQuestions: Int
-    @Published private(set) var accuracyRate: Double
-    @Published private(set) var bookmarkCount: Int
-    private let repository: RealmAnswerHistoryRepository
-    private let bookmarkQuizIds: [String]
-    private var bookmarkObserver: NSObjectProtocol?
-
-    init(
-        chapter: ChapterMetadata,
-        questions: [ReviewUnitListViewModel.ReviewChapter.ReviewQuestion],
-        wordPair: ChapterMetadata.WordPair? = nil
-    ) {
-        self.id = chapter.id
-        self.chapter = chapter
-        self.wordPair = wordPair ?? chapter.wordPair
-        self.repository = RealmAnswerHistoryRepository()
-        self.bookmarkQuizIds = questions.map(\.quizId)
-
-        let correct = questions.filter { $0.progress.status == .correct }.count
-        let answered = questions.filter { $0.progress.status.isAnswered }.count
-        let total = questions.count
-
-        self.correctCount = correct
-        self.answeredCount = answered
-        self.totalQuestions = total
-        if answered > 0 {
-            self.accuracyRate = min(max(Double(correct) / Double(answered), 0), 1)
-        } else {
-        self.accuracyRate = 0
-        }
-        self.bookmarkCount = repository.bookmarkedCount(quizIds: bookmarkQuizIds)
-        self.bookmarkObserver = NotificationCenter.default.addObserver(
-            forName: .bookmarkDidChange,
-            object: nil,
-            queue: .main
-        ) { [weak self] _ in
-            Task { @MainActor [weak self] in
-                guard let self else { return }
-                self.bookmarkCount = self.repository.bookmarkedCount(quizIds: self.bookmarkQuizIds)
-            }
-        }
-    }
-
-    deinit {
-        if let bookmarkObserver {
-            NotificationCenter.default.removeObserver(bookmarkObserver)
-        }
     }
 }
