@@ -1,4 +1,5 @@
 import SwiftUI
+@preconcurrency import RealmSwift
 
 struct ReviewQuestionListView: View {
     let unit: ReviewUnitListViewModel.ReviewUnit
@@ -8,6 +9,7 @@ struct ReviewQuestionListView: View {
     let onClose: () -> Void
 
     @EnvironmentObject private var mainViewState: MainViewState
+    @ObservedResults(BookmarkObject.self) private var bookmarks
     @State private var didTriggerExternalDismissal = false
 
     var body: some View {
@@ -28,7 +30,10 @@ struct ReviewQuestionListView: View {
                             )
                             onSelect(selection)
                         } label: {
-                            questionRow(question)
+                            questionRow(
+                                question,
+                                isBookmarked: isBookmarkReview ? isBookmarked(question.quizId) : true
+                            )
                         }
                         .buttonStyle(.plain)
                     }
@@ -44,22 +49,26 @@ struct ReviewQuestionListView: View {
         )
         .navigationBarBackButtonHidden(true)
         .onAppear(perform: configureHeader)
-        .onChange(of: mainViewState.isOnHome) { isOnHome in
+        .onChange(of: mainViewState.isOnHome) { _, isOnHome in
             guard isOnHome else { return }
             handleExternalDismissal()
         }
-        .onChange(of: mainViewState.isShowingReview) { isShowingReview in
+        .onChange(of: mainViewState.isShowingReview) { _, isShowingReview in
             guard !isShowingReview else { return }
             if mainViewState.isSuspendingReviewForBookmarks { return }
             handleExternalDismissal()
         }
-        .onChange(of: mainViewState.navigationResetToken) { _ in
+        .onChange(of: mainViewState.navigationResetToken) { _, _ in
             handleExternalDismissal()
         }
     }
 }
 
 private extension ReviewQuestionListView {
+    var isBookmarkReview: Bool {
+        headerTitle == ReviewCategory.bookmark.unitSelectionHeader
+    }
+
     func handleExternalDismissal() {
         guard !didTriggerExternalDismissal else { return }
         didTriggerExternalDismissal = true
@@ -90,13 +99,29 @@ private extension ReviewQuestionListView {
         .padding(.vertical, 32)
     }
 
-    func questionRow(_ question: ReviewUnitListViewModel.ReviewChapter.ReviewQuestion) -> some View {
+    func isBookmarked(_ quizId: String) -> Bool {
+        bookmarks.first(where: { $0.quizId == quizId })?.isBookmarked == true
+    }
+
+    func questionRow(
+        _ question: ReviewUnitListViewModel.ReviewChapter.ReviewQuestion,
+        isBookmarked: Bool
+    ) -> some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack(alignment: .center, spacing: 8) {
                 Text("第\(question.questionIndex + 1)問")
                     .font(.subheadline.weight(.semibold))
                     .foregroundColor(.themeTextSecondary)
-                statusBadge(for: question.progress.status)
+                if !isBookmarked {
+                    Text("解除済み")
+                        .font(.caption.weight(.semibold))
+                        .foregroundColor(.themeTextSecondary)
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 4)
+                        .background(Color.themeTextSecondary.opacity(0.12), in: Capsule())
+                } else {
+                    statusBadge(for: question.progress.status)
+                }
                 Spacer()
                 Image(systemName: "chevron.right")
                     .font(.headline.weight(.semibold))
@@ -126,6 +151,7 @@ private extension ReviewQuestionListView {
                 .stroke(Color.black.opacity(0.05), lineWidth: 0.5)
         )
         .shadow(color: Color.themeShadowSoft, radius: 12, x: 0, y: 8)
+        .opacity(isBookmarked ? 1 : 0.42)
     }
 
     func statusBadge(for status: QuestionStatus) -> some View {

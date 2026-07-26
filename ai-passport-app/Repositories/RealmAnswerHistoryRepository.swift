@@ -268,6 +268,66 @@ final class RealmAnswerHistoryRepository {
           }
       }
 
+      func isBookmarked(quizId: String) -> Bool {
+          do {
+              let realm = try realm()
+              return realm.object(ofType: BookmarkObject.self, forPrimaryKey: quizId)?.isBookmarked == true
+          } catch {
+              return false
+          }
+      }
+
+      func bookmarkedCount(unitId: String, chapterId: String) -> Int {
+          do {
+              let realm = try realm()
+              let prefix = "\(unitId)-\(chapterId)#"
+              return realm.objects(BookmarkObject.self)
+                  .filter("isBookmarked == true AND quizId BEGINSWITH %@", prefix)
+                  .count
+          } catch {
+              return 0
+          }
+      }
+
+      func bookmarkedCount(quizIds: [String]) -> Int {
+          do {
+              let realm = try realm()
+              return quizIds.reduce(into: 0) { count, quizId in
+                  if realm.object(ofType: BookmarkObject.self, forPrimaryKey: quizId)?.isBookmarked == true {
+                      count += 1
+                  }
+              }
+          } catch {
+              return 0
+          }
+      }
+
+      func setBookmark(quizId: String, userId: String, questionText: String, isBookmarked: Bool) {
+          do {
+              let realm = try realm()
+              let now = Date()
+              try realm.write {
+                  if let bookmark = realm.object(ofType: BookmarkObject.self, forPrimaryKey: quizId) {
+                      bookmark.isBookmarked = isBookmarked
+                      bookmark.userId = userId
+                      bookmark.questionText = questionText
+                      bookmark.updatedAt = now
+                  } else if isBookmarked {
+                      let bookmark = BookmarkObject()
+                      bookmark.quizId = quizId
+                      bookmark.userId = userId
+                      bookmark.questionText = questionText
+                      bookmark.createdAt = now
+                      bookmark.updatedAt = now
+                      bookmark.isBookmarked = true
+                      realm.add(bookmark)
+                  }
+              }
+          } catch {
+              print("❌ Failed to update bookmark: \(error)")
+          }
+      }
+
 
     func observeAnswerHistory(
         limit: Int? = nil,

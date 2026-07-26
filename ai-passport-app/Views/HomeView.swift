@@ -136,10 +136,10 @@ struct HomeView: View {
                 VStack(spacing: layout.sectionSpacing) {
                     progressCard(layout: layout)
                     VStack(spacing: layout.buttonSpacing) {
-                        actionButton(title: "学習を始める", systemImage: "play.fill", layout: layout) {
+                        actionButton(title: "学習を始める", systemImage: "play.fill", isPrimary: true, layout: layout) {
                             mainViewState.enterUnitSelection()
                         }
-                        actionButton(title: "復習を始める", systemImage: "arrow.triangle.2.circlepath", layout: layout) {
+                        actionButton(title: "復習を始める", systemImage: "arrow.triangle.2.circlepath", isPrimary: false, layout: layout) {
                             mainViewState.enterReview()
                         }
                     }
@@ -156,7 +156,7 @@ struct HomeView: View {
             mainViewState.enterHome()
             viewModel.refresh()
         }
-        .onChange(of: scenePhase) { newPhase in
+        .onChange(of: scenePhase) { _, newPhase in
             if newPhase == .active {
                 viewModel.refresh()
             }
@@ -166,11 +166,17 @@ struct HomeView: View {
     // MARK: - 学習進捗カード
     private func progressCard(layout: HomeLayout) -> some View {
         VStack(alignment: .leading, spacing: layout.cardSpacing) {
-            // タイトル行
+            // Apple Store のカードのように、補助ラベルと見出しを分けて情報に強弱を付ける。
             HStack(alignment: .center, spacing: 12) {
-                Label("学習進捗", systemImage: "chart.pie.fill")
-                    .font(.title3.weight(.semibold))
-                    .foregroundColor(.themeTextPrimary)
+                VStack(alignment: .leading, spacing: 3) {
+                    Text("LEARNING OVERVIEW")
+                        .font(.caption2.weight(.bold))
+                        .tracking(0.6)
+                        .foregroundColor(.themeSecondary)
+                    Text("学習進捗")
+                        .font(.title3.weight(.bold))
+                        .foregroundColor(.themeTextPrimary)
+                }
                 Spacer()
                 if let headerSummaryText {
                     Text(headerSummaryText)
@@ -222,16 +228,12 @@ struct HomeView: View {
                             .font(.footnote.weight(.semibold))
                             .foregroundColor(.themeSecondary)
                     }
-                    .padding(.vertical, 10)
-                    .padding(.horizontal, 14)
+                    .padding(.vertical, 12)
+                    .padding(.horizontal, 16)
                     .frame(maxWidth: .infinity)
                     .background(
-                        RoundedRectangle(cornerRadius: 16, style: .continuous)
-                            .fill(Color.themeButtonSecondary.opacity(0.14))
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 16, style: .continuous)
-                                    .stroke(Color.themeSecondary.opacity(0.12), lineWidth: 1)
-                            )
+                        RoundedRectangle(cornerRadius: 14, style: .continuous)
+                            .fill(Color.themeSecondary.opacity(0.07))
                     )
                 }
             )
@@ -241,30 +243,21 @@ struct HomeView: View {
         .padding(.vertical, layout.cardVerticalPadding)
         .frame(maxWidth: .infinity)
         .background(
-            RoundedRectangle(cornerRadius: 28, style: .continuous)
-                .fill(
-                    LinearGradient(
-                        colors: [
-                            Color.white.opacity(0.96),
-                            Color.white.opacity(0.86)
-                        ],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    )
-                )
+            RoundedRectangle(cornerRadius: 30, style: .continuous)
+                .fill(Color.themeSurface)
                 .overlay(
-                    RoundedRectangle(cornerRadius: 28, style: .continuous)
-                        .stroke(Color.white.opacity(0.45), lineWidth: 1)
-                        .blendMode(.overlay)
+                    RoundedRectangle(cornerRadius: 30, style: .continuous)
+                        .stroke(Color.black.opacity(0.05), lineWidth: 1)
                 )
         )
-        .shadow(color: Color.themeSecondary.opacity(0.14), radius: 20, x: 0, y: 14)
+        .shadow(color: Color.black.opacity(0.06), radius: 20, x: 0, y: 10)
     }
     
     // MARK: - ホームアクションボタン
     private func actionButton(
         title: String,
         systemImage: String,
+        isPrimary: Bool,
         layout: HomeLayout,
         action: @escaping () -> Void
     ) -> some View {
@@ -285,27 +278,19 @@ struct HomeView: View {
                         .font(.headline)
                 }
             }
-            .foregroundColor(.white)
+            .foregroundColor(isPrimary ? .white : .themeSecondary)
             .frame(maxWidth: .infinity)
-            .frame(minHeight: layout.buttonHeight)
+            .frame(minHeight: layout.buttonHeight + 2)
             .padding(.horizontal, 24)
             .background(
-                LinearGradient(
-                    colors: [
-                        Color.themeSecondary,
-                        Color.themeMain,
-                        Color.themeAccent.opacity(0.9)
-                    ],
-                    startPoint: .leading,
-                    endPoint: .trailing
-                )
+                RoundedRectangle(cornerRadius: 20, style: .continuous)
+                    .fill(isPrimary ? Color.themeSecondary : Color.themeSurface)
             )
-            .cornerRadius(24)
-            .shadow(color: Color.themeSecondary.opacity(0.35), radius: 18, x: 0, y: 12)
             .overlay(
-                RoundedRectangle(cornerRadius: 24)
-                    .stroke(Color.white.opacity(0.35), lineWidth: 1)
+                RoundedRectangle(cornerRadius: 20, style: .continuous)
+                    .stroke(isPrimary ? Color.clear : Color.themeSecondary.opacity(0.35), lineWidth: 1)
             )
+            .shadow(color: isPrimary ? Color.themeSecondary.opacity(0.18) : Color.black.opacity(0.04), radius: 10, x: 0, y: 6)
         }
         .buttonStyle(.plain)
     }
@@ -468,8 +453,8 @@ private struct ProgressRingView: View {
         }
         .frame(width: size, height: size)
         .onAppear { animateToCurrentProgress() }
-        .onChange(of: correctProgress) { _ in animateToCurrentProgress() }
-        .onChange(of: incorrectProgress) { _ in animateToCurrentProgress() }
+        .onChange(of: correctProgress) { _, _ in animateToCurrentProgress() }
+        .onChange(of: incorrectProgress) { _, _ in animateToCurrentProgress() }
     }
     
     // アニメーション更新
@@ -498,7 +483,7 @@ private struct StatColumnView: View {
     let value: Int
     
     var body: some View {
-        VStack(spacing: 8) {
+        VStack(spacing: 7) {
             Circle()
                 .fill(color)
                 .frame(width: 10, height: 10)
@@ -514,12 +499,12 @@ private struct StatColumnView: View {
                 .minimumScaleFactor(0.75)
         }
         .frame(maxWidth: .infinity)
-        .padding(.vertical, 12)
+        .padding(.vertical, 14)
         .background(
-            RoundedRectangle(cornerRadius: 16, style: .continuous)
-                .fill(Color.white.opacity(0.75))
+            RoundedRectangle(cornerRadius: 18, style: .continuous)
+                .fill(Color.themeSurfaceAlt)
                 .overlay(
-                    RoundedRectangle(cornerRadius: 16, style: .continuous)
+                    RoundedRectangle(cornerRadius: 18, style: .continuous)
                         .stroke(Color.themeTextSecondary.opacity(0.08), lineWidth: 1)
                 )
         )
@@ -529,11 +514,7 @@ private struct StatColumnView: View {
 // MARK: - 背景グラデーション＋ノイズ
 private struct PaperBackground: View {
     private let gradient = LinearGradient(
-        colors: [
-            Color.themeBase,
-            Color(red: 0.96, green: 0.99, blue: 0.98),
-            Color.themeSurfaceElevated
-        ],
+        colors: [Color.themeBase, Color.themeBase, Color.themeSurfaceAlt],
         startPoint: .topLeading,
         endPoint: .bottomTrailing
     )
@@ -543,7 +524,7 @@ private struct PaperBackground: View {
             .overlay(
                 NoiseTextureView()
                     .blendMode(.softLight)
-                    .opacity(0.04)
+                    .opacity(0.015)
             )
     }
 }

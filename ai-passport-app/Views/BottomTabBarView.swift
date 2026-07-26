@@ -55,7 +55,7 @@ struct BottomTabBarView: View {
                 }
                 .buttonStyle(.plain)
                 .allowsHitTesting(isHovering && isHomeButtonEnabled)
-                .foregroundColor(mainViewState.isOnHome && !mainViewState.isShowingBookmarks ? .white : .white.opacity(0.8))
+                .foregroundColor(mainViewState.isOnHome && !mainViewState.isShowingBookmarks ? .white : .white.opacity(0.75))
                 
                 Spacer()
                 
@@ -76,7 +76,7 @@ struct BottomTabBarView: View {
                 }
                 .buttonStyle(.plain)
                 .allowsHitTesting(isHovering && isBookmarksButtonEnabled)
-                .foregroundColor(mainViewState.isShowingBookmarks ? .white : .white.opacity(0.8))
+                .foregroundColor(mainViewState.isShowingBookmarks ? .white : .white.opacity(0.75))
                 
                 Spacer()
                 
@@ -94,7 +94,7 @@ struct BottomTabBarView: View {
                 }
                 .buttonStyle(.plain)
                 .allowsHitTesting(isHovering)
-                .foregroundColor(.white.opacity(0.8))
+                .foregroundColor(.white.opacity(0.75))
                 
                 Spacer()
             }
@@ -137,9 +137,9 @@ extension BottomTabBarView {
     /// グラデーションの定義（全体背景）
     private var backgroundGradient: LinearGradient {
         LinearGradient(
-            colors: [Color.themeSecondary, Color.themeMain],
-            startPoint: UnitPoint(x: 0.2, y: 0.0),
-            endPoint: UnitPoint(x: 0.8, y: 1.0)
+            colors: [Color.themeNavigationEnd, Color.themeNavigationStart],
+            startPoint: UnitPoint(x: 0.15, y: 0.0),
+            endPoint: UnitPoint(x: 0.85, y: 1.0)
         )
     }
 
@@ -147,7 +147,7 @@ extension BottomTabBarView {
     private var tabBarBackground: some View {
         TopRoundedRectangle(radius: 10)
             .fill(backgroundGradient)
-            .shadow(color: Color.themeSecondary.opacity(0.25), radius: 16, x: 0, y: 8)
+            .shadow(color: Color.themeNavigationEnd.opacity(0.18), radius: 12, x: 0, y: 6)
     }
 }
 

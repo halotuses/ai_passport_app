@@ -53,6 +53,7 @@ struct ChapterCardView<ViewModel: ChapterProgressDisplayable>: View {
                 answeredCount: viewModel.answeredCount,
                 totalCount: viewModel.totalQuestions,
                 accuracy: viewModel.accuracyRate,
+                bookmarkCount: viewModel.bookmarkCount,
                 displayMode: badgeDisplayMode
             )
             .allowsHitTesting(false)

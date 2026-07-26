@@ -61,7 +61,7 @@ struct QuestionView: View {
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .padding(.top, 16)
-        .onChange(of: viewModel.selectedAnswerIndex) { newValue in
+        .onChange(of: viewModel.selectedAnswerIndex) { _, newValue in
             guard let selectedIndex = newValue,
                   handledQuestionIndex != viewModel.currentQuestionIndex,
                   let quiz = viewModel.currentQuiz else { return }
@@ -70,7 +70,7 @@ struct QuestionView: View {
             let sound: SoundManager.SoundType = (selectedIndex == quiz.answerIndex) ? .correct : .wrong
             SoundManager.shared.play(sound)
         }
-        .onChange(of: viewModel.currentQuestionIndex) { _ in
+        .onChange(of: viewModel.currentQuestionIndex) { _, _ in
             handledQuestionIndex = nil
         }
     }

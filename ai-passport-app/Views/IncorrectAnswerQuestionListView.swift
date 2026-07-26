@@ -34,41 +34,20 @@ struct IncorrectAnswerQuestionListView: View {
             Color.themeBase
                 .ignoresSafeArea()
         )
-        .background(playNavigationLink)
+        .navigationDestination(item: $activeQuestion) { activeQuestion in
+            IncorrectAnswerPlayView(
+                unit: unit,
+                chapter: chapter,
+                initialQuestionId: activeQuestion.id,
+                onClose: handlePlayViewClose
+            )
+        }
         .navigationBarBackButtonHidden(true)
         .onAppear { setHeader() }
     }
 }
 
 private extension IncorrectAnswerQuestionListView {
-    @ViewBuilder
-    var playNavigationLink: some View {
-        NavigationLink(
-
-            isActive: Binding(
-                get: { activeQuestion != nil },
-                set: { value in
-                    if !value {
-                        activeQuestion = nil
-                    }
-                }
-            )
-        ) {
-            if let activeQuestion {
-                IncorrectAnswerPlayView(
-                    unit: unit,
-                    chapter: chapter,
-                    initialQuestionId: activeQuestion.id,
-                    onClose: handlePlayViewClose
-                )
-            } else {
-                EmptyView()
-            }
-        } label: {
-            EmptyView()
-        }
-        .hidden()
-    }
     func setHeader() {
         let backButton = MainViewState.HeaderBackButton(
             title: "◀ 不正解だった問題",

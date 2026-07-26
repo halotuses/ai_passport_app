@@ -57,15 +57,15 @@ struct DataResetView: View {
         .onAppear {
             synchronizeSelectionsWithAvailableUnits()
         }
-        .onChange(of: units) { _ in
+        .onChange(of: units) { _, _ in
             synchronizeSelectionsWithAvailableUnits()
         }
-        .onChange(of: selectedChapters) { _ in
+        .onChange(of: selectedChapters) { _, _ in
             if isProblemDataEnabled && selectedChapters.isEmpty {
                 isProblemDataEnabled = false
             }
         }
-        .onChange(of: isProblemDataEnabled) { newValue in
+        .onChange(of: isProblemDataEnabled) { _, newValue in
             if newValue {
                 if selectedChapters.isEmpty {
                     selectedChapters = allChapterSelections
@@ -75,7 +75,7 @@ struct DataResetView: View {
                 }
             }
         }
-        .onChange(of: isProgressFiltersEnabled) { newValue in
+        .onChange(of: isProgressFiltersEnabled) { _, newValue in
             if newValue && selectedStatuses.isEmpty {
                 selectedStatuses = deletableStatusChoices
             }

@@ -13,6 +13,7 @@ struct ProgressBadgeView: View {
     let answeredCount: Int
     let totalCount: Int
     let accuracy: Double
+    var bookmarkCount: Int = 0
     var displayMode: DisplayMode = .detailed
     
     private var clampedAccuracy: Double {
@@ -107,6 +108,7 @@ struct ProgressBadgeView: View {
                         Text("正答数")
                         Text("不正解数")
                         Text("未解答数")
+                        Text("ブックマーク")
                     }
                     .font(.system(size: 12, weight: .medium))
                     .foregroundStyle(Color.themeTextSecondary)
@@ -115,6 +117,7 @@ struct ProgressBadgeView: View {
                         Text("\(correctCount)")
                         Text("\(incorrectCount)")
                         Text("\(unansweredCount)")
+                        Text("\(bookmarkCount)")
                     }
                     .font(.system(size: 14, weight: .semibold))
                     .foregroundStyle(Color.themeTextPrimary)

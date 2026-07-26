@@ -21,7 +21,9 @@ final class UnitListViewModel: ObservableObject {
             object: nil,
             queue: .main
         ) { [weak self] _ in
-            self?.refreshAnsweredCounts()
+            Task { @MainActor [weak self] in
+                self?.refreshAnsweredCounts()
+            }
         }
     }
 

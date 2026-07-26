@@ -46,15 +46,15 @@ struct ContentView: View {
         .background(Color.themeBase)
         .animation(.none, value: activeExplanationRoute)
         .onAppear(perform: handleOnAppear)
-        .onChange(of: chapter.id, perform: handleChapterChange)
-        .onChange(of: viewModel.currentQuestionIndex, perform: { _ in refreshHeader() })
-        .onChange(of: viewModel.quizzes.count, perform: { _ in refreshHeader() })
-        .onChange(of: viewModel.isLoaded, perform: { _ in refreshHeader() })
-        .onChange(of: viewModel.hasError, perform: { _ in refreshHeader() })
-        .onChange(of: viewModel.bookmarkedQuizIds, perform: { _ in refreshHeader() })
-        .onChange(of: router.path.count, perform: handleRouterPathChange)
-        .onChange(of: activeExplanationRoute, perform: { _ in refreshHeader() })
-        .onChange(of: mainViewState.explanationDismissToken, perform: handleExplanationDismiss)
+        .onChange(of: chapter.id) { _, newID in handleChapterChange(newID) }
+        .onChange(of: viewModel.currentQuestionIndex) { _, _ in refreshHeader() }
+        .onChange(of: viewModel.quizzes.count) { _, _ in refreshHeader() }
+        .onChange(of: viewModel.isLoaded) { _, _ in refreshHeader() }
+        .onChange(of: viewModel.hasError) { _, _ in refreshHeader() }
+        .onChange(of: viewModel.bookmarkedQuizIds) { _, _ in refreshHeader() }
+        .onChange(of: router.path.count) { _, count in handleRouterPathChange(count) }
+        .onChange(of: activeExplanationRoute) { _, _ in refreshHeader() }
+        .onChange(of: mainViewState.explanationDismissToken) { _, token in handleExplanationDismiss(token) }
         .onDisappear(perform: handleOnDisappear)
     }
     

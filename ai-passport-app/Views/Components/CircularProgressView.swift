@@ -102,9 +102,9 @@ struct CircularProgressView: View {
             // 初回表示時にアニメーション開始
             .onAppear(perform: animateProgress)
             // totalProgressの変化時に再アニメーション
-            .onChange(of: totalProgress) { _ in animateProgress() }
+            .onChange(of: totalProgress) { _, _ in animateProgress() }
             // highlightProgressの変化時にも再アニメーション
-            .onChange(of: highlightProgress) { _ in animateProgress() }
+            .onChange(of: highlightProgress) { _, _ in animateProgress() }
         }
         // アスペクト比を1:1に固定（円を維持）
         .aspectRatio(1, contentMode: .fit)

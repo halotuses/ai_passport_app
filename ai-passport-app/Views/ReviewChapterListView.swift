@@ -64,16 +64,16 @@ struct ReviewChapterListView: View {
         .navigationBarBackButtonHidden(true)
         .onAppear(perform: configureHeader)
         .background(questionSelectionNavigationLink)
-        .onChange(of: mainViewState.isOnHome) { isOnHome in
+        .onChange(of: mainViewState.isOnHome) { _, isOnHome in
             guard isOnHome else { return }
             handleExternalDismissal()
         }
-        .onChange(of: mainViewState.isShowingReview) { isShowingReview in
+        .onChange(of: mainViewState.isShowingReview) { _, isShowingReview in
             guard !isShowingReview else { return }
             if mainViewState.isSuspendingReviewForBookmarks { return }
             handleExternalDismissal()
         }
-        .onChange(of: mainViewState.navigationResetToken) { _ in
+        .onChange(of: mainViewState.navigationResetToken) { _, _ in
             handleExternalDismissal()
         }
     }
@@ -176,6 +176,10 @@ final class ReviewChapterProgressViewModel: ObservableObject, Identifiable, Chap
     @Published private(set) var answeredCount: Int
     @Published private(set) var totalQuestions: Int
     @Published private(set) var accuracyRate: Double
+    @Published private(set) var bookmarkCount: Int
+    private let repository: RealmAnswerHistoryRepository
+    private let bookmarkQuizIds: [String]
+    private var bookmarkObserver: NSObjectProtocol?
 
     init(
         chapter: ChapterMetadata,
@@ -185,6 +189,8 @@ final class ReviewChapterProgressViewModel: ObservableObject, Identifiable, Chap
         self.id = chapter.id
         self.chapter = chapter
         self.wordPair = wordPair ?? chapter.wordPair
+        self.repository = RealmAnswerHistoryRepository()
+        self.bookmarkQuizIds = questions.map(\.quizId)
 
         let correct = questions.filter { $0.progress.status == .correct }.count
         let answered = questions.filter { $0.progress.status.isAnswered }.count
@@ -196,7 +202,24 @@ final class ReviewChapterProgressViewModel: ObservableObject, Identifiable, Chap
         if answered > 0 {
             self.accuracyRate = min(max(Double(correct) / Double(answered), 0), 1)
         } else {
-            self.accuracyRate = 0
+        self.accuracyRate = 0
+        }
+        self.bookmarkCount = repository.bookmarkedCount(quizIds: bookmarkQuizIds)
+        self.bookmarkObserver = NotificationCenter.default.addObserver(
+            forName: .bookmarkDidChange,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            Task { @MainActor [weak self] in
+                guard let self else { return }
+                self.bookmarkCount = self.repository.bookmarkedCount(quizIds: self.bookmarkQuizIds)
+            }
+        }
+    }
+
+    deinit {
+        if let bookmarkObserver {
+            NotificationCenter.default.removeObserver(bookmarkObserver)
         }
     }
 }

@@ -6,6 +6,8 @@ struct ReviewUnitListView: View {
     private let onSelect: @Sendable (ReviewUnitSelection) -> Void
     private let onClose: () -> Void
     private let headerTitle: String
+    private let countLabel: String
+    private let countTint: Color
     @State private var selectedUnit: ReviewUnitListViewModel.ReviewUnit? = nil
     @State private var isShowingChapterList = false
     @State private var hasRequestedExternalDismissal = false
@@ -20,6 +22,8 @@ struct ReviewUnitListView: View {
         chapterListProvider: @escaping (String, String) async -> [ChapterMetadata]?,
         shouldInclude: @escaping (QuestionProgress) -> Bool = { _ in true },
         headerTitle: String = "復習用単元選択",
+        countLabel: String = "復習対象",
+        countTint: Color = .themeSecondary,
         onSelect: @escaping @Sendable (ReviewUnitSelection) -> Void,
         onClose: @escaping () -> Void
     ) {
@@ -34,6 +38,8 @@ struct ReviewUnitListView: View {
         self.onSelect = onSelect
         self.onClose = onClose
         self.headerTitle = headerTitle
+        self.countLabel = countLabel
+        self.countTint = countTint
     }
     
     var body: some View {
@@ -65,16 +71,16 @@ struct ReviewUnitListView: View {
             configureHeader()
         }
         .background(navigationLinks)
-        .onChange(of: mainViewState.isOnHome) { isOnHome in
+        .onChange(of: mainViewState.isOnHome) { _, isOnHome in
             guard isOnHome else { return }
             handleExternalDismissal()
         }
-        .onChange(of: mainViewState.isShowingReview) { isShowingReview in
+        .onChange(of: mainViewState.isShowingReview) { _, isShowingReview in
             guard !isShowingReview else { return }
             if mainViewState.isSuspendingReviewForBookmarks { return }
             handleExternalDismissal()
         }
-        .onChange(of: mainViewState.navigationResetToken) { _ in
+        .onChange(of: mainViewState.navigationResetToken) { _, _ in
             handleExternalDismissal()
         }
     }
@@ -130,11 +136,7 @@ private extension ReviewUnitListView {
     }
     
     var stateBackground: some ShapeStyle {
-        LinearGradient(
-            colors: [Color.themeSurfaceElevated, Color.themeSurfaceAlt],
-            startPoint: .topLeading,
-            endPoint: .bottomTrailing
-        )
+        Color.themeSurface
     }
     
     func unitSelectionButton(_ unit: ReviewUnitListViewModel.ReviewUnit) -> some View {
@@ -152,9 +154,7 @@ private extension ReviewUnitListView {
     }
     
     func unitRowView(unit: ReviewUnitListViewModel.ReviewUnit, isDisabled: Bool) -> some View {
-        let totalReviewCount = unit.reviewCount
-        let totalUnitCount = unit.unit.total > 0 ? unit.unit.total : totalReviewCount
-        let ratioText = "\(totalReviewCount)/\(totalUnitCount)"
+        let reviewCount = unit.reviewCount
         
         return HStack(spacing: 16) {
             Image(systemName: "chevron.right")
@@ -186,24 +186,21 @@ private extension ReviewUnitListView {
             Spacer()
             
             ZStack {
-                Circle()
+                RoundedRectangle(cornerRadius: 22, style: .continuous)
                     .fill(
                         LinearGradient(
-                            colors: [
-                                Color.themeSecondary.opacity(0.3),
-                                Color.themeMain.opacity(0.3)
-                            ],
+                            colors: [countTint.opacity(0.12), countTint.opacity(0.20)],
                             startPoint: .topLeading,
                             endPoint: .bottomTrailing
                         )
                     )
-                    .frame(width: 44, height: 44)
+                    .frame(width: 72, height: 44)
                 
-                Text(ratioText)
-                    .font(.system(size: 11, weight: .semibold))
-                    .foregroundColor(.themeTextPrimary)
-                    .minimumScaleFactor(0.6)
-                    .lineLimit(1)
+                Text("\(countLabel)\n\(reviewCount)問")
+                    .font(.system(size: 10, weight: .semibold))
+                    .foregroundColor(countTint)
+                    .multilineTextAlignment(.center)
+                    .lineLimit(2)
                     .monospacedDigit()
             }
             .opacity(isDisabled ? 0.6 : 1.0)
@@ -212,20 +209,14 @@ private extension ReviewUnitListView {
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(
             RoundedRectangle(cornerRadius: 18)
-                .fill(
-                    LinearGradient(
-                        colors: [Color.themeSurfaceElevated, Color.themeSurfaceAlt],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    )
-                )
+                .fill(Color.themeSurface)
         )
         .cornerRadius(18)
         .overlay(
             RoundedRectangle(cornerRadius: 18)
-                .stroke(Color.themeMain.opacity(0.12), lineWidth: 1)
+                .stroke(Color.black.opacity(0.06), lineWidth: 1)
         )
-        .shadow(color: Color.themeShadowSoft, radius: 12, x: 0, y: 6)
+        .shadow(color: Color.black.opacity(0.04), radius: 10, x: 0, y: 5)
         .overlay(disabledOverlay(cornerRadius: 18, isDisabled: isDisabled))
         .opacity(isDisabled ? 0.55 : 1.0)
     }

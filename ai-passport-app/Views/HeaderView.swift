@@ -39,10 +39,10 @@ struct HeaderView: View {
                         }
                         .padding(.horizontal, 8)
                         .padding(.vertical, 6)
-                        .background(Color.white.opacity(0.18)) // 背景に半透明の白を適用
+                        .background(Color.white.opacity(0.18))
                         .cornerRadius(12)
                     }
-                    .foregroundColor(.white) // ボタン文字とアイコンを白で統一
+                    .foregroundColor(.white)
                     .accessibilityLabel(backButton.title) // VoiceOver対応
                 }
 
@@ -73,7 +73,7 @@ struct HeaderView: View {
         // MARK: - 背景スタイル
         .background(
             LinearGradient(
-                colors: [Color.themeMain, Color.themeSecondary], // 左→右のグラデーション
+                colors: [Color.themeNavigationStart, Color.themeNavigationEnd],
                 startPoint: .leading,
                 endPoint: .trailing
             )
@@ -81,8 +81,8 @@ struct HeaderView: View {
         .foregroundColor(.white)
         // 下方向に柔らかい影
         .shadow(
-            color: Color.themeSecondary.opacity(0.25),
-            radius: 12,
+            color: Color.themeNavigationEnd.opacity(0.18),
+            radius: 10,
             x: 0,
             y: 6
         )

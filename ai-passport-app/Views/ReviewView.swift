@@ -50,12 +50,12 @@ struct ReviewView: View {
                 resetNavigationState()
             }
         }
-        .onChange(of: mainViewState.isShowingReview) { isShowing in
+        .onChange(of: mainViewState.isShowingReview) { _, isShowing in
             if !isShowing && !mainViewState.isSuspendingReviewForBookmarks {
                 resetNavigationState()
             }
         }
-        .onChange(of: mainViewState.isOnHome) { isOnHome in
+        .onChange(of: mainViewState.isOnHome) { _, isOnHome in
             if isOnHome {
                 resetNavigationState()
             }
@@ -198,6 +198,8 @@ private extension ReviewView {
                     shouldInclude(progress, for: category)
                 },
                 headerTitle: category.unitSelectionHeader,
+                countLabel: category.unitSelectionCountLabel,
+                countTint: category.tintColor,
                 onSelect: { selection in
                     activePlayCategory = category
                     activePlaySelection = selection

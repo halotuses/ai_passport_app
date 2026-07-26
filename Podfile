@@ -11,6 +11,13 @@ target 'ai-passport-app' do
   # iOS17 / Xcode16 系での安定ビルド対応
   post_install do |installer|
     installer.pods_project.targets.each do |target|
+      target.shell_script_build_phases.each do |phase|
+        next unless phase.display_name == 'Create Symlinks to Header Folders'
+
+        # Xcode に生成物を知らせ、毎回実行されるという警告を防ぐ。
+        phase.output_paths = ['$(TARGET_BUILD_DIR)/$(WRAPPER_NAME)/Headers']
+      end
+
       target.build_configurations.each do |config|
         # モジュール安定性（Realm含む Swift ライブラリ対策）
         config.build_settings['BUILD_LIBRARY_FOR_DISTRIBUTION'] = 'YES'

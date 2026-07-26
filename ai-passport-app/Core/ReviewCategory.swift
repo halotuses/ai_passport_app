@@ -72,6 +72,17 @@ enum ReviewCategory: CaseIterable, Hashable, Sendable {
         }
     }
 
+    var unitSelectionCountLabel: String {
+        switch self {
+        case .bookmark:
+            return "ブックマーク"
+        case .correct:
+            return "正解済み"
+        case .incorrect:
+            return "不正解"
+        }
+    }
+
     var playHeaderPrefix: String {
         switch self {
         case .bookmark:

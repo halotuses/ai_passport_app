@@ -1,6 +1,7 @@
 import Foundation
 @preconcurrency import RealmSwift
 
+@MainActor
 protocol ChapterProgressDisplayable: ObservableObject, Identifiable {
     var chapter: ChapterMetadata { get }
     var wordPair: ChapterMetadata.WordPair? { get }
@@ -8,6 +9,7 @@ protocol ChapterProgressDisplayable: ObservableObject, Identifiable {
     var answeredCount: Int { get }
     var totalQuestions: Int { get }
     var accuracyRate: Double { get }
+    var bookmarkCount: Int { get }
 }
 
 @MainActor
@@ -19,6 +21,7 @@ final class ChapterProgressViewModel: ObservableObject, Identifiable {
     @Published private(set) var answeredCount: Int = 0
     @Published private(set) var totalQuestions: Int = 0
     @Published private(set) var accuracyRate: Double = 0
+    @Published private(set) var bookmarkCount: Int = 0
 
     private let repository: RealmAnswerHistoryRepository
     private let realmConfiguration: Realm.Configuration
@@ -27,6 +30,7 @@ final class ChapterProgressViewModel: ObservableObject, Identifiable {
     private let chapterIdentifier: String
     private let chapterNumericId: Int
     private var progressToken: NotificationToken?
+    private var bookmarkToken: NotificationToken?
     private var progressResults: Results<QuestionProgressObject>?
 
     init(
@@ -53,6 +57,7 @@ final class ChapterProgressViewModel: ObservableObject, Identifiable {
         guard count != totalQuestions else { return }
         totalQuestions = count
         recalculateAccuracyRate()
+        bookmarkCount = repository.bookmarkedCount(unitId: unitIdentifier, chapterId: chapterIdentifier)
     }
 
     func refresh() {
@@ -70,6 +75,7 @@ final class ChapterProgressViewModel: ObservableObject, Identifiable {
             correctCount = stringBasedCorrect
             answeredCount = stringBasedAnswered
         }
+        bookmarkCount = repository.bookmarkedCount(unitId: unitIdentifier, chapterId: chapterIdentifier)
         recalculateAccuracyRate()
     }
 
@@ -84,6 +90,19 @@ final class ChapterProgressViewModel: ObservableObject, Identifiable {
                     chapterNumericId
                 )
             progressResults = results
+
+            let bookmarkPrefix = "\(unitIdentifier)-\(chapterIdentifier)#"
+            bookmarkToken = realm.objects(BookmarkObject.self)
+                .filter("isBookmarked == true AND quizId BEGINSWITH %@", bookmarkPrefix)
+                .observe { [weak self] changes in
+                    guard let self else { return }
+                    switch changes {
+                    case .initial(let collection), .update(let collection, _, _, _):
+                        self.bookmarkCount = collection.count
+                    case .error(let error):
+                        print("❌ Realm bookmark observe failed: \(error)")
+                    }
+                }
 
             progressToken = results.observe { [weak self] changes in
                 guard let self else { return }
@@ -130,6 +149,7 @@ final class ChapterProgressViewModel: ObservableObject, Identifiable {
 
     deinit {
         progressToken?.invalidate()
+        bookmarkToken?.invalidate()
     }
 }
 extension ChapterProgressViewModel: ChapterProgressDisplayable {

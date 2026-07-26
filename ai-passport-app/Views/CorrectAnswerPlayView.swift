@@ -50,8 +50,8 @@ struct CorrectAnswerPlayView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(Color.themeBase)
         .onAppear(perform: handleOnAppear)
-        .onChange(of: viewModel.currentQuestionIndex) { _ in updateHeader() }
-        .onChange(of: viewModel.quizzes.count) { _ in updateHeader() }
+        .onChange(of: viewModel.currentQuestionIndex) { _, _ in updateHeader() }
+        .onChange(of: viewModel.quizzes.count) { _, _ in updateHeader() }
         .onDisappear(perform: handleOnDisappear)
     }
 }
@@ -217,7 +217,7 @@ private struct CorrectAnswerQuestionView: View {
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .padding(.top, 16)
-        .onChange(of: viewModel.selectedAnswerIndex) { newValue in
+        .onChange(of: viewModel.selectedAnswerIndex) { _, newValue in
             guard let selectedIndex = newValue,
                   handledQuestionIndex != viewModel.currentQuestionIndex,
                   let quiz = viewModel.currentQuiz else { return }
@@ -225,7 +225,7 @@ private struct CorrectAnswerQuestionView: View {
             let sound: SoundManager.SoundType = (selectedIndex == quiz.answerIndex) ? .correct : .wrong
             SoundManager.shared.play(sound)
         }
-        .onChange(of: viewModel.currentQuestionIndex) { _ in
+        .onChange(of: viewModel.currentQuestionIndex) { _, _ in
             handledQuestionIndex = nil
         }
         .navigationBarBackButtonHidden(true)

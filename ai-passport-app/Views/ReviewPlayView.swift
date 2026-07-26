@@ -13,6 +13,7 @@ struct ReviewPlayView: View {
 
     @StateObject private var viewModel: ReviewPlayViewModel
     @State private var activeExplanationRoute: ExplanationRoute?
+    @State private var isCurrentQuestionBookmarked = true
 
     @Environment(\.dismiss) private var dismiss
     @EnvironmentObject private var mainViewState: MainViewState
@@ -54,8 +55,10 @@ struct ReviewPlayView: View {
         .navigationBarBackButtonHidden(true)
         .background(Color.themeBase)
         .onAppear(perform: handleOnAppear)
-        .onChange(of: viewModel.currentQuestionIndex) { _ in updateHeader() }
-        .onChange(of: viewModel.quizzes.count) { _ in updateHeader() }
+        .onChange(of: viewModel.currentQuestionIndex) { _, _ in updateHeader() }
+        .onChange(of: viewModel.currentQuestionIndex) { _, _ in syncBookmarkState() }
+        .onChange(of: viewModel.quizzes.count) { _, _ in updateHeader() }
+        .onChange(of: viewModel.quizzes.count) { _, _ in syncBookmarkState() }
         .onDisappear(perform: handleOnDisappear)
     }
 }
@@ -90,7 +93,8 @@ private extension ReviewPlayView {
                 ReviewQuestionView(
                     viewModel: viewModel,
                     category: category,
-                    onRemoveBookmark: handleBookmarkRemoval
+                    isBookmarked: isCurrentQuestionBookmarked,
+                    onToggleBookmark: toggleCurrentBookmark
                 )
                 .padding(.top, 12)
                 Spacer(minLength: 0)
@@ -115,6 +119,7 @@ private extension ReviewPlayView {
 
     func handleOnAppear() {
         viewModel.loadIfNeeded()
+        syncBookmarkState()
         updateHeader()
     }
 
@@ -143,18 +148,24 @@ private extension ReviewPlayView {
         onClose()
     }
 
-    func handleBookmarkRemoval() {
+    func toggleCurrentBookmark() {
+        guard category == .bookmark,
+              let question = viewModel.currentQuestion,
+              let quiz = viewModel.currentQuiz else { return }
+
+        let nextState = !isCurrentQuestionBookmarked
+        progressManager.setBookmark(
+            quizId: question.quizId,
+            questionText: quiz.question,
+            isBookmarked: nextState
+        )
+        isCurrentQuestionBookmarked = nextState
+    }
+
+    func syncBookmarkState() {
         guard category == .bookmark,
               let question = viewModel.currentQuestion else { return }
-
-        progressManager.removeBookmark(with: question.quizId)
-        viewModel.removeCurrentQuestion()
-
-        if viewModel.totalCount == 0 {
-            finishReview()
-        } else {
-            updateHeader()
-        }
+        isCurrentQuestionBookmarked = progressManager.isBookmarked(question.quizId)
     }
 
     func updateHeader() {
@@ -184,7 +195,8 @@ private extension ReviewPlayView {
 private struct ReviewQuestionView: View {
     @ObservedObject var viewModel: ReviewPlayViewModel
     let category: ReviewCategory
-    let onRemoveBookmark: () -> Void
+    let isBookmarked: Bool
+    let onToggleBookmark: () -> Void
 
     var body: some View {
         VStack(spacing: 20) {
@@ -202,9 +214,12 @@ private struct ReviewQuestionView: View {
                         if category == .bookmark {
                             Button {
                                 SoundManager.shared.play(.tap)
-                                onRemoveBookmark()
+                                onToggleBookmark()
                             } label: {
-                                Label("ブックマーク解除", systemImage: "bookmark.slash")
+                                Label(
+                                    isBookmarked ? "ブックマーク解除" : "ブックマーク登録",
+                                    systemImage: isBookmarked ? "bookmark.slash" : "bookmark"
+                                )
                                     .font(.footnote.weight(.semibold))
                                     .padding(.horizontal, 12)
                                     .padding(.vertical, 6)
@@ -213,7 +228,7 @@ private struct ReviewQuestionView: View {
                                     .clipShape(Capsule())
                             }
                             .buttonStyle(.plain)
-                            .accessibilityLabel("ブックマーク解除")
+                            .accessibilityLabel(isBookmarked ? "ブックマーク解除" : "ブックマーク登録")
                         }
                     }
 

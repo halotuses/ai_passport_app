@@ -51,8 +51,8 @@ struct BookmarkPlayView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(Color.themeBase)
         .onAppear(perform: handleOnAppear)
-        .onChange(of: viewModel.currentQuestionIndex) { _ in updateHeader() }
-        .onChange(of: viewModel.quizzes.count) { _ in updateHeader() }
+        .onChange(of: viewModel.currentQuestionIndex) { _, _ in updateHeader() }
+        .onChange(of: viewModel.quizzes.count) { _, _ in updateHeader() }
         .onDisappear(perform: handleOnDisappear)
     }
 }
@@ -216,7 +216,7 @@ private struct BookmarkQuestionView: View {
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
         }
-        .onChange(of: viewModel.currentQuestionIndex) { newValue in
+        .onChange(of: viewModel.currentQuestionIndex) { _, newValue in
             handledQuestionIndex = newValue
         }
     }
