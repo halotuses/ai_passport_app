@@ -11,6 +11,10 @@ final class CorrectAnswerChapterViewModel: ObservableObject {
         var correctCount: Int { entry?.correctCount ?? 0 }
     }
 
+    static func resolvedTotalQuestionCount(catalogCount: Int, correctReviewCount: Int) -> Int {
+        max(max(catalogCount, correctReviewCount), 0)
+    }
+
     @Published private(set) var chapterItems: [ChapterItem] = []
 
     private let unit: CorrectAnswerView.UnitEntry
@@ -52,16 +56,23 @@ final class CorrectAnswerChapterViewModel: ObservableObject {
          progressLookup.removeAll()
 
          let items: [ChapterItem] = chapters.map { chapter in
+             let entry = entriesMap[chapter.id]
              let progressViewModel = ChapterProgressViewModel(
                  unitId: unit.unitId,
                  chapter: chapter,
                  repository: repository
              )
+             progressViewModel.updateTotalQuestions(
+                 Self.resolvedTotalQuestionCount(
+                     catalogCount: 0,
+                     correctReviewCount: entry?.correctCount ?? 0
+                 )
+             )
              progressLookup[chapter.id] = progressViewModel
              return ChapterItem(
                  id: chapter.id,
                  chapter: chapter,
-                 entry: entriesMap[chapter.id],
+                 entry: entry,
                  progressViewModel: progressViewModel
              )
          }
@@ -75,9 +86,16 @@ final class CorrectAnswerChapterViewModel: ObservableObject {
              let quizURL = Constants.url(quizPath)
              NetworkManager.fetchQuizList(from: quizURL) { [weak self] quizList in
                  guard let self else { return }
-                 let count = quizList?.questions.count ?? 0
+                 let catalogCount = quizList?.questions.count ?? 0
                  DispatchQueue.main.async {
-                     self.progressLookup[chapter.id]?.updateTotalQuestions(count)
+                     let correctReviewCount = self.chapterItems
+                         .first(where: { $0.id == chapter.id })?
+                         .correctCount ?? 0
+                     let totalCount = Self.resolvedTotalQuestionCount(
+                         catalogCount: catalogCount,
+                         correctReviewCount: correctReviewCount
+                     )
+                     self.progressLookup[chapter.id]?.updateTotalQuestions(totalCount)
                  }
              }
          }
