@@ -26,6 +26,28 @@ final class ai_passport_appTests: XCTestCase {
         // Mark your test async to allow awaiting for asynchronous code to complete. Check the results with assertions afterwards.
     }
 
+    @MainActor
+    func testCorrectAnswerChapterTotalUsesCatalogCountWhenItIsLarger() {
+        XCTAssertEqual(
+            CorrectAnswerChapterViewModel.resolvedTotalQuestionCount(
+                catalogCount: 12,
+                correctReviewCount: 5
+            ),
+            12
+        )
+    }
+
+    @MainActor
+    func testCorrectAnswerChapterTotalNeverFallsBelowReviewCount() {
+        XCTAssertEqual(
+            CorrectAnswerChapterViewModel.resolvedTotalQuestionCount(
+                catalogCount: 5,
+                correctReviewCount: 10
+            ),
+            10
+        )
+    }
+
     func testPerformanceExample() throws {
         // This is an example of a performance test case.
         self.measure {
